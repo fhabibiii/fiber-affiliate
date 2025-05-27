@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -73,64 +73,63 @@ const AddCustomer: React.FC = () => {
   return (
     <div className="space-y-6 w-full max-w-full">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
           Tambah Pelanggan
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+        <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm md:text-base">
           Tambahkan pelanggan baru ke sistem
         </p>
       </div>
 
       <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Form Tambah Pelanggan</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Nama Lengkap Pelanggan *</Label>
-              <Input
-                id="fullName"
-                value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                required
-                placeholder="Masukkan nama lengkap pelanggan"
-              />
+        <CardContent className="p-4 md:p-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-sm font-medium">Nama Lengkap Pelanggan *</Label>
+                <Input
+                  id="fullName"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  required
+                  placeholder="Masukkan nama lengkap pelanggan"
+                  className="text-sm"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber" className="text-sm font-medium">No. HP *</Label>
+                <Input
+                  id="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  required
+                  placeholder="Contoh: 081234567890"
+                  className="text-sm"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phoneNumber">No. HP *</Label>
-              <Input
-                id="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                required
-                placeholder="Contoh: 081234567890"
-              />
-              <p className="text-sm text-gray-500">
-                Format: 08xxxxxxxxxx atau +62xxxxxxxxxx
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="address">Alamat Lengkap *</Label>
+              <Label htmlFor="address" className="text-sm font-medium">Alamat Lengkap *</Label>
               <Textarea
                 id="address"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 required
                 placeholder="Masukkan alamat lengkap pelanggan"
-                rows={4}
+                rows={3}
+                className="text-sm"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="affiliator">Pilih Affiliator *</Label>
+              <Label htmlFor="affiliator" className="text-sm font-medium">Pilih Affiliator *</Label>
               <Select 
                 value={formData.affiliatorId} 
                 onValueChange={(value) => setFormData({ ...formData, affiliatorId: value })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="text-sm">
                   <SelectValue placeholder="Pilih affiliator" />
                 </SelectTrigger>
                 <SelectContent>
@@ -143,7 +142,7 @@ const AddCustomer: React.FC = () => {
               </Select>
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full">
+            <Button type="submit" disabled={loading} className="w-full text-sm md:text-base">
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {loading ? 'Menambahkan...' : 'Tambah Pelanggan'}
             </Button>

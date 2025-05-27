@@ -11,6 +11,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   const { user, logout } = useAuth();
   const location = useLocation();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
 
   const navigationTabs = [
     {
@@ -32,10 +33,18 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
     return location.pathname.startsWith(href);
   };
 
+  const getActiveIndex = () => {
+    return navigationTabs.findIndex((tab) => isActive(tab.href, tab.exact));
+  };
+
   const handleLogout = () => {
     logout();
     setShowLogoutModal(false);
   };
+
+  React.useEffect(() => {
+    setActiveTab(getActiveIndex());
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -55,7 +64,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
             {/* Navigation Tabs - Desktop */}
             <nav className="hidden md:flex relative">
               <div className="flex space-x-8 relative">
-                {navigationTabs.map((tab) => (
+                {navigationTabs.map((tab, index) => (
                   <Link
                     key={tab.href}
                     to={tab.href}
@@ -64,13 +73,19 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                         ? 'text-blue-700 dark:text-blue-400 font-bold'
                         : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                     }`}
+                    onMouseEnter={() => setActiveTab(index)}
+                    onMouseLeave={() => setActiveTab(getActiveIndex())}
                   >
                     {tab.label}
-                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 ${
-                      isActive(tab.href, tab.exact) ? 'w-full' : 'w-0 group-hover:w-full'
-                    }`} />
                   </Link>
                 ))}
+                <div 
+                  className="absolute bottom-0 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 w-8"
+                  style={{
+                    left: `${activeTab * 50 + 25}%`,
+                    transform: 'translateX(-50%)'
+                  }}
+                />
               </div>
             </nav>
 
@@ -104,9 +119,9 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
           </div>
 
           {/* Mobile Navigation Tabs */}
-          <nav className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <nav className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 relative">
             <div className="flex space-x-8 overflow-x-auto py-2">
-              {navigationTabs.map((tab) => (
+              {navigationTabs.map((tab, index) => (
                 <Link
                   key={tab.href}
                   to={tab.href}
@@ -115,13 +130,18 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                       ? 'text-blue-700 dark:text-blue-400 font-bold'
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                   }`}
+                  onTouchStart={() => setActiveTab(index)}
                 >
                   {tab.label}
-                  <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 ${
-                    isActive(tab.href, tab.exact) ? 'w-full' : 'w-0'
-                  }`} />
                 </Link>
               ))}
+              <div 
+                className="absolute bottom-0 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 w-8"
+                style={{
+                  left: `${getActiveIndex() * 50 + 25}%`,
+                  transform: 'translateX(-50%)'
+                }}
+              />
             </div>
           </nav>
         </div>
