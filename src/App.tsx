@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AffiliatorDashboard from "@/pages/affiliator/AffiliatorDashboard";
 import NotFound from "./pages/NotFound";
 import ThemeToggle from "@/components/ThemeToggle";
+import PaymentHistory from "@/pages/affiliator/PaymentHistory";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +48,17 @@ const App = () => (
                   <PrivateRoute roles={['AFFILIATOR']}>
                     <AffiliatorLayout>
                       <AffiliatorDashboard />
+                    </AffiliatorLayout>
+                  </PrivateRoute>
+                } 
+              />
+              
+              <Route 
+                path="/affiliator/payments" 
+                element={
+                  <PrivateRoute roles={['AFFILIATOR']}>
+                    <AffiliatorLayout>
+                      <PaymentHistory />
                     </AffiliatorLayout>
                   </PrivateRoute>
                 } 

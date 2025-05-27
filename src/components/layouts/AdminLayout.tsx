@@ -11,11 +11,13 @@ import {
   ChevronDown, 
   ChevronRight,
   X,
-  LogOut
+  LogOut,
+  Menu
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import LogoutModal from '@/components/LogoutModal';
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
@@ -24,6 +26,8 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [paymentSearchOpen, setPaymentSearchOpen] = useState(false);
   const [affiliatorSearch, setAffiliatorSearch] = useState('');
   const [paymentSearch, setPaymentSearch] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const navigationItems = [
     {
@@ -34,7 +38,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     },
     {
       href: '/admin/add-customer',
-      label: indonesianTexts.navigation.addCustomer,
+      label: 'Pelanggan',
       icon: UserPlus,
       exact: false
     }
@@ -62,16 +66,33 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     affiliator.fullName.toLowerCase().includes(paymentSearch.toLowerCase())
   );
 
+  const handleLogout = () => {
+    logout();
+    setShowLogoutModal(false);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex w-full">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex w-full">
       {/* Sidebar */}
-      <div className="w-280 bg-white shadow-sm border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-900 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">F</span>
+      <div className={`${sidebarOpen ? 'w-280' : 'w-16'} bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ${
+        sidebarOpen ? '' : 'lg:w-16'
+      }`}>
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className={`flex items-center space-x-3 ${sidebarOpen ? '' : 'justify-center'}`}>
+              <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">F</span>
+              </div>
+              {sidebarOpen && <span className="font-semibold text-gray-900 dark:text-white">Fibernode</span>}
             </div>
-            <span className="font-semibold text-gray-900">Fibernode</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="hidden lg:flex"
+            >
+              <Menu className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 
@@ -83,43 +104,45 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               to={item.href}
               className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                 isActive(item.href, item.exact)
-                  ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-700'
-                  : 'text-gray-700 hover:bg-gray-50'
-              }`}
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-l-4 border-blue-700 dark:border-blue-400'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              } ${!sidebarOpen ? 'justify-center' : ''}`}
+              title={!sidebarOpen ? item.label : ''}
             >
               <item.icon className="w-5 h-5" />
-              <span className="font-medium">{item.label}</span>
+              {sidebarOpen && <span className="font-medium">{item.label}</span>}
             </Link>
           ))}
 
-          {/* Manajemen Affiliator with Search */}
+          {/* Affiliator Management with Search */}
           <div className="space-y-2">
             <button
               onClick={() => setAffiliatorSearchOpen(!affiliatorSearchOpen)}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/affiliators')
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-50'
-              }`}
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              } ${!sidebarOpen ? 'justify-center' : ''}`}
+              title={!sidebarOpen ? 'Affiliator' : ''}
             >
               <div className="flex items-center space-x-3">
                 <Users className="w-5 h-5" />
-                <span className="font-medium">{indonesianTexts.navigation.manageAffiliator}</span>
+                {sidebarOpen && <span className="font-medium">Affiliator</span>}
               </div>
-              {affiliatorSearchOpen ? (
+              {sidebarOpen && (affiliatorSearchOpen ? (
                 <ChevronDown className="w-4 h-4" />
               ) : (
                 <ChevronRight className="w-4 h-4" />
-              )}
+              ))}
             </button>
 
-            {affiliatorSearchOpen && (
+            {affiliatorSearchOpen && sidebarOpen && (
               <div className="ml-8 space-y-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     type="text"
-                    placeholder={indonesianTexts.navigation.searchAffiliator}
+                    placeholder="Cari Affiliator..."
                     value={affiliatorSearch}
                     onChange={(e) => setAffiliatorSearch(e.target.value)}
                     className="pl-10 pr-8 py-2 text-sm"
@@ -127,7 +150,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   {affiliatorSearch && (
                     <button
                       onClick={() => setAffiliatorSearch('')}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -140,14 +163,14 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       <Link
                         key={affiliator.uuid}
                         to={`/admin/affiliators/${affiliator.uuid}`}
-                        className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded transition-colors"
+                        className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
                       >
                         {affiliator.fullName}
                       </Link>
                     ))
                   ) : (
-                    <div className="px-3 py-2 text-sm text-gray-500">
-                      {indonesianTexts.navigation.noResults}
+                    <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                      Tidak ada hasil ditemukan
                     </div>
                   )}
                 </div>
@@ -155,34 +178,35 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             )}
           </div>
 
-          {/* Manajemen Pembayaran with Search */}
+          {/* Payment Management with Search */}
           <div className="space-y-2">
             <button
               onClick={() => setPaymentSearchOpen(!paymentSearchOpen)}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/payments')
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-50'
-              }`}
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              } ${!sidebarOpen ? 'justify-center' : ''}`}
+              title={!sidebarOpen ? 'Pembayaran' : ''}
             >
               <div className="flex items-center space-x-3">
                 <CreditCard className="w-5 h-5" />
-                <span className="font-medium">{indonesianTexts.navigation.managePayment}</span>
+                {sidebarOpen && <span className="font-medium">Pembayaran</span>}
               </div>
-              {paymentSearchOpen ? (
+              {sidebarOpen && (paymentSearchOpen ? (
                 <ChevronDown className="w-4 h-4" />
               ) : (
                 <ChevronRight className="w-4 h-4" />
-              )}
+              ))}
             </button>
 
-            {paymentSearchOpen && (
+            {paymentSearchOpen && sidebarOpen && (
               <div className="ml-8 space-y-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     type="text"
-                    placeholder={indonesianTexts.navigation.searchAffiliator}
+                    placeholder="Cari Affiliator..."
                     value={paymentSearch}
                     onChange={(e) => setPaymentSearch(e.target.value)}
                     className="pl-10 pr-8 py-2 text-sm"
@@ -190,7 +214,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   {paymentSearch && (
                     <button
                       onClick={() => setPaymentSearch('')}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -203,14 +227,14 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       <Link
                         key={affiliator.uuid}
                         to={`/admin/payments/affiliator/${affiliator.uuid}`}
-                        className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded transition-colors"
+                        className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
                       >
                         {affiliator.fullName}
                       </Link>
                     ))
                   ) : (
-                    <div className="px-3 py-2 text-sm text-gray-500">
-                      {indonesianTexts.navigation.noResults}
+                    <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                      Tidak ada hasil ditemukan
                     </div>
                   )}
                 </div>
@@ -223,19 +247,24 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Top Navbar */}
-        <header className="h-16 bg-white shadow-sm border-b border-gray-200 flex items-center justify-between px-6">
+        <header className="h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6">
           <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-blue-900 rounded-lg flex items-center justify-center lg:hidden">
-              <span className="text-white font-bold text-sm">F</span>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden"
+            >
+              <Menu className="w-4 h-4" />
+            </Button>
           </div>
 
           <div className="flex items-center space-x-4">
-            <span className="text-gray-700">
+            <span className="text-gray-700 dark:text-gray-300">
               {indonesianTexts.navigation.welcome}, {user?.fullName}
             </span>
             <Button
-              onClick={logout}
+              onClick={() => setShowLogoutModal(true)}
               variant="destructive"
               size="sm"
               className="bg-red-600 hover:bg-red-700"
@@ -251,6 +280,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           {children}
         </main>
       </div>
+
+      {/* Logout Modal */}
+      <LogoutModal
+        open={showLogoutModal}
+        onOpenChange={setShowLogoutModal}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 };
