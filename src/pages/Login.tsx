@@ -82,14 +82,13 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Animated Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 animate-gradient-x"></div>
-      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/10 to-purple-500/20 animate-pulse"></div>
+      <div className="absolute inset-0 animate-gradient-slow dark:animate-gradient-slow-dark"></div>
       
       <div className="max-w-md w-full space-y-8 relative z-10">
         {/* Login Form */}
-        <Card className="shadow-2xl backdrop-blur-sm bg-white/95 border-0">
+        <Card className="shadow-2xl backdrop-blur-sm bg-white/95 dark:bg-gray-900/95 border-0">
           <CardHeader>
-            <CardTitle className="text-center text-xl font-semibold text-gray-900">
+            <CardTitle className="text-center text-xl font-semibold text-gray-900 dark:text-white">
               {indonesianTexts.login.title}
             </CardTitle>
           </CardHeader>
@@ -97,7 +96,7 @@ const Login: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Username Field */}
               <div>
-                <Label htmlFor="username" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="username" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {indonesianTexts.login.username}
                 </Label>
                 <Input
@@ -118,7 +117,7 @@ const Login: React.FC = () => {
 
               {/* Password Field */}
               <div>
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {indonesianTexts.login.password}
                 </Label>
                 <Input
@@ -139,7 +138,7 @@ const Login: React.FC = () => {
 
               {/* Demo Credentials */}
               <div className="space-y-2">
-                <p className="text-sm text-gray-600 text-center">Kredensial untuk testing:</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Kredensial untuk testing:</p>
                 <div className="flex gap-2">
                   <Button
                     type="button"

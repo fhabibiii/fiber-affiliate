@@ -1,7 +1,7 @@
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { User, LoginCredentials, AuthContextType } from '@/types/auth';
-import { apiService } from '@/services/api';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, AuthContextType, LoginCredentials } from '@/types/auth';
+import { mockAuthService } from '@/services/mockAuth';
 import { useToast } from '@/hooks/use-toast';
 import { indonesianTexts } from '@/constants/texts';
 
@@ -9,45 +9,58 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const refreshToken = useCallback(async (): Promise<boolean> => {
-    try {
-      const response = await apiService.refreshTokenRequest();
-      setUser(response.user);
-      return true;
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      setUser(null);
-      return false;
-    }
+  // Check for existing session on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
-      const response = await apiService.login(credentials);
+      const response = await mockAuthService.login(credentials);
+      
       setUser(response.user);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('token', response.token);
       
       toast({
         title: "Login berhasil",
-        description: `${indonesianTexts.navigation.welcome}, ${response.user.fullName}!`,
+        description: `Selamat datang, ${response.user.fullName}!`,
       });
     } catch (error) {
-      console.error('Login failed:', error);
+      const errorMessage = error instanceof Error ? error.message : indonesianTexts.login.errors.invalid;
       toast({
-        variant: "destructive",
         title: "Login gagal",
-        description: indonesianTexts.login.errors.invalid,
+        description: errorMessage,
+        variant: "destructive",
       });
       throw error;
     } finally {
@@ -55,41 +68,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = useCallback(async () => {
+  const logout = async () => {
     try {
-      await apiService.logout();
+      await mockAuthService.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       setUser(null);
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      
       toast({
         title: "Logout berhasil",
         description: "Anda telah keluar dari sistem",
       });
     }
-  }, [toast]);
+  };
 
-  // Auto-refresh token every 10 seconds
-  useEffect(() => {
-    if (!user) {
-      setIsLoading(false);
-      return;
+  const refreshToken = async (): Promise<boolean> => {
+    try {
+      const response = await mockAuthService.refreshToken();
+      localStorage.setItem('token', response.token);
+      return true;
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      logout();
+      return false;
     }
-
-    const interval = setInterval(async () => {
-      const success = await refreshToken();
-      if (!success) {
-        logout();
-      }
-    }, 10000); // 10 seconds
-
-    return () => clearInterval(interval);
-  }, [user, refreshToken, logout]);
-
-  // Initial auth check
-  useEffect(() => {
-    setIsLoading(false);
-  }, []);
+  };
 
   const value: AuthContextType = {
     user,
@@ -99,5 +105,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     refreshToken,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

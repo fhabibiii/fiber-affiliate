@@ -97,51 +97,45 @@
 }
 
 @layer utilities {
-  @keyframes gradient-x {
-    0%, 100% {
-      transform: translateX(0%);
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
     }
     50% {
-      transform: translateX(100%);
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
     }
   }
   
-  @keyframes gradient-y {
-    0%, 100% {
-      transform: translateY(0%);
-    }
-    50% {
-      transform: translateY(100%);
-    }
-  }
-  
-  @keyframes gradient-xy {
-    0%, 100% {
-      transform: translate(0%, 0%);
+  @keyframes gradient-color-shift {
+    0% {
+      filter: hue-rotate(0deg);
     }
     25% {
-      transform: translate(100%, 0%);
+      filter: hue-rotate(90deg);
     }
     50% {
-      transform: translate(100%, 100%);
+      filter: hue-rotate(180deg);
     }
     75% {
-      transform: translate(0%, 100%);
+      filter: hue-rotate(270deg);
+    }
+    100% {
+      filter: hue-rotate(360deg);
     }
   }
 
-  .animate-gradient-x {
-    animation: gradient-x 15s ease infinite;
+  .animate-gradient-slow {
+    background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
     background-size: 400% 400%;
+    animation: gradient-shift 8s ease infinite, gradient-color-shift 12s ease infinite;
   }
   
-  .animate-gradient-y {
-    animation: gradient-y 15s ease infinite;
+  .animate-gradient-slow-dark {
+    background: linear-gradient(-45deg, #2d3748, #4a5568, #553c9a, #7c3aed, #1e3a8a, #0f172a);
     background-size: 400% 400%;
-  }
-  
-  .animate-gradient-xy {
-    animation: gradient-xy 15s ease infinite;
-    background-size: 400% 400%;
+    animation: gradient-shift 8s ease infinite, gradient-color-shift 15s ease infinite;
   }
 }
