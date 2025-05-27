@@ -11,7 +11,6 @@ import {
   Search, 
   ChevronDown, 
   ChevronRight,
-  ChevronLeft,
   X,
   LogOut,
   Menu
@@ -96,14 +95,10 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex w-full overflow-hidden">
       {/* Sidebar */}
       <div 
-        className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 relative flex-shrink-0 h-screen overflow-y-auto fixed md:relative z-20 ${sidebarOpen && window.innerWidth < 768 ? 'w-full' : ''}`}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            handleSidebarToggle();
-          }
-        }}
+        className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 cursor-pointer relative flex-shrink-0`}
+        onClick={handleSidebarToggle}
       >
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700" onClick={handleSidebarToggle}>
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className={`flex items-center ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
             <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
               <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
@@ -122,12 +117,12 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               to={item.href}
               className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                 isActive(item.href, item.exact)
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-l-4 border-blue-700 dark:border-blue-400'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               } ${!sidebarOpen ? 'justify-center' : ''}`}
               title={!sidebarOpen ? item.label : ''}
             >
-              <item.icon className={`${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'} flex-shrink-0`} />
+              <item.icon className="w-6 h-6 flex-shrink-0" />
               {sidebarOpen && <span className="font-medium">{item.label}</span>}
             </Link>
           ))}
@@ -144,7 +139,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               title={!sidebarOpen ? 'Affiliator' : ''}
             >
               <div className="flex items-center space-x-3">
-                <Users className={`${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'} flex-shrink-0`} />
+                <Users className="w-6 h-6 flex-shrink-0" />
                 {sidebarOpen && <span className="font-medium">Affiliator</span>}
               </div>
               {sidebarOpen && (affiliatorSearchOpen ? (
@@ -208,7 +203,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               title={!sidebarOpen ? 'Pembayaran' : ''}
             >
               <div className="flex items-center space-x-3">
-                <CreditCard className={`${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'} flex-shrink-0`} />
+                <CreditCard className="w-6 h-6 flex-shrink-0" />
                 {sidebarOpen && <span className="font-medium">Pembayaran</span>}
               </div>
               {sidebarOpen && (paymentSearchOpen ? (
@@ -259,40 +254,28 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               </div>
             )}
           </div>
-
-          {/* Logout Button in Sidebar */}
-          {sidebarOpen && (
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={() => setShowLogoutModal(true)}
-                className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-              >
-                <LogOut className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium">Logout</span>
-              </button>
-            </div>
-          )}
         </nav>
 
-        {/* Toggle buttons */}
-        <div className="fixed top-1/2 transform -translate-y-1/2 z-30" style={{ left: sidebarOpen ? '240px' : '40px' }}>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleSidebarToggle}
-            className="w-8 h-8 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            {sidebarOpen ? (
-              <ChevronLeft className="w-4 h-4" />
-            ) : (
-              <ChevronRight className="w-4 h-4" />
-            )}
-          </Button>
-        </div>
+        {/* Expand button when collapsed */}
+        {!sidebarOpen && (
+          <div className="absolute top-1/2 -right-3 transform -translate-y-1/2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSidebarOpen(true);
+              }}
+              className="w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              <ChevronRight className="w-3 h-3" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden md:ml-0" style={{ marginLeft: window.innerWidth >= 768 ? (sidebarOpen ? '256px' : '64px') : '0' }}>
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Navbar */}
         <header className="h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
           <div className="flex items-center space-x-4">
@@ -300,7 +283,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               variant="ghost"
               size="sm"
               onClick={handleSidebarToggle}
-              className="md:hidden"
+              className="lg:hidden"
             >
               <Menu className="w-4 h-4" />
             </Button>
@@ -314,10 +297,10 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               onClick={() => setShowLogoutModal(true)}
               variant="destructive"
               size="sm"
-              className="bg-red-600 hover:bg-red-700 flex items-center justify-center"
+              className="bg-red-600 hover:bg-red-700"
             >
-              <LogOut className="w-4 h-4 md:mr-2" />
-              <span className="hidden md:inline">{indonesianTexts.navigation.logout}</span>
+              <LogOut className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">{indonesianTexts.navigation.logout}</span>
             </Button>
           </div>
         </header>
@@ -329,14 +312,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </main>
       </div>
-
-      {/* Overlay for mobile */}
-      {sidebarOpen && window.innerWidth < 768 && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
 
       {/* Logout Modal */}
       <LogoutModal

@@ -73,7 +73,7 @@ const Login: React.FC = () => {
         <Card className="shadow-2xl backdrop-blur-sm bg-white/95 dark:bg-gray-900/95 border-0">
           <CardHeader>
             <CardTitle className="text-center text-xl font-semibold text-gray-900 dark:text-white">
-              Masuk ke Fibernode Affiliate
+              {indonesianTexts.login.title}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -129,12 +129,12 @@ const Login: React.FC = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
-                    Sedang masuk...
+                    Masuk...
                   </>
                 ) : (
                   <>
                     <LogIn className="-ml-1 mr-3 h-5 w-5" />
-                    Masuk
+                    {indonesianTexts.login.signIn}
                   </>
                 )}
               </Button>
