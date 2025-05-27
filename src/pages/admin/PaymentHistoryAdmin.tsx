@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Trash2, Eye, Download } from 'lucide-react';
+import { Edit, Trash2, Eye, Download, Plus } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ResponsiveTable from '@/components/ui/responsive-table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -18,6 +18,7 @@ const PaymentHistoryAdmin: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [formData, setFormData] = useState({
@@ -144,6 +145,28 @@ const PaymentHistoryAdmin: React.FC = () => {
     }
   };
 
+  const handleSubmitAddPayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Berhasil",
+        description: "Pembayaran berhasil ditambahkan",
+      });
+
+      setShowAddPaymentModal(false);
+      setFormData({ month: '', year: '', amount: '' });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal menambahkan pembayaran",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDeleteConfirm = async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -226,45 +249,26 @@ const PaymentHistoryAdmin: React.FC = () => {
   const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full">
       {/* Page Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={() => navigate('/admin/payments')}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Kembali
-        </Button>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Riwayat Pembayaran: {affiliator.fullName}
+            {affiliator.fullName}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
             Riwayat pembayaran untuk affiliator ini
           </p>
         </div>
-      </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardContent className="p-6">
+        <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 w-full lg:w-auto">
+          <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <p className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">
                 Total Pembayaran
               </p>
-              <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-xl font-bold text-green-700 dark:text-green-300">
                 {formatCurrency(totalAmount)}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Jumlah Transaksi
-              </p>
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                {payments.length}
               </p>
             </div>
           </CardContent>
@@ -272,9 +276,15 @@ const PaymentHistoryAdmin: React.FC = () => {
       </div>
 
       {/* Payment Table */}
-      <Card>
+      <Card className="w-full">
         <CardHeader>
-          <CardTitle>Riwayat Pembayaran</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Riwayat Pembayaran</CardTitle>
+            <Button onClick={() => setShowAddPaymentModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Pembayaran
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-6">
           <ResponsiveTable
@@ -285,6 +295,66 @@ const PaymentHistoryAdmin: React.FC = () => {
           />
         </CardContent>
       </Card>
+
+      {/* Add Payment Modal */}
+      <Dialog open={showAddPaymentModal} onOpenChange={setShowAddPaymentModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tambah Pembayaran</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmitAddPayment} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="addAffiliator">Affiliator</Label>
+              <Select value={affiliator.uuid} disabled>
+                <SelectTrigger>
+                  <SelectValue placeholder={affiliator.fullName} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={affiliator.uuid}>{affiliator.fullName}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addMonth">Bulan</Label>
+              <Select value={formData.month} onValueChange={(value) => setFormData({ ...formData, month: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih bulan" />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((month) => (
+                    <SelectItem key={month} value={month}>
+                      {month}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addYear">Tahun</Label>
+              <Input
+                id="addYear"
+                type="number"
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addAmount">Jumlah</Label>
+              <Input
+                id="addAmount"
+                type="number"
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Tambah Pembayaran
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>

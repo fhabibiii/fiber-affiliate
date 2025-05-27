@@ -40,58 +40,71 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Top Navbar */}
-      <header className="h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">F</span>
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Main header */}
+          <div className="h-16 flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">F</span>
+              </div>
+              <span className="font-semibold text-gray-900 dark:text-white">Fibernode</span>
             </div>
-            <span className="font-semibold text-gray-900 dark:text-white">Fibernode</span>
+
+            {/* Navigation Tabs - Desktop */}
+            <nav className="hidden md:flex relative">
+              <div className="flex space-x-8 relative">
+                {navigationTabs.map((tab) => (
+                  <Link
+                    key={tab.href}
+                    to={tab.href}
+                    className={`px-3 py-2 text-sm font-medium transition-all duration-300 relative group ${
+                      isActive(tab.href, tab.exact)
+                        ? 'text-blue-700 dark:text-blue-400 font-bold'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {tab.label}
+                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 ${
+                      isActive(tab.href, tab.exact) ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`} />
+                  </Link>
+                ))}
+              </div>
+            </nav>
+
+            {/* User Info and Logout - Desktop */}
+            <div className="hidden md:flex items-center space-x-4">
+              <span className="text-gray-700 dark:text-gray-300 text-sm">
+                {indonesianTexts.navigation.welcome}, {user?.fullName}
+              </span>
+              <Button
+                onClick={() => setShowLogoutModal(true)}
+                variant="destructive"
+                size="sm"
+                className="bg-red-600 hover:bg-red-700"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                {indonesianTexts.navigation.logout}
+              </Button>
+            </div>
+
+            {/* Logout Button - Mobile */}
+            <div className="md:hidden">
+              <Button
+                onClick={() => setShowLogoutModal(true)}
+                variant="destructive"
+                size="sm"
+                className="bg-red-600 hover:bg-red-700"
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <nav className="hidden md:flex relative">
-            <div className="flex space-x-8 relative">
-              {navigationTabs.map((tab) => (
-                <Link
-                  key={tab.href}
-                  to={tab.href}
-                  className={`px-3 py-2 text-sm font-medium transition-all duration-300 relative group ${
-                    isActive(tab.href, tab.exact)
-                      ? 'text-blue-700 dark:text-blue-400 font-bold'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {tab.label}
-                  <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 ${
-                    isActive(tab.href, tab.exact) ? 'w-full' : 'w-0 group-hover:w-full'
-                  }`} />
-                </Link>
-              ))}
-            </div>
-          </nav>
-
-          {/* User Info and Logout */}
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-700 dark:text-gray-300 text-sm">
-              {indonesianTexts.navigation.welcome}, {user?.fullName}
-            </span>
-            <Button
-              onClick={() => setShowLogoutModal(true)}
-              variant="destructive"
-              size="sm"
-              className="bg-red-600 hover:bg-red-700"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              {indonesianTexts.navigation.logout}
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation Tabs */}
-        <nav className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Mobile Navigation Tabs */}
+          <nav className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <div className="flex space-x-8 overflow-x-auto py-2">
               {navigationTabs.map((tab) => (
                 <Link
@@ -110,8 +123,8 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                 </Link>
               ))}
             </div>
-          </div>
-        </nav>
+          </nav>
+        </div>
       </header>
 
       {/* Page Content */}

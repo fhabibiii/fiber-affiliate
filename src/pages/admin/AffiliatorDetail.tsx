@@ -2,13 +2,14 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Plus, Phone } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ResponsiveTable from '@/components/ui/responsive-table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 
 const AffiliatorDetail: React.FC = () => {
@@ -17,6 +18,7 @@ const AffiliatorDetail: React.FC = () => {
   const { toast } = useToast();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -57,6 +59,21 @@ const AffiliatorDetail: React.FC = () => {
       joinDate: '2024-03-01T00:00:00Z'
     }
   ];
+
+  const formatWhatsAppNumber = (phoneNumber: string) => {
+    let cleanNumber = phoneNumber.replace(/\D/g, '');
+    if (cleanNumber.startsWith('0')) {
+      cleanNumber = '62' + cleanNumber.substring(1);
+    } else if (!cleanNumber.startsWith('62')) {
+      cleanNumber = '62' + cleanNumber;
+    }
+    return cleanNumber;
+  };
+
+  const handleWhatsAppClick = (phoneNumber: string) => {
+    const formattedNumber = formatWhatsAppNumber(phoneNumber);
+    window.open(`https://wa.me/${formattedNumber}`, '_blank');
+  };
 
   const handleExportCSV = () => {
     const csvContent = [
@@ -112,6 +129,28 @@ const AffiliatorDetail: React.FC = () => {
     }
   };
 
+  const handleSubmitAddCustomer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Berhasil",
+        description: "Pelanggan berhasil ditambahkan",
+      });
+
+      setShowAddCustomerModal(false);
+      setFormData({ fullName: '', phoneNumber: '', address: '' });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal menambahkan pelanggan",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDeleteConfirm = async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -138,7 +177,16 @@ const AffiliatorDetail: React.FC = () => {
     },
     {
       key: 'phoneNumber',
-      label: 'No. HP'
+      label: 'No. HP',
+      render: (value: string) => (
+        <button
+          onClick={() => handleWhatsAppClick(value)}
+          className="text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
+        >
+          {value}
+          <Phone className="w-3 h-3" />
+        </button>
+      )
     },
     {
       key: 'address',
@@ -171,78 +219,58 @@ const AffiliatorDetail: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full">
       {/* Page Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={() => navigate('/admin/affiliators')}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Kembali
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Detail Affiliator: {affiliator.fullName}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Daftar pelanggan dari affiliator ini
-          </p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          {affiliator.fullName}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Daftar pelanggan dari affiliator ini
+        </p>
       </div>
 
       {/* Affiliator Info */}
-      <Card>
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Informasi Affiliator</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Nama Lengkap</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{affiliator.fullName}</p>
-            </div>
-            <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{affiliator.phoneNumber}</p>
+              <button
+                onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
+                className="text-lg font-semibold text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
+              >
+                {affiliator.phoneNumber}
+                <Phone className="w-4 h-4" />
+              </button>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Customer Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Total Pelanggan
-              </p>
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                {customers.length}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Tanggal Bergabung
-              </p>
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
                 {new Date(affiliator.joinDate).toLocaleDateString('id-ID')}
               </p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Customer Table */}
-      <Card>
+      <Card className="w-full">
         <CardHeader>
-          <CardTitle>Daftar Pelanggan</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Daftar Pelanggan</CardTitle>
+            <Button onClick={() => setShowAddCustomerModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Pelanggan
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-6">
           <ResponsiveTable
@@ -253,6 +281,58 @@ const AffiliatorDetail: React.FC = () => {
           />
         </CardContent>
       </Card>
+
+      {/* Add Customer Modal */}
+      <Dialog open={showAddCustomerModal} onOpenChange={setShowAddCustomerModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tambah Pelanggan Baru</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmitAddCustomer} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="addAffiliator">Affiliator</Label>
+              <Select value={affiliator.uuid} disabled>
+                <SelectTrigger>
+                  <SelectValue placeholder={affiliator.fullName} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={affiliator.uuid}>{affiliator.fullName}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addFullName">Nama Lengkap</Label>
+              <Input
+                id="addFullName"
+                value={formData.fullName}
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addPhoneNumber">No. HP</Label>
+              <Input
+                id="addPhoneNumber"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addAddress">Alamat</Label>
+              <Textarea
+                id="addAddress"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Tambah Pelanggan
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>

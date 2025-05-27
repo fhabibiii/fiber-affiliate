@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,78 +21,31 @@ const AddCustomer: React.FC = () => {
 
   // Mock affiliator data
   const affiliators = [
-    { id: '1', name: 'John Doe' },
-    { id: '2', name: 'Jane Smith' },
-    { id: '3', name: 'Bob Johnson' }
+    { uuid: '1', fullName: 'John Doe' },
+    { uuid: '2', fullName: 'Jane Smith' },
+    { uuid: '3', fullName: 'Bob Johnson' },
   ];
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const validateForm = () => {
-    if (!formData.fullName.trim()) {
-      toast({
-        title: "Error",
-        description: "Nama lengkap harus diisi",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    if (!formData.phoneNumber.trim()) {
-      toast({
-        title: "Error",
-        description: "Nomor HP harus diisi",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    // Simple phone number validation
-    const phoneRegex = /^(\+62|62|0)[0-9]{9,12}$/;
-    if (!phoneRegex.test(formData.phoneNumber)) {
-      toast({
-        title: "Error",
-        description: "Format nomor HP tidak valid",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    if (!formData.address.trim()) {
-      toast({
-        title: "Error",
-        description: "Alamat lengkap harus diisi",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    if (!formData.affiliatorId) {
-      toast({
-        title: "Error",
-        description: "Affiliator harus dipilih",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    return true;
+  const validatePhoneNumber = (phone: string) => {
+    const phoneRegex = /^(\+62|62|0)[0-9]{9,13}$/;
+    return phoneRegex.test(phone);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!validatePhoneNumber(formData.phoneNumber)) {
+      toast({
+        title: "Error",
+        description: "Format nomor HP tidak valid",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setLoading(true);
-    
+
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       toast({
@@ -100,7 +53,6 @@ const AddCustomer: React.FC = () => {
         description: "Pelanggan berhasil ditambahkan",
       });
 
-      // Reset form
       setFormData({
         fullName: '',
         phoneNumber: '',
@@ -119,9 +71,8 @@ const AddCustomer: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="mb-8">
+    <div className="space-y-6 w-full max-w-full">
+      <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Tambah Pelanggan
         </h1>
@@ -130,10 +81,9 @@ const AddCustomer: React.FC = () => {
         </p>
       </div>
 
-      {/* Form */}
-      <Card className="max-w-2xl">
+      <Card className="w-full">
         <CardHeader>
-          <CardTitle>Informasi Pelanggan</CardTitle>
+          <CardTitle>Form Tambah Pelanggan</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -141,11 +91,10 @@ const AddCustomer: React.FC = () => {
               <Label htmlFor="fullName">Nama Lengkap Pelanggan *</Label>
               <Input
                 id="fullName"
-                type="text"
                 value={formData.fullName}
-                onChange={(e) => handleInputChange('fullName', e.target.value)}
-                placeholder="Masukkan nama lengkap pelanggan"
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 required
+                placeholder="Masukkan nama lengkap pelanggan"
               />
             </div>
 
@@ -153,12 +102,14 @@ const AddCustomer: React.FC = () => {
               <Label htmlFor="phoneNumber">No. HP *</Label>
               <Input
                 id="phoneNumber"
-                type="tel"
                 value={formData.phoneNumber}
-                onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                placeholder="Contoh: 081234567890"
+                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                 required
+                placeholder="Contoh: 081234567890"
               />
+              <p className="text-sm text-gray-500">
+                Format: 08xxxxxxxxxx atau +62xxxxxxxxxx
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -166,23 +117,26 @@ const AddCustomer: React.FC = () => {
               <Textarea
                 id="address"
                 value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                required
                 placeholder="Masukkan alamat lengkap pelanggan"
                 rows={4}
-                required
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="affiliator">Pilih Affiliator *</Label>
-              <Select value={formData.affiliatorId} onValueChange={(value) => handleInputChange('affiliatorId', value)}>
+              <Select 
+                value={formData.affiliatorId} 
+                onValueChange={(value) => setFormData({ ...formData, affiliatorId: value })}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih affiliator" />
                 </SelectTrigger>
                 <SelectContent>
                   {affiliators.map((affiliator) => (
-                    <SelectItem key={affiliator.id} value={affiliator.id}>
-                      {affiliator.name}
+                    <SelectItem key={affiliator.uuid} value={affiliator.uuid}>
+                      {affiliator.fullName}
                     </SelectItem>
                   ))}
                 </SelectContent>

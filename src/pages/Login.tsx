@@ -32,7 +32,6 @@ const Login: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
@@ -48,35 +47,20 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
-      // Convert form data to LoginCredentials type
       const credentials: LoginCredentials = {
         username: data.username,
         password: data.password,
       };
       await login(credentials);
       
-      // Redirect based on user role
       if (from !== '/') {
         navigate(from, { replace: true });
-      } else {
-        // Default redirect based on role will be handled by the useEffect above
       }
     } catch (error) {
-      // Error is handled in the AuthContext
       console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const setAdminCredentials = () => {
-    setValue('username', 'admin');
-    setValue('password', 'admin123');
-  };
-
-  const setAffiliatorCredentials = () => {
-    setValue('username', 'affiliator');
-    setValue('password', 'affiliator123');
   };
 
   return (
@@ -136,49 +120,21 @@ const Login: React.FC = () => {
                 )}
               </div>
 
-              {/* Demo Credentials */}
-              <div className="space-y-2">
-                <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Kredensial untuk testing:</p>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={setAdminCredentials}
-                    disabled={isLoading}
-                    className="flex-1"
-                  >
-                    Admin
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={setAffiliatorCredentials}
-                    disabled={isLoading}
-                    className="flex-1"
-                  >
-                    Affiliator
-                  </Button>
-                </div>
-              </div>
-
               {/* Submit Button */}
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-                size="lg"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {indonesianTexts.login.loading}
+                    <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                    Masuk...
                   </>
                 ) : (
                   <>
-                    <LogIn className="w-4 h-4 mr-2" />
-                    {indonesianTexts.login.submit}
+                    <LogIn className="-ml-1 mr-3 h-5 w-5" />
+                    {indonesianTexts.login.signIn}
                   </>
                 )}
               </Button>
