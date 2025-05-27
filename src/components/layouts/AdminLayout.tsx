@@ -71,32 +71,42 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     setShowLogoutModal(false);
   };
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex w-full">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-280' : 'w-16'} bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ${
-        sidebarOpen ? '' : 'lg:w-16'
-      }`}>
+      <div 
+        className={`${sidebarOpen ? 'w-280' : 'w-16'} bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 cursor-pointer relative`}
+        onClick={toggleSidebar}
+      >
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div className={`flex items-center space-x-3 ${sidebarOpen ? '' : 'justify-center'}`}>
+          <div className={`flex items-center ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
+            <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
               <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">F</span>
               </div>
               {sidebarOpen && <span className="font-semibold text-gray-900 dark:text-white">Fibernode</span>}
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="hidden lg:flex"
-            >
-              <Menu className="w-4 h-4" />
-            </Button>
+            {sidebarOpen && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSidebarOpen(false);
+                }}
+                className="hidden lg:flex"
+              >
+                <Menu className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2" onClick={(e) => e.stopPropagation()}>
           {/* Static Navigation Items */}
           {navigationItems.map((item) => (
             <Link
@@ -109,7 +119,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               } ${!sidebarOpen ? 'justify-center' : ''}`}
               title={!sidebarOpen ? item.label : ''}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className={`${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'}`} />
               {sidebarOpen && <span className="font-medium">{item.label}</span>}
             </Link>
           ))}
@@ -117,7 +127,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           {/* Affiliator Management with Search */}
           <div className="space-y-2">
             <button
-              onClick={() => setAffiliatorSearchOpen(!affiliatorSearchOpen)}
+              onClick={() => {
+                if (sidebarOpen) {
+                  setAffiliatorSearchOpen(!affiliatorSearchOpen);
+                } else {
+                  window.location.href = '/admin/affiliators';
+                }
+              }}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/affiliators')
                   ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
@@ -126,7 +142,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               title={!sidebarOpen ? 'Affiliator' : ''}
             >
               <div className="flex items-center space-x-3">
-                <Users className="w-5 h-5" />
+                <Users className={`${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'}`} />
                 {sidebarOpen && <span className="font-medium">Affiliator</span>}
               </div>
               {sidebarOpen && (affiliatorSearchOpen ? (
@@ -181,7 +197,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           {/* Payment Management with Search */}
           <div className="space-y-2">
             <button
-              onClick={() => setPaymentSearchOpen(!paymentSearchOpen)}
+              onClick={() => {
+                if (sidebarOpen) {
+                  setPaymentSearchOpen(!paymentSearchOpen);
+                } else {
+                  window.location.href = '/admin/payments';
+                }
+              }}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/payments')
                   ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
@@ -190,7 +212,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               title={!sidebarOpen ? 'Pembayaran' : ''}
             >
               <div className="flex items-center space-x-3">
-                <CreditCard className="w-5 h-5" />
+                <CreditCard className={`${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'}`} />
                 {sidebarOpen && <span className="font-medium">Pembayaran</span>}
               </div>
               {sidebarOpen && (paymentSearchOpen ? (
@@ -242,6 +264,23 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             )}
           </div>
         </nav>
+
+        {/* Minimize button when collapsed */}
+        {!sidebarOpen && (
+          <div className="p-2 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSidebarOpen(true);
+              }}
+              className="w-full flex justify-center"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Main Content */}
@@ -252,7 +291,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={toggleSidebar}
               className="lg:hidden"
             >
               <Menu className="w-4 h-4" />

@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Users, CreditCard, TrendingUp } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { indonesianTexts } from '@/constants/texts';
 
 const AdminDashboard: React.FC = () => {
@@ -28,7 +29,7 @@ const AdminDashboard: React.FC = () => {
       bgColor: 'bg-green-50 dark:bg-green-900/20'
     },
     {
-      title: 'Pembayaran',
+      title: 'Pembayaran Bulan Ini',
       value: `Rp ${stats.monthlyPayments.toLocaleString('id-ID')}`,
       icon: CreditCard,
       color: 'text-purple-600',
@@ -37,13 +38,19 @@ const AdminDashboard: React.FC = () => {
   ];
 
   // Mock data for monthly customer statistics
-  const monthlyStats = [
+  const monthlyCustomerData = [
     { month: 'Jan', customers: 8 },
     { month: 'Feb', customers: 12 },
     { month: 'Mar', customers: 18 },
     { month: 'Apr', customers: 15 },
     { month: 'Mei', customers: 22 },
     { month: 'Jun', customers: 28 },
+    { month: 'Jul', customers: 35 },
+    { month: 'Agu', customers: 30 },
+    { month: 'Sep', customers: 42 },
+    { month: 'Okt', customers: 38 },
+    { month: 'Nov', customers: 45 },
+    { month: 'Des', customers: 50 }
   ];
 
   return (
@@ -81,31 +88,40 @@ const AdminDashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Monthly Customer Statistics */}
+      {/* Monthly Customer Statistics Chart */}
       <Card>
         <CardHeader>
           <CardTitle className="text-gray-900 dark:text-white">Pelanggan Baru per Bulan (2024)</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {monthlyStats.map((stat, index) => (
-              <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{stat.month}</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-32 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all"
-                      style={{ width: `${(stat.customers / 30) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white w-8 text-right">
-                    {stat.customers}
-                  </span>
-                </div>
-              </div>
-            ))}
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={monthlyCustomerData}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis 
+                  dataKey="month" 
+                  className="text-gray-600 dark:text-gray-400"
+                />
+                <YAxis className="text-gray-600 dark:text-gray-400" />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'var(--background)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="customers" 
+                  stroke="#3b82f6" 
+                  strokeWidth={3}
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
+                  name="Pelanggan Baru"
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>

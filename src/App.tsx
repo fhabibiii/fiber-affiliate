@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,10 +11,15 @@ import AdminLayout from "@/components/layouts/AdminLayout";
 import AffiliatorLayout from "@/components/layouts/AffiliatorLayout";
 import Login from "@/pages/Login";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AddCustomer from "@/pages/admin/AddCustomer";
+import AffiliatorList from "@/pages/admin/AffiliatorList";
+import AffiliatorDetail from "@/pages/admin/AffiliatorDetail";
+import AddPayment from "@/pages/admin/AddPayment";
+import PaymentHistoryAdmin from "@/pages/admin/PaymentHistoryAdmin";
 import AffiliatorDashboard from "@/pages/affiliator/AffiliatorDashboard";
+import PaymentHistory from "@/pages/affiliator/PaymentHistory";
 import NotFound from "./pages/NotFound";
 import ThemeToggle from "@/components/ThemeToggle";
-import PaymentHistory from "@/pages/affiliator/PaymentHistory";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +42,61 @@ const App = () => (
                   <PrivateRoute roles={['ADMIN']}>
                     <AdminLayout>
                       <AdminDashboard />
+                    </AdminLayout>
+                  </PrivateRoute>
+                } 
+              />
+              
+              <Route 
+                path="/admin/add-customer" 
+                element={
+                  <PrivateRoute roles={['ADMIN']}>
+                    <AdminLayout>
+                      <AddCustomer />
+                    </AdminLayout>
+                  </PrivateRoute>
+                } 
+              />
+              
+              <Route 
+                path="/admin/affiliators" 
+                element={
+                  <PrivateRoute roles={['ADMIN']}>
+                    <AdminLayout>
+                      <AffiliatorList />
+                    </AdminLayout>
+                  </PrivateRoute>
+                } 
+              />
+              
+              <Route 
+                path="/admin/affiliators/:id" 
+                element={
+                  <PrivateRoute roles={['ADMIN']}>
+                    <AdminLayout>
+                      <AffiliatorDetail />
+                    </AdminLayout>
+                  </PrivateRoute>
+                } 
+              />
+              
+              <Route 
+                path="/admin/payments" 
+                element={
+                  <PrivateRoute roles={['ADMIN']}>
+                    <AdminLayout>
+                      <AddPayment />
+                    </AdminLayout>
+                  </PrivateRoute>
+                } 
+              />
+              
+              <Route 
+                path="/admin/payments/affiliator/:id" 
+                element={
+                  <PrivateRoute roles={['ADMIN']}>
+                    <AdminLayout>
+                      <PaymentHistoryAdmin />
                     </AdminLayout>
                   </PrivateRoute>
                 } 
