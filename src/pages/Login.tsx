@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { LogIn, Loader2 } from 'lucide-react';
+import { LoginCredentials } from '@/types/auth';
 
 const loginSchema = z.object({
   username: z.string().min(1, indonesianTexts.login.errors.required),
@@ -31,6 +32,7 @@ const Login: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
@@ -46,7 +48,12 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
-      await login(data);
+      // Convert form data to LoginCredentials type
+      const credentials: LoginCredentials = {
+        username: data.username,
+        password: data.password,
+      };
+      await login(credentials);
       
       // Redirect based on user role
       if (from !== '/') {
@@ -62,20 +69,25 @@ const Login: React.FC = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Logo and Title */}
-        <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-blue-900 rounded-2xl flex items-center justify-center mb-4">
-            <span className="text-white font-bold text-2xl">F</span>
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900">Fibernode</h2>
-          <p className="mt-2 text-sm text-gray-600">Affiliate Management System</p>
-        </div>
+  const setAdminCredentials = () => {
+    setValue('username', 'admin');
+    setValue('password', 'admin123');
+  };
 
+  const setAffiliatorCredentials = () => {
+    setValue('username', 'affiliator');
+    setValue('password', 'affiliator123');
+  };
+
+  return (
+    <div className="min-h-screen relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Animated Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 animate-gradient-x"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/10 to-purple-500/20 animate-pulse"></div>
+      
+      <div className="max-w-md w-full space-y-8 relative z-10">
         {/* Login Form */}
-        <Card className="shadow-lg">
+        <Card className="shadow-2xl backdrop-blur-sm bg-white/95 border-0">
           <CardHeader>
             <CardTitle className="text-center text-xl font-semibold text-gray-900">
               {indonesianTexts.login.title}
@@ -123,6 +135,33 @@ const Login: React.FC = () => {
                     {errors.password.message}
                   </p>
                 )}
+              </div>
+
+              {/* Demo Credentials */}
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600 text-center">Kredensial untuk testing:</p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={setAdminCredentials}
+                    disabled={isLoading}
+                    className="flex-1"
+                  >
+                    Admin
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={setAffiliatorCredentials}
+                    disabled={isLoading}
+                    className="flex-1"
+                  >
+                    Affiliator
+                  </Button>
+                </div>
               </div>
 
               {/* Submit Button */}
