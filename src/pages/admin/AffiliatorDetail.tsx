@@ -318,10 +318,12 @@ const AffiliatorDetail: React.FC = () => {
                 size="sm"
                 className="flex-1"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
               </Button>
               <Button onClick={() => setShowAddCustomerModal(true)} size="sm" className="flex-1">
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Pelanggan
               </Button>
             </div>
           </div>
