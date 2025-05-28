@@ -67,7 +67,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                   >
                     {tab.label}
                     <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 ${
-                      isActive(tab.href, tab.exact) ? 'w-8' : 'w-0 group-hover:w-8'
+                      isActive(tab.href, tab.exact) ? 'w-full' : 'w-0 group-hover:w-full'
                     }`} />
                   </Link>
                 ))}
@@ -118,7 +118,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                 >
                   {tab.label}
                   <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 ${
-                    isActive(tab.href, tab.exact) ? 'w-8' : 'w-0'
+                    isActive(tab.href, tab.exact) ? 'w-full' : 'w-0'
                   }`} />
                 </Link>
               ))}
@@ -128,12 +128,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       </header>
 
       {/* Page Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
-        <div className="text-center md:text-left mb-4 md:hidden">
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
-            {indonesianTexts.navigation.welcome}, {user?.fullName}
-          </p>
-        </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
 

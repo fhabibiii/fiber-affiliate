@@ -11,7 +11,6 @@ import {
   Search, 
   ChevronDown, 
   ChevronRight,
-  ChevronLeft,
   X,
   LogOut,
   Menu
@@ -94,25 +93,12 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex w-full overflow-hidden">
-      {/* Overlay for mobile */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={handleSidebarToggle}
-        />
-      )}
-
       {/* Sidebar */}
       <div 
-        className={`${
-          sidebarOpen ? 'w-64' : 'w-16'
-        } bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 relative flex-shrink-0 fixed lg:relative h-screen z-50 lg:z-auto overflow-y-auto`}
-        style={{ 
-          transform: sidebarOpen ? 'translateX(0)' : window.innerWidth < 1024 ? 'translateX(-100%)' : 'translateX(0)',
-          transition: 'transform 0.3s ease-in-out, width 0.3s ease-in-out'
-        }}
+        className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 cursor-pointer relative flex-shrink-0`}
+        onClick={handleSidebarToggle}
       >
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className={`flex items-center ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
             <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
               <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
@@ -123,7 +109,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
           {/* Static Navigation Items */}
           {navigationItems.map((item) => (
             <Link
@@ -131,15 +117,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               to={item.href}
               className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                 isActive(item.href, item.exact)
-                  ? sidebarOpen 
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-l-4 border-blue-700 dark:border-blue-400'
-                    : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-l-4 border-blue-700 dark:border-blue-400'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               } ${!sidebarOpen ? 'justify-center' : ''}`}
               title={!sidebarOpen ? item.label : ''}
             >
-              <item.icon className={`${sidebarOpen ? 'w-6 h-6' : 'w-8 h-8'} flex-shrink-0`} />
-              {sidebarOpen && <span className="font-medium text-sm lg:text-base">{item.label}</span>}
+              <item.icon className="w-6 h-6 flex-shrink-0" />
+              {sidebarOpen && <span className="font-medium">{item.label}</span>}
             </Link>
           ))}
 
@@ -149,16 +133,14 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               onClick={handleAffiliatorClick}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/affiliators')
-                  ? sidebarOpen 
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                    : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               } ${!sidebarOpen ? 'justify-center' : ''}`}
               title={!sidebarOpen ? 'Affiliator' : ''}
             >
               <div className="flex items-center space-x-3">
-                <Users className={`${sidebarOpen ? 'w-6 h-6' : 'w-8 h-8'} flex-shrink-0`} />
-                {sidebarOpen && <span className="font-medium text-sm lg:text-base">Affiliator</span>}
+                <Users className="w-6 h-6 flex-shrink-0" />
+                {sidebarOpen && <span className="font-medium">Affiliator</span>}
               </div>
               {sidebarOpen && (affiliatorSearchOpen ? (
                 <ChevronDown className="w-4 h-4 flex-shrink-0" />
@@ -215,16 +197,14 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               onClick={handlePaymentClick}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/payments')
-                  ? sidebarOpen 
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                    : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               } ${!sidebarOpen ? 'justify-center' : ''}`}
               title={!sidebarOpen ? 'Pembayaran' : ''}
             >
               <div className="flex items-center space-x-3">
-                <CreditCard className={`${sidebarOpen ? 'w-6 h-6' : 'w-8 h-8'} flex-shrink-0`} />
-                {sidebarOpen && <span className="font-medium text-sm lg:text-base">Pembayaran</span>}
+                <CreditCard className="w-6 h-6 flex-shrink-0" />
+                {sidebarOpen && <span className="font-medium">Pembayaran</span>}
               </div>
               {sidebarOpen && (paymentSearchOpen ? (
                 <ChevronDown className="w-4 h-4 flex-shrink-0" />
@@ -274,33 +254,24 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               </div>
             )}
           </div>
-
-          {/* Logout Button in Sidebar */}
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 ${!sidebarOpen ? 'justify-center' : ''}`}
-            title={!sidebarOpen ? 'Logout' : ''}
-          >
-            <LogOut className={`${sidebarOpen ? 'w-6 h-6' : 'w-8 h-8'} flex-shrink-0`} />
-            {sidebarOpen && <span className="font-medium text-sm lg:text-base">Logout</span>}
-          </button>
         </nav>
 
-        {/* Toggle buttons */}
-        <div className="fixed top-1/2 transform -translate-y-1/2 z-50" style={{ left: sidebarOpen ? '16rem' : '4rem' }}>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleSidebarToggle}
-            className="w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            {sidebarOpen ? (
-              <ChevronLeft className="w-3 h-3" />
-            ) : (
+        {/* Expand button when collapsed */}
+        {!sidebarOpen && (
+          <div className="absolute top-1/2 -right-3 transform -translate-y-1/2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSidebarOpen(true);
+              }}
+              className="w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
               <ChevronRight className="w-3 h-3" />
-            )}
-          </Button>
-        </div>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Main Content */}
@@ -319,23 +290,23 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <span className="hidden sm:inline text-gray-700 dark:text-gray-300 text-xs lg:text-sm">
+            <span className="hidden sm:inline text-gray-700 dark:text-gray-300 text-sm">
               {indonesianTexts.navigation.welcome}, {user?.fullName}
             </span>
             <Button
               onClick={() => setShowLogoutModal(true)}
               variant="destructive"
               size="sm"
-              className="bg-red-600 hover:bg-red-700 flex items-center justify-center"
+              className="bg-red-600 hover:bg-red-700"
             >
-              <LogOut className="w-3 h-3 lg:w-4 lg:h-4 lg:mr-2" />
-              <span className="hidden lg:inline text-xs lg:text-sm">{indonesianTexts.navigation.logout}</span>
+              <LogOut className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">{indonesianTexts.navigation.logout}</span>
             </Button>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-2 sm:p-4 lg:p-6 overflow-auto">
+        <main className="flex-1 p-4 sm:p-6 overflow-auto">
           <div className="max-w-full">
             {children}
           </div>

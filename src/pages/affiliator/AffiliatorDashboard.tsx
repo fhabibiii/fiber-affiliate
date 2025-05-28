@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Phone, MapPin, Calendar } from 'lucide-react';
@@ -158,23 +157,6 @@ const AffiliatorDashboard: React.FC = () => {
     });
   };
 
-  const formatWhatsAppNumber = (phoneNumber: string) => {
-    let cleanNumber = phoneNumber.replace(/\D/g, '');
-    if (cleanNumber.startsWith('0')) {
-      cleanNumber = '62' + cleanNumber.substring(1);
-    } else if (cleanNumber.startsWith('62')) {
-      // Already starts with 62, no change needed
-    } else {
-      cleanNumber = '62' + cleanNumber;
-    }
-    return cleanNumber;
-  };
-
-  const handleWhatsAppClick = (phoneNumber: string) => {
-    const formattedNumber = formatWhatsAppNumber(phoneNumber);
-    window.open(`https://wa.me/${formattedNumber}`, '_blank');
-  };
-
   const handleExportCSV = () => {
     const csvContent = [
       ['Nama Lengkap', 'No. Telepon', 'Alamat', 'Tanggal Bergabung'],
@@ -193,22 +175,32 @@ const AffiliatorDashboard: React.FC = () => {
     link.click();
   };
 
+  const formatName = (fullName: string) => {
+    const words = fullName.split(' ');
+    if (words.length <= 2) return fullName;
+    
+    return words.map((word, index) => {
+      if (index === 0 || index === words.length - 1) {
+        return word;
+      }
+      return word.charAt(0) + '.';
+    }).join(' ');
+  };
+
   const columns = [
     {
       key: 'fullName',
-      label: 'Nama'
+      label: 'Nama',
+      render: (value: string) => (
+        <span className="block md:hidden">{formatName(value)}</span>
+      ),
+      fullRender: (value: string) => (
+        <span className="hidden md:block">{value}</span>
+      )
     },
     {
       key: 'phoneNumber',
-      label: 'No. Telepon',
-      render: (value: string) => (
-        <button
-          onClick={() => handleWhatsAppClick(value)}
-          className="text-blue-900 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-xs lg:text-sm"
-        >
-          {value}
-        </button>
-      )
+      label: 'No. Telepon'
     },
     {
       key: 'fullAddress',
@@ -222,14 +214,14 @@ const AffiliatorDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-4 lg:space-y-6">
+    <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-center lg:items-center gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div className="text-center lg:text-left w-full lg:w-auto">
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {indonesianTexts.navigation.customerList}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm lg:text-base">
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
             Daftar pelanggan yang telah Anda daftarkan
           </p>
         </div>
@@ -237,10 +229,10 @@ const AffiliatorDashboard: React.FC = () => {
         <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 w-full lg:w-auto">
           <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-xs lg:text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
+              <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
                 Total Pelanggan
               </p>
-              <p className="text-xl lg:text-2xl font-bold text-blue-700 dark:text-blue-300">
+              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
                 {customers.length}
               </p>
             </div>
@@ -250,7 +242,7 @@ const AffiliatorDashboard: React.FC = () => {
 
       {/* Customer Table */}
       <Card className="w-full">
-        <CardContent className="p-4 lg:p-6">
+        <CardContent className="p-6">
           <ResponsiveTable
             data={customers}
             columns={columns}

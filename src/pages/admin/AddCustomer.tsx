@@ -71,50 +71,49 @@ const AddCustomer: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 lg:space-y-6 w-full max-w-full">
+    <div className="space-y-6 w-full max-w-full">
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Tambah Pelanggan
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm lg:text-base">
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
           Tambahkan pelanggan baru ke sistem
         </p>
       </div>
 
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-base lg:text-lg">Informasi Pelanggan</CardTitle>
+          <CardTitle>Form Tambah Pelanggan</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-sm lg:text-base">Nama Lengkap Pelanggan *</Label>
-                <Input
-                  id="fullName"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  required
-                  placeholder="Masukkan nama lengkap pelanggan"
-                  className="text-sm lg:text-base"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber" className="text-sm lg:text-base">No. HP *</Label>
-                <Input
-                  id="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  required
-                  placeholder="Contoh: 081234567890"
-                  className="text-sm lg:text-base"
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Nama Lengkap Pelanggan *</Label>
+              <Input
+                id="fullName"
+                value={formData.fullName}
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                required
+                placeholder="Masukkan nama lengkap pelanggan"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address" className="text-sm lg:text-base">Alamat Lengkap *</Label>
+              <Label htmlFor="phoneNumber">No. HP *</Label>
+              <Input
+                id="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                required
+                placeholder="Contoh: 081234567890"
+              />
+              <p className="text-sm text-gray-500">
+                Format: 08xxxxxxxxxx atau +62xxxxxxxxxx
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Alamat Lengkap *</Label>
               <Textarea
                 id="address"
                 value={formData.address}
@@ -122,17 +121,16 @@ const AddCustomer: React.FC = () => {
                 required
                 placeholder="Masukkan alamat lengkap pelanggan"
                 rows={4}
-                className="text-sm lg:text-base"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="affiliator" className="text-sm lg:text-base">Pilih Affiliator *</Label>
+              <Label htmlFor="affiliator">Pilih Affiliator *</Label>
               <Select 
                 value={formData.affiliatorId} 
                 onValueChange={(value) => setFormData({ ...formData, affiliatorId: value })}
               >
-                <SelectTrigger className="text-sm lg:text-base">
+                <SelectTrigger>
                   <SelectValue placeholder="Pilih affiliator" />
                 </SelectTrigger>
                 <SelectContent>
@@ -145,7 +143,7 @@ const AddCustomer: React.FC = () => {
               </Select>
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full text-sm lg:text-base">
+            <Button type="submit" disabled={loading} className="w-full">
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {loading ? 'Menambahkan...' : 'Tambah Pelanggan'}
             </Button>
