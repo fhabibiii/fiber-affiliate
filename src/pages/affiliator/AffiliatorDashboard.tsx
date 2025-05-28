@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ResponsiveTable from '@/components/ui/responsive-table';
@@ -197,9 +198,9 @@ const AffiliatorDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Customer Table */}
-      <Card className="w-full">
+      <Card className="w-full text-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-xl text-gray-900 dark:text-white">
+          <CardTitle className="text-lg text-gray-900 dark:text-white">
             Data Pelanggan Saya
           </CardTitle>
         </CardHeader>
@@ -208,7 +209,7 @@ const AffiliatorDashboard: React.FC = () => {
             data={customers}
             columns={columns}
             onExport={handleExportCSV}
-            defaultPageSize={5}
+            defaultPageSize={10}
           />
         </CardContent>
       </Card>

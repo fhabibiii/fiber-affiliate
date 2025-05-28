@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -246,39 +247,12 @@ const PaymentHistory: React.FC = () => {
     }
   ];
 
-  const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
-
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-        <div className="text-center lg:text-left w-full lg:w-auto">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Riwayat Pembayaran
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Riwayat pembayaran komisi Anda
-          </p>
-        </div>
-        
-        <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 w-full lg:w-auto">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">
-                Total Diterima
-              </p>
-              <p className="text-xl font-bold text-green-700 dark:text-green-300">
-                {formatCurrency(totalAmount)}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Payment Table */}
-      <Card className="w-full">
+      <Card className="w-full text-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-xl text-gray-900 dark:text-white">
+          <CardTitle className="text-lg text-gray-900 dark:text-white">
             Histori Pembayaran dari Admin
           </CardTitle>
         </CardHeader>
@@ -287,7 +261,7 @@ const PaymentHistory: React.FC = () => {
             data={payments}
             columns={columns}
             onExport={handleExportCSV}
-            defaultPageSize={5}
+            defaultPageSize={10}
           />
         </CardContent>
       </Card>

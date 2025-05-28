@@ -39,8 +39,8 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
   return (
     <div className="min-h-screen bg-[#ecf3ff] dark:bg-gray-900 flex flex-col">
-      {/* Top Navbar */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      {/* Top Navbar with shadow */}
+      <header className="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Main header */}
           <div className="h-16 flex items-center justify-between">
@@ -54,8 +54,8 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
             {/* User Info and Logout - Desktop */}
             <div className="hidden md:flex items-center space-x-4">
-              <span className="text-[#1e3a8a] dark:text-gray-300 text-sm font-bold">
-                {indonesianTexts.navigation.welcome}, {user?.fullName}
+              <span className="text-gray-600 dark:text-gray-300 text-sm">
+                {indonesianTexts.navigation.welcome}, <span className="font-bold text-[#1e3a8a] dark:text-blue-400">{user?.fullName}</span>
               </span>
               <Button
                 onClick={() => setShowLogoutModal(true)}
@@ -83,16 +83,16 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
       </header>
 
-      {/* Navigation Menu - Rectangular below navbar */}
+      {/* Navigation Menu - Smaller rectangular card with proper spacing */}
       <div className="bg-[#ecf3ff] dark:bg-gray-900 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 flex">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-1 flex">
               {navigationTabs.map((tab) => (
                 <Link
                   key={tab.href}
                   to={tab.href}
-                  className={`px-8 py-4 text-sm font-medium transition-all duration-300 rounded-md ${
+                  className={`px-6 py-3 text-sm font-medium transition-all duration-300 rounded-md ${
                     isActive(tab.href, tab.exact)
                       ? 'text-white bg-blue-600'
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -106,7 +106,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
       </div>
 
-      {/* Page Content */}
+      {/* Page Content with proper spacing */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
