@@ -63,16 +63,6 @@ const AffiliatorDetail: React.FC = () => {
     }
   ];
 
-  const formatWhatsAppNumber = (phoneNumber: string) => {
-    let cleanNumber = phoneNumber.replace(/\D/g, '');
-    if (cleanNumber.startsWith('0')) {
-      cleanNumber = '62' + cleanNumber.substring(1);
-    } else if (!cleanNumber.startsWith('62')) {
-      cleanNumber = '62' + cleanNumber;
-    }
-    return cleanNumber;
-  };
-
   const handleWhatsAppClick = (phoneNumber: string) => {
     const formattedNumber = formatWhatsAppNumber(phoneNumber);
     window.open(`https://wa.me/${formattedNumber}`, '_blank');
@@ -184,7 +174,7 @@ const AffiliatorDetail: React.FC = () => {
       render: (value: string) => (
         <button
           onClick={() => handleWhatsAppClick(value)}
-          className="text-primary font-medium hover:opacity-80 transition-opacity"
+          className="text-blue-900 dark:text-gray-300 font-medium hover:opacity-80 transition-opacity"
         >
           {value}
         </button>
@@ -237,8 +227,8 @@ const AffiliatorDetail: React.FC = () => {
         <Collapsible open={isInfoOpen} onOpenChange={setIsInfoOpen}>
           <Card className="w-full">
             <CollapsibleTrigger className="w-full">
-              <CardHeader className="flex flex-row items-center justify-center space-y-0 p-4">
-                <CardTitle className="text-center flex-1">Informasi Affiliator</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                <CardTitle className="text-left text-base">Informasi Affiliator</CardTitle>
                 {isInfoOpen ? (
                   <ChevronUp className="w-4 h-4" />
                 ) : (
@@ -253,7 +243,7 @@ const AffiliatorDetail: React.FC = () => {
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
                     <button
                       onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
-                      className="text-lg font-semibold text-primary hover:opacity-80 transition-opacity"
+                      className="text-lg font-semibold text-blue-900 dark:text-gray-300 hover:opacity-80 transition-opacity"
                     >
                       {affiliator.phoneNumber}
                     </button>
@@ -286,7 +276,7 @@ const AffiliatorDetail: React.FC = () => {
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
                 <button
                   onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
-                  className="text-lg font-semibold text-primary hover:opacity-80 transition-opacity"
+                  className="text-lg font-semibold text-blue-900 dark:text-gray-300 hover:opacity-80 transition-opacity"
                 >
                   {affiliator.phoneNumber}
                 </button>
@@ -308,30 +298,43 @@ const AffiliatorDetail: React.FC = () => {
 
       {/* Customer Table */}
       <Card className="w-full">
-        <CardHeader className="pb-3">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle>Daftar Pelanggan</CardTitle>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button 
-                onClick={handleExportCSV}
-                variant="outline"
-                className="flex-1 sm:flex-none"
-              >
-                <Download className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Export CSV</span>
-              </Button>
-              <Button onClick={() => setShowAddCustomerModal(true)} className="flex-1 sm:flex-none">
-                <Plus className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Tambah Pelanggan</span>
-              </Button>
-            </div>
-          </div>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl md:text-2xl">Daftar Pelanggan</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-6 pt-2">
+          {/* Mobile buttons - Above search bar */}
+          <div className="flex gap-2 mb-4 sm:hidden">
+            <Button 
+              onClick={handleExportCSV}
+              variant="outline"
+              className="flex-1"
+            >
+              <Download className="w-4 h-4" />
+            </Button>
+            <Button onClick={() => setShowAddCustomerModal(true)} className="flex-1">
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+
           <ResponsiveTable
             data={customers}
             columns={columns}
             actions={actions}
+            extraControls={
+              <div className="hidden sm:flex gap-2">
+                <Button 
+                  onClick={handleExportCSV}
+                  variant="outline"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export CSV
+                </Button>
+                <Button onClick={() => setShowAddCustomerModal(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Tambah Pelanggan
+                </Button>
+              </div>
+            }
           />
         </CardContent>
       </Card>

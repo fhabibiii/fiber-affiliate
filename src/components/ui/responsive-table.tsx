@@ -19,6 +19,7 @@ interface ResponsiveTableProps {
   onExport?: () => void;
   actions?: (row: any) => React.ReactNode;
   onRowClick?: (row: any) => void;
+  extraControls?: React.ReactNode;
 }
 
 const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
@@ -26,7 +27,8 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
   columns,
   onExport,
   actions,
-  onRowClick
+  onRowClick,
+  extraControls
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,7 +92,9 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
           />
         </div>
         
-        {onExport && (
+        {extraControls && extraControls}
+        
+        {onExport && !extraControls && (
           <Button onClick={onExport} variant="outline" className="w-full sm:w-auto">
             <Download className="w-4 h-4 mr-2" />
             Export CSV

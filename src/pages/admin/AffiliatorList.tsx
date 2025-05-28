@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -158,7 +159,7 @@ const AffiliatorList: React.FC = () => {
       render: (value: string) => (
         <button
           onClick={() => handleWhatsAppClick(value)}
-          className="text-primary font-medium hover:opacity-80 transition-opacity"
+          className="text-blue-900 dark:text-gray-300 font-medium hover:opacity-80 transition-opacity"
         >
           {value}
         </button>
@@ -207,92 +208,156 @@ const AffiliatorList: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Daftar Affiliator
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Kelola semua affiliator dalam sistem
-          </p>
-        </div>
-
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button 
-            onClick={handleExportCSV}
-            variant="outline"
-            className="flex-1 sm:flex-none"
-          >
-            <Download className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:inline">Export CSV</span>
-          </Button>
-          <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-            <DialogTrigger asChild>
-              <Button className="flex-1 sm:flex-none">
-                <Plus className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Tambah Affiliator</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Tambah Affiliator Baru</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Nama Lengkap</Label>
-                  <Input
-                    id="fullName"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phoneNumber">No. HP</Label>
-                  <Input
-                    id="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    value={formData.username}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    required
-                  />
-                </div>
-                <Button type="submit" disabled={loading} className="w-full">
-                  {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  {loading ? 'Menambahkan...' : 'Tambah Affiliator'}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Daftar Affiliator
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Kelola semua affiliator dalam sistem
+        </p>
       </div>
 
       {/* Affiliator Table */}
       <Card>
         <CardContent className="p-6">
+          {/* Mobile buttons - Above search bar */}
+          <div className="flex gap-2 mb-4 sm:hidden">
+            <Button 
+              onClick={handleExportCSV}
+              variant="outline"
+              className="flex-1"
+            >
+              <Download className="w-4 h-4" />
+            </Button>
+            <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+              <DialogTrigger asChild>
+                <Button className="flex-1">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Tambah Affiliator Baru</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Nama Lengkap</Label>
+                    <Input
+                      id="fullName"
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phoneNumber">No. HP</Label>
+                    <Input
+                      id="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      value={formData.username}
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={loading} className="w-full">
+                    {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    {loading ? 'Menambahkan...' : 'Tambah Affiliator'}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
           <ResponsiveTable
             data={affiliators}
             columns={columns}
             actions={actions}
             onRowClick={handleRowClick}
+            extraControls={
+              <div className="hidden sm:flex gap-2">
+                <Button 
+                  onClick={handleExportCSV}
+                  variant="outline"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export CSV
+                </Button>
+                <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tambah Affiliator
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Tambah Affiliator Baru</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName">Nama Lengkap</Label>
+                        <Input
+                          id="fullName"
+                          value={formData.fullName}
+                          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phoneNumber">No. HP</Label>
+                        <Input
+                          id="phoneNumber"
+                          value={formData.phoneNumber}
+                          onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                          id="username"
+                          value={formData.username}
+                          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          value={formData.password}
+                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <Button type="submit" disabled={loading} className="w-full">
+                        {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        {loading ? 'Menambahkan...' : 'Tambah Affiliator'}
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            }
           />
         </CardContent>
       </Card>
