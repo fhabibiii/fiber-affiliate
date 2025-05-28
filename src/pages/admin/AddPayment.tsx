@@ -37,10 +37,10 @@ const AddPayment: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
         toast({
           title: "Error",
-          description: "Ukuran file maksimal 5MB",
+          description: "Ukuran file maksimal 10MB",
           variant: "destructive"
         });
         return;
@@ -87,30 +87,30 @@ const AddPayment: React.FC = () => {
 
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Form Tambah Pembayaran</CardTitle>
+          <CardTitle>Informasi Pembayaran</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="affiliator">Pilih Affiliator *</Label>
-              <Select 
-                value={formData.affiliatorId} 
-                onValueChange={(value) => setFormData({ ...formData, affiliatorId: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih affiliator" />
-                </SelectTrigger>
-                <SelectContent>
-                  {affiliators.map((affiliator) => (
-                    <SelectItem key={affiliator.uuid} value={affiliator.uuid}>
-                      {affiliator.fullName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="affiliator">Pilih Affiliator *</Label>
+                <Select 
+                  value={formData.affiliatorId} 
+                  onValueChange={(value) => setFormData({ ...formData, affiliatorId: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih affiliator" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {affiliators.map((affiliator) => (
+                      <SelectItem key={affiliator.uuid} value={affiliator.uuid}>
+                        {affiliator.fullName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="month">Bulan *</Label>
                 <Select 
@@ -144,27 +144,29 @@ const AddPayment: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="amount">Jumlah Bayar *</Label>
-              <Input
-                id="amount"
-                type="number"
-                value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                required
-                placeholder="Masukkan jumlah pembayaran"
-              />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="amount">Jumlah Bayar *</Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  required
+                  placeholder="Masukkan jumlah pembayaran"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="paymentDate">Tanggal Bayar *</Label>
-              <Input
-                id="paymentDate"
-                type="date"
-                value={formData.paymentDate}
-                onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
-                required
-              />
+              <div className="space-y-2">
+                <Label htmlFor="paymentDate">Tanggal Bayar *</Label>
+                <Input
+                  id="paymentDate"
+                  type="date"
+                  value={formData.paymentDate}
+                  onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -178,7 +180,7 @@ const AddPayment: React.FC = () => {
                         {formData.proofImage ? formData.proofImage.name : 'Klik untuk upload atau drag & drop'}
                       </span>
                       <span className="mt-1 block text-xs text-gray-500">
-                        PNG, JPG, JPEG hingga 5MB
+                        PNG, JPG, JPEG hingga 10MB
                       </span>
                     </label>
                     <input

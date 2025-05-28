@@ -227,7 +227,7 @@ const AffiliatorDetail: React.FC = () => {
           <Card className="w-full">
             <CollapsibleTrigger className="w-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
-                <CardTitle className="text-left text-sm">Informasi Affiliator</CardTitle>
+                <CardTitle className="text-left text-lg">Informasi Affiliator</CardTitle>
                 {isInfoOpen ? (
                   <ChevronUp className="w-4 h-4" />
                 ) : (
@@ -242,24 +242,24 @@ const AffiliatorDetail: React.FC = () => {
                     <p className="text-xs font-medium text-gray-600 dark:text-gray-400">No. HP</p>
                     <button
                       onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
-                      className="text-sm font-semibold text-blue-900 dark:text-gray-300 hover:opacity-80 transition-opacity"
+                      className="text-xs font-semibold text-blue-900 dark:text-gray-300 hover:opacity-80 transition-opacity"
                     >
                       {affiliator.phoneNumber}
                     </button>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Username</p>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
+                    <p className="text-xs font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <p className="text-xs font-semibold text-gray-900 dark:text-white">
                       {formatIndonesianDate(affiliator.joinDate)}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Jumlah Pelanggan</p>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{customers.length}</p>
+                    <p className="text-xs font-semibold text-gray-900 dark:text-white">{customers.length}</p>
                   </div>
                 </div>
               </CardContent>
@@ -279,24 +279,24 @@ const AffiliatorDetail: React.FC = () => {
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
                 <button
                   onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
-                  className="text-base font-semibold text-blue-900 dark:text-gray-300 hover:opacity-80 transition-opacity"
+                  className="text-sm font-semibold text-blue-900 dark:text-gray-300 hover:opacity-80 transition-opacity"
                 >
                   {affiliator.phoneNumber}
                 </button>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
-                <p className="text-base font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
-                <p className="text-base font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">
                   {formatIndonesianDate(affiliator.joinDate)}
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Jumlah Pelanggan</p>
-                <p className="text-base font-semibold text-gray-900 dark:text-white">{customers.length}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{customers.length}</p>
               </div>
             </div>
           </CardContent>
@@ -306,9 +306,9 @@ const AffiliatorDetail: React.FC = () => {
       {/* Customer Table */}
       <Card className="w-full">
         <CardHeader className="pb-2">
-          <CardTitle className="text-xl md:text-2xl sm:text-base">Daftar Pelanggan</CardTitle>
+          <CardTitle className="text-xl md:text-2xl text-lg">Daftar Pelanggan</CardTitle>
         </CardHeader>
-        <CardContent className="p-6 pt-1">
+        <CardContent className="p-6 pt-2">
           <ResponsiveTable
             data={customers}
             columns={columns}
