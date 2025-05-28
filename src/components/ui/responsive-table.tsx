@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -112,13 +111,13 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white"
+                  className="text-left py-2 px-4 font-medium text-gray-900 dark:text-white"
                 >
                   {column.label}
                 </th>
               ))}
               {actions && (
-                <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                <th className="text-left py-2 px-4 font-medium text-gray-900 dark:text-white">
                   Aksi
                 </th>
               )}
@@ -134,12 +133,12 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
                 onClick={(e) => handleRowClick(row, e)}
               >
                 {columns.map((column) => (
-                  <td key={column.key} className="py-3 px-4 text-gray-700 dark:text-gray-300">
+                  <td key={column.key} className="py-2 px-4 text-gray-700 dark:text-gray-300">
                     {renderCellContent(column, row[column.key], row)}
                   </td>
                 ))}
                 {actions && (
-                  <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                  <td className="py-2 px-4" onClick={(e) => e.stopPropagation()}>
                     {actions(row)}
                   </td>
                 )}
