@@ -83,8 +83,8 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
       </header>
 
-      {/* Navigation Menu with proper spacing */}
-      <div className="bg-[#ecf3ff] dark:bg-gray-900 py-8">
+      {/* Navigation Menu with increased top spacing */}
+      <div className="bg-[#ecf3ff] dark:bg-gray-900 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 flex">
@@ -106,9 +106,11 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
       </div>
 
-      {/* Page Content with proper spacing */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-8">
-        {children}
+      {/* Page Content with reduced top spacing */}
+      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-4 mb-8">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
 
       {/* Footer */}

@@ -249,8 +249,8 @@ const PaymentHistory: React.FC = () => {
 
   return (
     <div className="w-full">
-      {/* Payment Table - Full width from logo to logout */}
-      <Card className="w-full">
+      {/* Payment Table - Full width spanning entire container */}
+      <Card className="w-full mb-8">
         <CardHeader className="pb-2">
           <CardTitle className="text-base text-gray-900 dark:text-white">
             Histori Pembayaran dari Admin
