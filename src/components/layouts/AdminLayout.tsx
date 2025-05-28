@@ -94,10 +94,10 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-900 flex w-full overflow-hidden">
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay - only show when sidebar is open on mobile */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -108,7 +108,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           sidebarOpen 
             ? 'w-64 translate-x-0' 
             : 'w-0 -translate-x-full md:translate-x-0 md:w-16'
-        } bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 relative flex-shrink-0 h-screen overflow-hidden fixed md:relative z-40`}
+        } bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 flex-shrink-0 h-screen overflow-hidden fixed md:relative z-50`}
       >
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
@@ -130,7 +130,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 to={item.href}
                 className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                   isActive(item.href, item.exact)
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                    ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 } ${!sidebarOpen ? 'justify-center' : 'space-x-3'}`}
                 title={!sidebarOpen ? item.label : ''}
@@ -146,7 +146,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 onClick={handleAffiliatorClick}
                 className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
                   isActive('/admin/affiliators')
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                    ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 } ${!sidebarOpen ? 'justify-center' : 'justify-between'}`}
                 title={!sidebarOpen ? 'Affiliator' : ''}
@@ -210,7 +210,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 onClick={handlePaymentClick}
                 className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
                   isActive('/admin/payments')
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                    ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 } ${!sidebarOpen ? 'justify-center' : 'justify-between'}`}
                 title={!sidebarOpen ? 'Pembayaran' : ''}
@@ -281,26 +281,28 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </div>
 
-      {/* Toggle Button - Positioned on sidebar border */}
-      <div className="relative">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleSidebarToggle}
-          className={`absolute top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 z-50 ${
-            sidebarOpen ? '-left-3' : 'left-5 md:-left-3'
-          } transition-all duration-300`}
-        >
-          {sidebarOpen ? (
-            <ChevronLeft className="w-3 h-3" />
-          ) : (
-            <ChevronRight className="w-3 h-3" />
-          )}
-        </Button>
-      </div>
+      {/* Toggle Button - Hidden on mobile when sidebar is collapsed */}
+      {(sidebarOpen || window.innerWidth >= 768) && (
+        <div className="relative hidden md:block">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleSidebarToggle}
+            className={`absolute top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 z-50 ${
+              sidebarOpen ? '-left-3' : 'left-5 md:-left-3'
+            } transition-all duration-300`}
+          >
+            {sidebarOpen ? (
+              <ChevronLeft className="w-3 h-3" />
+            ) : (
+              <ChevronRight className="w-3 h-3" />
+            )}
+          </Button>
+        </div>
+      )}
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col min-w-0 overflow-hidden h-screen ${!sidebarOpen ? 'md:ml-0' : ''}`}>
+      <div className={`flex-1 flex flex-col min-w-0 overflow-hidden h-screen`}>
         {/* Top Navbar */}
         <header className="h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
           <div className="flex items-center space-x-4">
