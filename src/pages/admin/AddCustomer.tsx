@@ -85,11 +85,13 @@ const AddCustomer: React.FC = () => {
 
   return (
     <div className="space-y-6 w-full max-w-full h-full overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-      <style jsx>{`
-        div::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
+      <style>
+        {`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
       
       {/* Page Header */}
       <div className="mb-8">
