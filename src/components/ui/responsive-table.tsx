@@ -76,6 +76,10 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
     return value;
   };
 
+  // Calculate the actual range being displayed
+  const actualStartIndex = filteredData.length > 0 ? startIndex + 1 : 0;
+  const actualEndIndex = Math.min(endIndex, filteredData.length);
+
   return (
     <div className="space-y-4">
       {/* Search and Controls */}
@@ -236,7 +240,7 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
         <div className="text-center text-xs text-gray-600 dark:text-gray-400">
           {filteredData.length > 0 ? (
             <>
-              {startIndex + 1} dari {filteredData.length} data ditampilkan
+              {actualStartIndex}-{actualEndIndex} dari {filteredData.length} data ditampilkan
             </>
           ) : (
             '0 dari 0 data ditampilkan'
