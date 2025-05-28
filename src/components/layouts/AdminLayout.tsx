@@ -102,7 +102,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Mobile: Fixed overlay, Desktop: Normal sidebar */}
       <div 
         className={`${
           sidebarOpen 
@@ -132,11 +132,11 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   isActive(item.href, item.exact)
                     ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                } ${!sidebarOpen ? 'justify-center' : 'space-x-3'}`}
+                } ${!sidebarOpen ? 'justify-center' : ''}`}
                 title={!sidebarOpen ? item.label : ''}
               >
                 <item.icon className="w-6 h-6 flex-shrink-0" />
-                {sidebarOpen && <span className="font-medium">{item.label}</span>}
+                {sidebarOpen && <span className="ml-3 font-medium">{item.label}</span>}
               </Link>
             ))}
 
@@ -151,9 +151,9 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 } ${!sidebarOpen ? 'justify-center' : 'justify-between'}`}
                 title={!sidebarOpen ? 'Affiliator' : ''}
               >
-                <div className={`flex items-center ${!sidebarOpen ? '' : 'space-x-3'}`}>
+                <div className={`flex items-center ${!sidebarOpen ? '' : ''}`}>
                   <Users className="w-6 h-6 flex-shrink-0" />
-                  {sidebarOpen && <span className="font-medium">Affiliator</span>}
+                  {sidebarOpen && <span className="ml-3 font-medium">Affiliator</span>}
                 </div>
                 {sidebarOpen && (affiliatorSearchOpen ? (
                   <ChevronDown className="w-4 h-4 flex-shrink-0" />
@@ -215,9 +215,9 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 } ${!sidebarOpen ? 'justify-center' : 'justify-between'}`}
                 title={!sidebarOpen ? 'Pembayaran' : ''}
               >
-                <div className={`flex items-center ${!sidebarOpen ? '' : 'space-x-3'}`}>
+                <div className={`flex items-center ${!sidebarOpen ? '' : ''}`}>
                   <CreditCard className="w-6 h-6 flex-shrink-0" />
-                  {sidebarOpen && <span className="font-medium">Pembayaran</span>}
+                  {sidebarOpen && <span className="ml-3 font-medium">Pembayaran</span>}
                 </div>
                 {sidebarOpen && (paymentSearchOpen ? (
                   <ChevronDown className="w-4 h-4 flex-shrink-0" />
@@ -271,38 +271,36 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             {/* Logout Button in Sidebar */}
             <button
               onClick={() => setShowLogoutModal(true)}
-              className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 ${!sidebarOpen ? 'justify-center' : 'space-x-3'}`}
+              className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 ${!sidebarOpen ? 'justify-center' : ''}`}
               title={!sidebarOpen ? 'Logout' : ''}
             >
               <LogOut className="w-6 h-6 flex-shrink-0" />
-              {sidebarOpen && <span className="font-medium">Logout</span>}
+              {sidebarOpen && <span className="ml-3 font-medium">Logout</span>}
             </button>
           </nav>
         </div>
       </div>
 
-      {/* Toggle Button - Hidden on mobile when sidebar is collapsed */}
-      {(sidebarOpen || window.innerWidth >= 768) && (
-        <div className="relative hidden md:block">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleSidebarToggle}
-            className={`absolute top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 z-50 ${
-              sidebarOpen ? '-left-3' : 'left-5 md:-left-3'
-            } transition-all duration-300`}
-          >
-            {sidebarOpen ? (
-              <ChevronLeft className="w-3 h-3" />
-            ) : (
-              <ChevronRight className="w-3 h-3" />
-            )}
-          </Button>
-        </div>
-      )}
+      {/* Toggle Button - Hidden on mobile, positioned at sidebar edge on desktop */}
+      <div className="relative hidden md:block">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleSidebarToggle}
+          className={`absolute top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 z-50 ${
+            sidebarOpen ? '-left-3' : 'left-5 md:-left-3'
+          } transition-all duration-300`}
+        >
+          {sidebarOpen ? (
+            <ChevronLeft className="w-3 h-3" />
+          ) : (
+            <ChevronRight className="w-3 h-3" />
+          )}
+        </Button>
+      </div>
 
-      {/* Main Content */}
-      <div className={`flex-1 flex flex-col min-w-0 overflow-hidden h-screen`}>
+      {/* Main Content - No sidebar width adjustment needed since sidebar is overlay on mobile */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
         {/* Top Navbar */}
         <header className="h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
           <div className="flex items-center space-x-4">
@@ -333,7 +331,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </header>
 
         {/* Page Content - Scrollable */}
-        <main className="flex-1 p-4 sm:p-6 overflow-auto">
+        <main className="flex-1 p-4 sm:p-6 overflow-hidden">
           <div className="max-w-full h-full">
             {children}
           </div>
