@@ -11,6 +11,7 @@ import {
   Search, 
   ChevronDown, 
   ChevronRight,
+  ChevronLeft,
   X,
   LogOut,
   Menu
@@ -92,190 +93,202 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex w-full overflow-hidden">
+    <div className="h-screen bg-gray-50 dark:bg-gray-900 flex w-full overflow-hidden">
       {/* Sidebar */}
       <div 
-        className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 cursor-pointer relative flex-shrink-0`}
-        onClick={handleSidebarToggle}
+        className={`${
+          sidebarOpen ? 'w-64 md:w-64' : 'w-0 md:w-16'
+        } bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full overflow-hidden`}
       >
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className={`flex items-center ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
-            <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
-              <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">F</span>
-              </div>
-              {sidebarOpen && <span className="font-semibold text-gray-900 dark:text-white">Fibernode</span>}
+        {/* Toggle Button */}
+        <div className="absolute top-1/2 -right-3 transform -translate-y-1/2 z-20">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleSidebarToggle}
+            className="w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            {sidebarOpen ? (
+              <ChevronLeft className="w-3 h-3" />
+            ) : (
+              <ChevronRight className="w-3 h-3" />
+            )}
+          </Button>
+        </div>
+
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <div className={`flex items-center ${sidebarOpen ? 'justify-start' : 'justify-center'}`}>
+            <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">F</span>
             </div>
+            {sidebarOpen && <span className="ml-3 font-semibold text-gray-900 dark:text-white">Fibernode</span>}
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-          {/* Static Navigation Items */}
-          {navigationItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                isActive(item.href, item.exact)
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-l-4 border-blue-700 dark:border-blue-400'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              } ${!sidebarOpen ? 'justify-center' : ''}`}
-              title={!sidebarOpen ? item.label : ''}
-            >
-              <item.icon className="w-6 h-6 flex-shrink-0" />
-              {sidebarOpen && <span className="font-medium">{item.label}</span>}
-            </Link>
-          ))}
+        {/* Sidebar Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          <nav className="p-4 space-y-2">
+            {/* Static Navigation Items */}
+            {navigationItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                  isActive(item.href, item.exact)
+                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                } ${!sidebarOpen ? 'justify-center' : ''}`}
+                title={!sidebarOpen ? item.label : ''}
+              >
+                <item.icon className="w-6 h-6 flex-shrink-0" />
+                {sidebarOpen && <span className="font-medium">{item.label}</span>}
+              </Link>
+            ))}
 
-          {/* Affiliator Management with Search */}
-          <div className="space-y-2">
-            <button
-              onClick={handleAffiliatorClick}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                isActive('/admin/affiliators')
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              } ${!sidebarOpen ? 'justify-center' : ''}`}
-              title={!sidebarOpen ? 'Affiliator' : ''}
-            >
-              <div className="flex items-center space-x-3">
-                <Users className="w-6 h-6 flex-shrink-0" />
-                {sidebarOpen && <span className="font-medium">Affiliator</span>}
-              </div>
-              {sidebarOpen && (affiliatorSearchOpen ? (
-                <ChevronDown className="w-4 h-4 flex-shrink-0" />
-              ) : (
-                <ChevronRight className="w-4 h-4 flex-shrink-0" />
-              ))}
-            </button>
-
-            {affiliatorSearchOpen && sidebarOpen && (
-              <div className="ml-8 space-y-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    type="text"
-                    placeholder="Cari Affiliator..."
-                    value={affiliatorSearch}
-                    onChange={(e) => setAffiliatorSearch(e.target.value)}
-                    className="pl-10 pr-8 py-2 text-sm"
-                  />
-                  {affiliatorSearch && (
-                    <button
-                      onClick={() => setAffiliatorSearch('')}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
+            {/* Affiliator Management with Search */}
+            <div className="space-y-2">
+              <button
+                onClick={handleAffiliatorClick}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/admin/affiliators')
+                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                } ${!sidebarOpen ? 'justify-center' : ''}`}
+                title={!sidebarOpen ? 'Affiliator' : ''}
+              >
+                <div className="flex items-center space-x-3">
+                  <Users className="w-6 h-6 flex-shrink-0" />
+                  {sidebarOpen && <span className="font-medium">Affiliator</span>}
                 </div>
+                {sidebarOpen && (affiliatorSearchOpen ? (
+                  <ChevronDown className="w-4 h-4 flex-shrink-0" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 flex-shrink-0" />
+                ))}
+              </button>
 
-                <div className="max-h-40 overflow-y-auto space-y-1">
-                  {filteredAffiliators.length > 0 ? (
-                    filteredAffiliators.map((affiliator) => (
-                      <Link
-                        key={affiliator.uuid}
-                        to={`/admin/affiliators/${affiliator.uuid}`}
-                        className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+              {affiliatorSearchOpen && sidebarOpen && (
+                <div className="ml-8 space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      type="text"
+                      placeholder="Cari Affiliator..."
+                      value={affiliatorSearch}
+                      onChange={(e) => setAffiliatorSearch(e.target.value)}
+                      className="pl-10 pr-8 py-2 text-sm"
+                    />
+                    {affiliatorSearch && (
+                      <button
+                        onClick={() => setAffiliatorSearch('')}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                       >
-                        {affiliator.fullName}
-                      </Link>
-                    ))
-                  ) : (
-                    <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                      Tidak ada hasil ditemukan
-                    </div>
-                  )}
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-40 overflow-y-auto space-y-1">
+                    {filteredAffiliators.length > 0 ? (
+                      filteredAffiliators.map((affiliator) => (
+                        <Link
+                          key={affiliator.uuid}
+                          to={`/admin/affiliators/${affiliator.uuid}`}
+                          className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                        >
+                          {affiliator.fullName}
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                        Tidak ada hasil ditemukan
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Payment Management with Search */}
-          <div className="space-y-2">
-            <button
-              onClick={handlePaymentClick}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                isActive('/admin/payments')
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              } ${!sidebarOpen ? 'justify-center' : ''}`}
-              title={!sidebarOpen ? 'Pembayaran' : ''}
-            >
-              <div className="flex items-center space-x-3">
-                <CreditCard className="w-6 h-6 flex-shrink-0" />
-                {sidebarOpen && <span className="font-medium">Pembayaran</span>}
-              </div>
-              {sidebarOpen && (paymentSearchOpen ? (
-                <ChevronDown className="w-4 h-4 flex-shrink-0" />
-              ) : (
-                <ChevronRight className="w-4 h-4 flex-shrink-0" />
-              ))}
-            </button>
-
-            {paymentSearchOpen && sidebarOpen && (
-              <div className="ml-8 space-y-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    type="text"
-                    placeholder="Cari Affiliator..."
-                    value={paymentSearch}
-                    onChange={(e) => setPaymentSearch(e.target.value)}
-                    className="pl-10 pr-8 py-2 text-sm"
-                  />
-                  {paymentSearch && (
-                    <button
-                      onClick={() => setPaymentSearch('')}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
+            {/* Payment Management with Search */}
+            <div className="space-y-2">
+              <button
+                onClick={handlePaymentClick}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/admin/payments')
+                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                } ${!sidebarOpen ? 'justify-center' : ''}`}
+                title={!sidebarOpen ? 'Pembayaran' : ''}
+              >
+                <div className="flex items-center space-x-3">
+                  <CreditCard className="w-6 h-6 flex-shrink-0" />
+                  {sidebarOpen && <span className="font-medium">Pembayaran</span>}
                 </div>
+                {sidebarOpen && (paymentSearchOpen ? (
+                  <ChevronDown className="w-4 h-4 flex-shrink-0" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 flex-shrink-0" />
+                ))}
+              </button>
 
-                <div className="max-h-40 overflow-y-auto space-y-1">
-                  {filteredPaymentAffiliators.length > 0 ? (
-                    filteredPaymentAffiliators.map((affiliator) => (
-                      <Link
-                        key={affiliator.uuid}
-                        to={`/admin/payments/affiliator/${affiliator.uuid}`}
-                        className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+              {paymentSearchOpen && sidebarOpen && (
+                <div className="ml-8 space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      type="text"
+                      placeholder="Cari Affiliator..."
+                      value={paymentSearch}
+                      onChange={(e) => setPaymentSearch(e.target.value)}
+                      className="pl-10 pr-8 py-2 text-sm"
+                    />
+                    {paymentSearch && (
+                      <button
+                        onClick={() => setPaymentSearch('')}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                       >
-                        {affiliator.fullName}
-                      </Link>
-                    ))
-                  ) : (
-                    <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                      Tidak ada hasil ditemukan
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </nav>
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
 
-        {/* Expand button when collapsed */}
-        {!sidebarOpen && (
-          <div className="absolute top-1/2 -right-3 transform -translate-y-1/2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSidebarOpen(true);
-              }}
-              className="w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  <div className="max-h-40 overflow-y-auto space-y-1">
+                    {filteredPaymentAffiliators.length > 0 ? (
+                      filteredPaymentAffiliators.map((affiliator) => (
+                        <Link
+                          key={affiliator.uuid}
+                          to={`/admin/payments/affiliator/${affiliator.uuid}`}
+                          className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                        >
+                          {affiliator.fullName}
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                        Tidak ada hasil ditemukan
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Logout Button in Sidebar */}
+            <button
+              onClick={() => setShowLogoutModal(true)}
+              className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              title={!sidebarOpen ? 'Logout' : ''}
             >
-              <ChevronRight className="w-3 h-3" />
-            </Button>
-          </div>
-        )}
+              <LogOut className="w-6 h-6 flex-shrink-0" />
+              {sidebarOpen && <span className="font-medium">Logout</span>}
+            </button>
+          </nav>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-full">
         {/* Top Navbar */}
         <header className="h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
           <div className="flex items-center space-x-4">
@@ -283,7 +296,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               variant="ghost"
               size="sm"
               onClick={handleSidebarToggle}
-              className="lg:hidden"
+              className="md:hidden"
             >
               <Menu className="w-4 h-4" />
             </Button>
@@ -297,17 +310,17 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               onClick={() => setShowLogoutModal(true)}
               variant="destructive"
               size="sm"
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 flex items-center justify-center"
             >
-              <LogOut className="w-4 h-4 mr-2" />
+              <LogOut className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">{indonesianTexts.navigation.logout}</span>
             </Button>
           </div>
         </header>
 
-        {/* Page Content */}
+        {/* Page Content - Scrollable */}
         <main className="flex-1 p-4 sm:p-6 overflow-auto">
-          <div className="max-w-full">
+          <div className="max-w-full h-full">
             {children}
           </div>
         </main>
