@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +14,8 @@ import {
   ChevronLeft,
   X,
   LogOut,
-  Menu
+  Menu,
+  Zap
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -112,8 +114,8 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className={`flex items-center ${sidebarOpen ? 'justify-start' : 'justify-center'}`}>
-            <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">F</span>
+            <div className="w-8 h-8 bg-blue-600 dark:bg-blue-600 rounded-lg flex items-center justify-center">
+              <Zap className="text-white w-5 h-5" />
             </div>
             {sidebarOpen && <span className="ml-3 font-semibold text-gray-900 dark:text-white">Fibernode</span>}
           </div>
@@ -315,7 +317,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
           <div className="flex items-center space-x-4">
             <span className="hidden sm:inline text-gray-700 dark:text-gray-300 text-sm">
-              {indonesianTexts.navigation.welcome}, {user?.fullName}
+              {indonesianTexts.navigation.welcome}, <span className="font-bold text-blue-600 dark:text-blue-400">{user?.fullName}</span>
             </span>
             <Button
               onClick={() => setShowLogoutModal(true)}
