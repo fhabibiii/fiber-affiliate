@@ -20,6 +20,7 @@ import AffiliatorDashboard from "@/pages/affiliator/AffiliatorDashboard";
 import PaymentHistory from "@/pages/affiliator/PaymentHistory";
 import NotFound from "./pages/NotFound";
 import ThemeToggle from "@/components/ThemeToggle";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -132,6 +133,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <ThemeToggle />
+            <PWAInstallPrompt />
           </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>
