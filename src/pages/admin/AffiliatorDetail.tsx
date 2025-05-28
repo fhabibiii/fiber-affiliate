@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -227,7 +226,7 @@ const AffiliatorDetail: React.FC = () => {
           <Card className="w-full">
             <CollapsibleTrigger className="w-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
-                <CardTitle className="text-left text-lg">Informasi Affiliator</CardTitle>
+                <CardTitle className="text-left text-base">Informasi Affiliator</CardTitle>
                 {isInfoOpen ? (
                   <ChevronUp className="w-4 h-4" />
                 ) : (
@@ -273,7 +272,7 @@ const AffiliatorDetail: React.FC = () => {
           <Card className="w-full">
             <CollapsibleTrigger className="w-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 p-6">
-                <CardTitle className="text-left">Informasi Affiliator</CardTitle>
+                <CardTitle className="text-left text-base">Informasi Affiliator</CardTitle>
                 {isInfoOpen ? (
                   <ChevronUp className="w-4 h-4" />
                 ) : (
@@ -317,7 +316,7 @@ const AffiliatorDetail: React.FC = () => {
       {/* Customer Table */}
       <Card className="w-full">
         <CardHeader className="pb-2">
-          <CardTitle className="text-xl md:text-2xl text-lg">Daftar Pelanggan</CardTitle>
+          <CardTitle className="text-base">Daftar Pelanggan</CardTitle>
         </CardHeader>
         <CardContent className="p-6 pt-2">
           {/* Mobile Controls - Above search bar */}

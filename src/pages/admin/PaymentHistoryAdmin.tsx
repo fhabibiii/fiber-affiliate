@@ -285,7 +285,7 @@ const PaymentHistoryAdmin: React.FC = () => {
         </div>
       </div>
 
-      {/* Total Payment Card - Moved above */}
+      {/* Total Payment Card */}
       <div className="block md:hidden">
         <Collapsible open={isTotalOpen} onOpenChange={setIsTotalOpen}>
           <Card className="w-full">
@@ -315,7 +315,7 @@ const PaymentHistoryAdmin: React.FC = () => {
           <Card className="w-full">
             <CollapsibleTrigger className="w-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 p-6">
-                <CardTitle className="text-left text-lg">Total Pembayaran</CardTitle>
+                <CardTitle className="text-left text-base">Total Pembayaran</CardTitle>
                 {isTotalOpen ? (
                   <ChevronUp className="w-4 h-4" />
                 ) : (
@@ -325,7 +325,7 @@ const PaymentHistoryAdmin: React.FC = () => {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <CardContent className="pt-0">
-                <div className="text-2xl font-bold text-green-700 dark:text-green-300">
+                <div className="text-xl font-bold text-green-700 dark:text-green-300">
                   {formatCurrency(totalAmount)}
                 </div>
               </CardContent>
@@ -337,7 +337,7 @@ const PaymentHistoryAdmin: React.FC = () => {
       {/* Payment Table */}
       <Card className="w-full">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xl md:text-2xl">Riwayat Pembayaran</CardTitle>
+          <CardTitle className="text-base">Riwayat Pembayaran</CardTitle>
         </CardHeader>
         <CardContent className="p-6 pt-0">
           {/* Mobile Controls - Above search bar */}
