@@ -38,7 +38,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Top Navbar */}
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,30 +49,8 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               <div className="w-8 h-8 bg-blue-900 dark:bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">F</span>
               </div>
-              <span className="font-semibold text-gray-900 dark:text-white">Fibernode</span>
+              <span className="font-semibold text-gray-900 dark:text-white">Fibernode Internet</span>
             </div>
-
-            {/* Navigation Tabs - Desktop */}
-            <nav className="hidden md:flex relative">
-              <div className="flex space-x-8 relative">
-                {navigationTabs.map((tab) => (
-                  <Link
-                    key={tab.href}
-                    to={tab.href}
-                    className={`px-3 py-2 text-sm font-medium transition-all duration-300 relative group ${
-                      isActive(tab.href, tab.exact)
-                        ? 'text-blue-700 dark:text-blue-400 font-bold'
-                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                    }`}
-                  >
-                    {tab.label}
-                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 ${
-                      isActive(tab.href, tab.exact) ? 'w-full' : 'w-0 group-hover:w-full'
-                    }`} />
-                  </Link>
-                ))}
-              </div>
-            </nav>
 
             {/* User Info and Logout - Desktop */}
             <div className="hidden md:flex items-center space-x-4">
@@ -102,35 +80,45 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               </Button>
             </div>
           </div>
+        </div>
+      </header>
 
-          {/* Mobile Navigation Tabs */}
-          <nav className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      {/* Navigation Tabs */}
+      <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center md:justify-start">
             <div className="flex space-x-8 overflow-x-auto py-2">
               {navigationTabs.map((tab) => (
                 <Link
                   key={tab.href}
                   to={tab.href}
-                  className={`px-3 py-2 text-sm font-medium transition-all duration-300 whitespace-nowrap relative ${
+                  className={`px-4 py-3 text-sm font-medium transition-all duration-300 whitespace-nowrap relative ${
                     isActive(tab.href, tab.exact)
-                      ? 'text-blue-700 dark:text-blue-400 font-bold'
+                      ? 'text-white bg-blue-600 rounded-md'
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   {tab.label}
-                  <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-blue-700 dark:bg-blue-400 transition-all duration-300 ${
-                    isActive(tab.href, tab.exact) ? 'w-full' : 'w-0'
-                  }`} />
                 </Link>
               ))}
             </div>
-          </nav>
+          </div>
         </div>
-      </header>
+      </nav>
 
       {/* Page Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
+
+      {/* Footer */}
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+            © 2023 Fibernode Internet. All rights reserved.
+          </div>
+        </div>
+      </footer>
 
       {/* Logout Modal */}
       <LogoutModal
