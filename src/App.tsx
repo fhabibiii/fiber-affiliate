@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,8 +20,122 @@ import PaymentHistory from "@/pages/affiliator/PaymentHistory";
 import NotFound from "./pages/NotFound";
 import ThemeToggle from "@/components/ThemeToggle";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import { usePWA } from "@/hooks/usePWA";
 
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  const { isStandalone } = usePWA();
+  
+  return (
+    <>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+        
+        {/* Protected Admin Routes */}
+        <Route 
+          path="/admin" 
+          element={
+            <PrivateRoute roles={['ADMIN']}>
+              <AdminLayout>
+                <AdminDashboard />
+              </AdminLayout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/admin/add-customer" 
+          element={
+            <PrivateRoute roles={['ADMIN']}>
+              <AdminLayout>
+                <AddCustomer />
+              </AdminLayout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/admin/affiliators" 
+          element={
+            <PrivateRoute roles={['ADMIN']}>
+              <AdminLayout>
+                <AffiliatorList />
+              </AdminLayout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/admin/affiliators/:id" 
+          element={
+            <PrivateRoute roles={['ADMIN']}>
+              <AdminLayout>
+                <AffiliatorDetail />
+              </AdminLayout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/admin/payments" 
+          element={
+            <PrivateRoute roles={['ADMIN']}>
+              <AdminLayout>
+                <AddPayment />
+              </AdminLayout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/admin/payments/affiliator/:id" 
+          element={
+            <PrivateRoute roles={['ADMIN']}>
+              <AdminLayout>
+                <PaymentHistoryAdmin />
+              </AdminLayout>
+            </PrivateRoute>
+          } 
+        />
+        
+        {/* Protected Affiliator Routes */}
+        <Route 
+          path="/affiliator" 
+          element={
+            <PrivateRoute roles={['AFFILIATOR']}>
+              <AffiliatorLayout>
+                <AffiliatorDashboard />
+              </AffiliatorLayout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/affiliator/payments" 
+          element={
+            <PrivateRoute roles={['AFFILIATOR']}>
+              <AffiliatorLayout>
+                <PaymentHistory />
+              </AffiliatorLayout>
+            </PrivateRoute>
+          } 
+        />
+        
+        {/* Root redirect */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        
+        {/* Catch-all 404 route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      
+      {/* Only show theme toggle and install prompt when not in standalone mode */}
+      {!isStandalone && <ThemeToggle />}
+      <PWAInstallPrompt />
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -32,108 +145,7 @@ const App = () => (
         <Sonner />
         <AuthProvider>
           <BrowserRouter>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
-              
-              {/* Protected Admin Routes */}
-              <Route 
-                path="/admin" 
-                element={
-                  <PrivateRoute roles={['ADMIN']}>
-                    <AdminLayout>
-                      <AdminDashboard />
-                    </AdminLayout>
-                  </PrivateRoute>
-                } 
-              />
-              
-              <Route 
-                path="/admin/add-customer" 
-                element={
-                  <PrivateRoute roles={['ADMIN']}>
-                    <AdminLayout>
-                      <AddCustomer />
-                    </AdminLayout>
-                  </PrivateRoute>
-                } 
-              />
-              
-              <Route 
-                path="/admin/affiliators" 
-                element={
-                  <PrivateRoute roles={['ADMIN']}>
-                    <AdminLayout>
-                      <AffiliatorList />
-                    </AdminLayout>
-                  </PrivateRoute>
-                } 
-              />
-              
-              <Route 
-                path="/admin/affiliators/:id" 
-                element={
-                  <PrivateRoute roles={['ADMIN']}>
-                    <AdminLayout>
-                      <AffiliatorDetail />
-                    </AdminLayout>
-                  </PrivateRoute>
-                } 
-              />
-              
-              <Route 
-                path="/admin/payments" 
-                element={
-                  <PrivateRoute roles={['ADMIN']}>
-                    <AdminLayout>
-                      <AddPayment />
-                    </AdminLayout>
-                  </PrivateRoute>
-                } 
-              />
-              
-              <Route 
-                path="/admin/payments/affiliator/:id" 
-                element={
-                  <PrivateRoute roles={['ADMIN']}>
-                    <AdminLayout>
-                      <PaymentHistoryAdmin />
-                    </AdminLayout>
-                  </PrivateRoute>
-                } 
-              />
-              
-              {/* Protected Affiliator Routes */}
-              <Route 
-                path="/affiliator" 
-                element={
-                  <PrivateRoute roles={['AFFILIATOR']}>
-                    <AffiliatorLayout>
-                      <AffiliatorDashboard />
-                    </AffiliatorLayout>
-                  </PrivateRoute>
-                } 
-              />
-              
-              <Route 
-                path="/affiliator/payments" 
-                element={
-                  <PrivateRoute roles={['AFFILIATOR']}>
-                    <AffiliatorLayout>
-                      <PaymentHistory />
-                    </AffiliatorLayout>
-                  </PrivateRoute>
-                } 
-              />
-              
-              {/* Root redirect */}
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              
-              {/* Catch-all 404 route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <ThemeToggle />
-            <PWAInstallPrompt />
+            <AppContent />
           </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>

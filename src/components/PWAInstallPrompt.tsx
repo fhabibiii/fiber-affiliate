@@ -1,62 +1,50 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, X } from 'lucide-react';
-
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: Array<string>;
-  readonly userChoice: Promise<{
-    outcome: 'accepted' | 'dismissed';
-    platform: string;
-  }>;
-  prompt(): Promise<void>;
-}
+import { usePWA } from '@/hooks/usePWA';
 
 const PWAInstallPrompt: React.FC = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const { canInstall, installApp } = usePWA();
+  const [showPrompt, setShowPrompt] = React.useState(false);
 
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowInstallPrompt(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
+  React.useEffect(() => {
+    if (canInstall) {
+      // Show prompt after a delay to not interrupt user experience
+      const timer = setTimeout(() => {
+        setShowPrompt(true);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [canInstall]);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-    } else {
-      console.log('User dismissed the install prompt');
+    try {
+      await installApp();
+      setShowPrompt(false);
+    } catch (error) {
+      console.error('Install failed:', error);
     }
-    
-    setDeferredPrompt(null);
-    setShowInstallPrompt(false);
   };
 
   const handleDismiss = () => {
-    setShowInstallPrompt(false);
-    setDeferredPrompt(null);
+    setShowPrompt(false);
+    // Don't show again for this session
+    sessionStorage.setItem('pwa-install-dismissed', 'true');
   };
 
-  if (!showInstallPrompt || !deferredPrompt) {
+  // Don't show if dismissed in this session
+  if (sessionStorage.getItem('pwa-install-dismissed') === 'true') {
+    return null;
+  }
+
+  if (!showPrompt || !canInstall) {
     return null;
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 max-w-sm mx-auto">
+    <div className="fixed bottom-4 left-4 right-4 z-50 max-w-sm mx-auto animate-fade-in">
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
