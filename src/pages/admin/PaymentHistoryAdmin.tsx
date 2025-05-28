@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -214,10 +215,10 @@ const PaymentHistoryAdmin: React.FC = () => {
     {
       key: 'month',
       label: 'Bulan',
-      render: (value: string, row: any) => (
+      render: (value: string) => (
         <>
           <span className="hidden sm:inline">{value}</span>
-          <span className="sm:hidden">{formatMobileMonth(value, row.year)}</span>
+          <span className="sm:hidden">{formatMobileMonth(value, 2024)}</span>
         </>
       )
     },
@@ -269,55 +270,39 @@ const PaymentHistoryAdmin: React.FC = () => {
 
   const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
-  const TableWithTotal = ({ children }: { children: React.ReactNode }) => (
-    <div className="hidden md:block overflow-x-auto">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b border-gray-200 dark:border-gray-700">
-            {columns.map((column) => (
-              <th
-                key={column.key}
-                className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white"
-              >
-                {column.label}
-              </th>
-            ))}
-            <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
-              Aksi
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {payments.map((row, rowIndex) => (
-            <tr
-              key={row.uuid || rowIndex}
-              className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            >
-              {columns.map((column) => (
-                <td key={column.key} className="py-3 px-4 text-gray-700 dark:text-gray-300">
-                  {column.render ? column.render(row[column.key], row) : row[column.key]}
-                </td>
-              ))}
-              <td className="py-3 px-4">
-                {actions(row)}
-              </td>
-            </tr>
-          ))}
-          <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
-            <td colSpan={4} className="py-3 px-4 text-center font-bold text-gray-900 dark:text-white">
-              Total Pembayaran
-            </td>
-            <td colSpan={2} className="py-3 px-4 text-center font-bold text-green-700 dark:text-green-300">
-              {formatCurrency(totalAmount)}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  const extraControls = (
+    <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
+      <div className="flex gap-2 sm:hidden w-full">
+        <Button 
+          onClick={handleExportCSV}
+          variant="outline"
+          size="sm"
+          className="flex-1"
+        >
+          <Download className="w-4 h-4" />
+        </Button>
+        <Button onClick={() => setShowAddPaymentModal(true)} size="sm" className="flex-1">
+          <Plus className="w-4 h-4" />
+        </Button>
+      </div>
+      <div className="hidden sm:flex gap-2">
+        <Button 
+          onClick={handleExportCSV}
+          variant="outline"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export CSV
+        </Button>
+        <Button onClick={() => setShowAddPaymentModal(true)}>
+          <Plus className="w-4 h-4 mr-2" />
+          Tambah Pembayaran
+        </Button>
+      </div>
     </div>
   );
 
   return (
-    <div className="space-y-6 w-full max-w-full">
+    <div className="space-y-4 w-full max-w-full">
       {/* Page Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
@@ -332,125 +317,43 @@ const PaymentHistoryAdmin: React.FC = () => {
 
       {/* Payment Table */}
       <Card className="w-full">
-        <CardHeader className="pb-2">
-          <CardTitle>Riwayat Pembayaran</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Riwayat Pembayaran</CardTitle>
         </CardHeader>
-        <CardContent className="p-6 pt-2">
-          <div className="space-y-4">
-            {/* Search and Controls */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-              <div className="relative w-full sm:w-auto sm:min-w-64 order-2 sm:order-1">
-                <div className="relative">
-                  <Input
-                    type="text"
-                    placeholder="Cari data..."
-                    className="pl-10"
-                  />
+        <CardContent className="p-6 pt-0">
+          <ResponsiveTable
+            data={payments}
+            columns={columns}
+            actions={actions}
+            extraControls={extraControls}
+          />
+          
+          {/* Total Payment Footer for Desktop */}
+          <div className="hidden md:block mt-4">
+            <div className="border-t-2 border-gray-300 dark:border-gray-600">
+              <div className="grid grid-cols-6 py-3 bg-gray-50 dark:bg-gray-800">
+                <div className="col-span-4 px-4 text-center font-bold text-gray-900 dark:text-white">
+                  Total Pembayaran
                 </div>
-              </div>
-              
-              <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
-                <div className="flex gap-2 sm:hidden w-full">
-                  <Button 
-                    onClick={handleExportCSV}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button onClick={() => setShowAddPaymentModal(true)} size="sm" className="flex-1">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="hidden sm:flex gap-2">
-                  <Button 
-                    onClick={handleExportCSV}
-                    variant="outline"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export CSV
-                  </Button>
-                  <Button onClick={() => setShowAddPaymentModal(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Tambah Pembayaran
-                  </Button>
+                <div className="col-span-2 px-4 text-center font-bold text-green-700 dark:text-green-300">
+                  {formatCurrency(totalAmount)}
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Table */}
-            <TableWithTotal>
-              {children}
-            </TableWithTotal>
-
-            {/* Mobile Cards */}
-            <div className="md:hidden space-y-3">
-              {payments.map((row, rowIndex) => (
-                <Card key={row.uuid || rowIndex} className="transition-all duration-200">
-                  <CardContent className="p-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <span className="font-medium text-gray-900 dark:text-white">
-                            {formatMobileMonth(row.month, row.year)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {actions(row)}
-                        </div>
-                      </div>
-                      <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                        <div>
-                          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            Jumlah:
-                          </div>
-                          <div className="text-sm text-gray-900 dark:text-white mt-1">
-                            {formatCurrency(row.amount)}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            Tanggal Pembayaran:
-                          </div>
-                          <div className="text-sm text-gray-900 dark:text-white mt-1">
-                            {formatDate(row.paymentDate)}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            Bukti Pembayaran:
-                          </div>
-                          <div className="text-sm text-gray-900 dark:text-white mt-1">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewImage(row.proofImage)}
-                              className="flex items-center gap-2"
-                            >
-                              <Eye className="w-4 h-4" />
-                              Lihat Bukti
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              
-              {/* Mobile Total */}
-              <Card className="bg-gray-50 dark:bg-gray-800">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-gray-900 dark:text-white">Total Pembayaran</span>
-                    <span className="font-bold text-green-700 dark:text-green-300">
-                      {formatCurrency(totalAmount)}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          {/* Mobile Total */}
+          <div className="md:hidden mt-4">
+            <Card className="bg-gray-50 dark:bg-gray-800">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-gray-900 dark:text-white">Total Pembayaran</span>
+                  <span className="font-bold text-green-700 dark:text-green-300">
+                    {formatCurrency(totalAmount)}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </CardContent>
       </Card>
