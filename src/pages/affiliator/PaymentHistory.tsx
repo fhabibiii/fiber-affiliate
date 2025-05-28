@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -217,21 +218,36 @@ const PaymentHistory: React.FC = () => {
   const columns = [
     {
       key: 'month',
-      label: 'Bulan'
+      label: 'Bulan',
+      render: (value: string, row: any) => (
+        <span className="block md:hidden text-xs">
+          {`${value} ${row.year}`}
+        </span>
+      ),
+      fullRender: (value: string, row: any) => (
+        <span className="hidden md:block text-sm lg:text-base">
+          {value}
+        </span>
+      )
     },
     {
       key: 'year',
-      label: 'Tahun'
+      label: 'Tahun',
+      hideOnMobile: true
     },
     {
       key: 'amount',
       label: 'Jumlah',
-      render: (value: number) => formatCurrency(value)
+      render: (value: number) => (
+        <span className="text-xs lg:text-sm">{formatCurrency(value)}</span>
+      )
     },
     {
       key: 'paymentDate',
       label: 'Tanggal Pembayaran',
-      render: (value: string) => formatDate(value)
+      render: (value: string) => (
+        <span className="text-xs lg:text-sm">{formatDate(value)}</span>
+      )
     },
     {
       key: 'proofImage',
@@ -241,9 +257,9 @@ const PaymentHistory: React.FC = () => {
           variant="outline"
           size="sm"
           onClick={() => setSelectedImage(value)}
-          className="flex items-center gap-2 w-full md:w-auto"
+          className="flex items-center gap-2 w-full md:w-auto text-xs lg:text-sm"
         >
-          <Eye className="w-4 h-4" />
+          <Eye className="w-3 h-3 lg:w-4 lg:h-4" />
           Lihat Bukti
         </Button>
       )
@@ -253,14 +269,14 @@ const PaymentHistory: React.FC = () => {
   const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-center lg:items-center gap-4">
         <div className="text-center lg:text-left w-full lg:w-auto">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
             Riwayat Pembayaran
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm lg:text-base">
             Riwayat pembayaran komisi Anda
           </p>
         </div>
@@ -268,10 +284,10 @@ const PaymentHistory: React.FC = () => {
         <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 w-full lg:w-auto">
           <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">
+              <p className="text-xs lg:text-sm font-medium text-green-600 dark:text-green-400 mb-1">
                 Total Diterima
               </p>
-              <p className="text-xl font-bold text-green-700 dark:text-green-300">
+              <p className="text-lg lg:text-xl font-bold text-green-700 dark:text-green-300">
                 {formatCurrency(totalAmount)}
               </p>
             </div>
@@ -281,7 +297,7 @@ const PaymentHistory: React.FC = () => {
 
       {/* Payment Table */}
       <Card className="w-full">
-        <CardContent className="p-6">
+        <CardContent className="p-4 lg:p-6">
           <ResponsiveTable
             data={payments}
             columns={columns}
