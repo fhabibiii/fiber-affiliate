@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,12 +7,16 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, Search } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 
 const AddPayment: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
   const [formData, setFormData] = useState({
     affiliatorId: '',
     month: '',
@@ -27,12 +31,25 @@ const AddPayment: React.FC = () => {
     { uuid: '1', fullName: 'John Doe' },
     { uuid: '2', fullName: 'Jane Smith' },
     { uuid: '3', fullName: 'Bob Johnson' },
+    { uuid: '4', fullName: 'Alice Brown' },
+    { uuid: '5', fullName: 'Charlie Wilson' },
+    { uuid: '6', fullName: 'Diana Davis' },
+    { uuid: '7', fullName: 'Edward Miller' },
+    { uuid: '8', fullName: 'Fiona Garcia' },
   ];
 
   const months = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
   ];
+
+  const filteredAffiliators = useMemo(() => {
+    return affiliators.filter(affiliator =>
+      affiliator.fullName.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  }, [searchValue]);
+
+  const selectedAffiliator = affiliators.find(a => a.uuid === formData.affiliatorId);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -94,21 +111,48 @@ const AddPayment: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="affiliator">Pilih Affiliator *</Label>
-                <Select 
-                  value={formData.affiliatorId} 
-                  onValueChange={(value) => setFormData({ ...formData, affiliatorId: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih affiliator" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {affiliators.map((affiliator) => (
-                      <SelectItem key={affiliator.uuid} value={affiliator.uuid}>
-                        {affiliator.fullName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-full justify-between"
+                    >
+                      {selectedAffiliator
+                        ? selectedAffiliator.fullName
+                        : "Pilih affiliator..."}
+                      <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0" align="start">
+                    <Command>
+                      <CommandInput
+                        placeholder="Cari affiliator..."
+                        value={searchValue}
+                        onValueChange={setSearchValue}
+                      />
+                      <CommandList>
+                        <CommandEmpty>Tidak ada affiliator ditemukan.</CommandEmpty>
+                        <CommandGroup>
+                          {filteredAffiliators.map((affiliator) => (
+                            <CommandItem
+                              key={affiliator.uuid}
+                              value={affiliator.fullName}
+                              onSelect={() => {
+                                setFormData({ ...formData, affiliatorId: affiliator.uuid });
+                                setOpen(false);
+                                setSearchValue('');
+                              }}
+                            >
+                              {affiliator.fullName}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div className="space-y-2">

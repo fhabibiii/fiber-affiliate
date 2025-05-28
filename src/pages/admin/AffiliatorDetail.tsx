@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,7 +38,6 @@ const AffiliatorDetail: React.FC = () => {
     joinDate: '2024-01-15T00:00:00Z'
   };
 
-  // Mock customer data for this affiliator
   const customers = [
     {
       uuid: '1',
@@ -269,38 +269,49 @@ const AffiliatorDetail: React.FC = () => {
       </div>
 
       <div className="hidden md:block">
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Informasi Affiliator</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
-                <button
-                  onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
-                  className="text-sm font-semibold text-blue-900 dark:text-gray-300 hover:opacity-80 transition-opacity"
-                >
-                  {affiliator.phoneNumber}
-                </button>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {formatIndonesianDate(affiliator.joinDate)}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Jumlah Pelanggan</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">{customers.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <Collapsible open={isInfoOpen} onOpenChange={setIsInfoOpen}>
+          <Card className="w-full">
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 p-6">
+                <CardTitle className="text-left">Informasi Affiliator</CardTitle>
+                {isInfoOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
+                    <button
+                      onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
+                      className="text-sm font-semibold text-blue-900 dark:text-gray-300 hover:opacity-80 transition-opacity"
+                    >
+                      {affiliator.phoneNumber}
+                    </button>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                      {formatIndonesianDate(affiliator.joinDate)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Jumlah Pelanggan</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{customers.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
       </div>
 
       {/* Customer Table */}
@@ -401,7 +412,6 @@ const AffiliatorDetail: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
         <DialogContent>
           <DialogHeader>
@@ -442,7 +452,6 @@ const AffiliatorDetail: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Modal */}
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent>
           <DialogHeader>
