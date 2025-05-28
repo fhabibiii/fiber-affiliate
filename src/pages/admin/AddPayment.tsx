@@ -5,28 +5,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
-import { Loader2, Upload } from 'lucide-react';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 const AddPayment: React.FC = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    affiliatorId: '',
+    affiliator: '',
     month: '',
-    year: new Date().getFullYear().toString(),
+    year: '',
     amount: '',
-    paymentDate: '',
+    paymentDate: null as Date | null,
     proofImage: null as File | null
   });
 
-  // Mock affiliator data
+  // Mock affiliators data
   const affiliators = [
     { uuid: '1', fullName: 'John Doe' },
     { uuid: '2', fullName: 'Jane Smith' },
-    { uuid: '3', fullName: 'Bob Johnson' },
+    { uuid: '3', fullName: 'Bob Wilson' }
   ];
 
   const months = [
@@ -34,171 +35,156 @@ const AddPayment: React.FC = () => {
     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
   ];
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        toast({
-          title: "Error",
-          description: "Ukuran file maksimal 10MB",
-          variant: "destructive"
-        });
-        return;
-      }
-      setFormData({ ...formData, proofImage: file });
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
+    
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({
         title: "Berhasil",
         description: "Pembayaran berhasil ditambahkan",
       });
 
-      // Navigate to payment history for the selected affiliator
-      navigate(`/admin/payments/affiliator/${formData.affiliatorId}`);
+      setFormData({
+        affiliator: '',
+        month: '',
+        year: '',
+        amount: '',
+        paymentDate: null,
+        proofImage: null
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "Gagal menambahkan pembayaran",
         variant: "destructive"
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-6 w-full max-w-full">
+    <div className="space-y-6 w-full max-w-2xl mx-auto">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Tambah Pembayaran
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Tambahkan pembayaran komisi untuk affiliator
+          Tambahkan pembayaran baru untuk affiliator
         </p>
       </div>
 
-      <Card className="w-full">
+      <Card>
         <CardHeader>
-          <CardTitle>Informasi Pembayaran</CardTitle>
+          <CardTitle>Form Tambah Pembayaran</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="affiliator">Pilih Affiliator *</Label>
-                <Select 
-                  value={formData.affiliatorId} 
-                  onValueChange={(value) => setFormData({ ...formData, affiliatorId: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih affiliator" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {affiliators.map((affiliator) => (
-                      <SelectItem key={affiliator.uuid} value={affiliator.uuid}>
-                        {affiliator.fullName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="month">Bulan *</Label>
-                <Select 
-                  value={formData.month} 
-                  onValueChange={(value) => setFormData({ ...formData, month: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih bulan" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((month) => (
-                      <SelectItem key={month} value={month}>
-                        {month}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="year">Tahun *</Label>
-                <Input
-                  id="year"
-                  type="number"
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                  required
-                  min="2020"
-                  max="2030"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="amount">Jumlah Bayar *</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  required
-                  placeholder="Masukkan jumlah pembayaran"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="paymentDate">Tanggal Bayar *</Label>
-                <Input
-                  id="paymentDate"
-                  type="date"
-                  value={formData.paymentDate}
-                  onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
-                  required
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="affiliator">Affiliator</Label>
+              <Select 
+                value={formData.affiliator} 
+                onValueChange={(value) => setFormData({ ...formData, affiliator: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih affiliator" />
+                </SelectTrigger>
+                <SelectContent>
+                  {affiliators.map((affiliator) => (
+                    <SelectItem key={affiliator.uuid} value={affiliator.uuid}>
+                      {affiliator.fullName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="proofImage">Upload Foto Bukti *</Label>
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6">
-                <div className="text-center">
-                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                  <div className="mt-4">
-                    <label htmlFor="proofImage" className="cursor-pointer">
-                      <span className="mt-2 block text-sm font-medium text-gray-900 dark:text-white">
-                        {formData.proofImage ? formData.proofImage.name : 'Klik untuk upload atau drag & drop'}
-                      </span>
-                      <span className="mt-1 block text-xs text-gray-500">
-                        PNG, JPG, JPEG hingga 10MB
-                      </span>
-                    </label>
-                    <input
-                      id="proofImage"
-                      type="file"
-                      className="sr-only"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
+              <Label htmlFor="month">Bulan</Label>
+              <Select 
+                value={formData.month} 
+                onValueChange={(value) => setFormData({ ...formData, month: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih bulan" />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((month) => (
+                    <SelectItem key={month} value={month}>
+                      {month}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {loading ? 'Menambahkan...' : 'Tambah Pembayaran'}
+            <div className="space-y-2">
+              <Label htmlFor="year">Tahun</Label>
+              <Input
+                id="year"
+                type="number"
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                placeholder="Masukkan tahun"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="amount">Jumlah</Label>
+              <Input
+                id="amount"
+                type="number"
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                placeholder="Masukkan jumlah pembayaran"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="paymentDate">Tanggal Bayar</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !formData.paymentDate && "text-muted-foreground"
+                    )}
+                  >
+                    {formData.paymentDate ? (
+                      format(formData.paymentDate, "PPP", { locale: id })
+                    ) : (
+                      <span>Pilih tanggal pembayaran</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={formData.paymentDate}
+                    onSelect={(date) => setFormData({ ...formData, paymentDate: date })}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="proofImage">Bukti Pembayaran</Label>
+              <Input
+                id="proofImage"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFormData({ ...formData, proofImage: e.target.files?.[0] || null })}
+              />
+              <p className="text-xs text-gray-500">Maksimal ukuran file 10MB</p>
+            </div>
+
+            <Button type="submit" className="w-full">
+              Tambah Pembayaran
             </Button>
           </form>
         </CardContent>
