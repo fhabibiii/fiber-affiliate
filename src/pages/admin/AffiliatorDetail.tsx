@@ -309,37 +309,42 @@ const AffiliatorDetail: React.FC = () => {
           <CardTitle className="text-xl md:text-2xl text-lg">Daftar Pelanggan</CardTitle>
         </CardHeader>
         <CardContent className="p-6 pt-2">
+          {/* Mobile Controls - Above search bar */}
+          <div className="md:hidden mb-4">
+            <div className="flex gap-2 w-full">
+              <Button 
+                onClick={handleExportCSV}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
+              </Button>
+              <Button onClick={() => setShowAddCustomerModal(true)} size="sm" className="flex-1">
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Pelanggan
+              </Button>
+            </div>
+          </div>
+
           <ResponsiveTable
             data={customers}
             columns={columns}
             actions={actions}
             extraControls={
-              <div className="flex gap-2">
-                <div className="flex gap-2 sm:hidden">
-                  <Button 
-                    onClick={handleExportCSV}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button onClick={() => setShowAddCustomerModal(true)} size="sm">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="hidden sm:flex gap-2">
-                  <Button 
-                    onClick={handleExportCSV}
-                    variant="outline"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export CSV
-                  </Button>
-                  <Button onClick={() => setShowAddCustomerModal(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Tambah Pelanggan
-                  </Button>
-                </div>
+              <div className="hidden md:flex gap-2">
+                <Button 
+                  onClick={handleExportCSV}
+                  variant="outline"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export CSV
+                </Button>
+                <Button onClick={() => setShowAddCustomerModal(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Tambah Pelanggan
+                </Button>
               </div>
             }
           />

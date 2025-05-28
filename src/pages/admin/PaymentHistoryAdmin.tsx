@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -317,43 +316,76 @@ const PaymentHistoryAdmin: React.FC = () => {
 
       {/* Payment Table */}
       <Card className="w-full">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Riwayat Pembayaran</CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 pt-0">
+        <CardContent className="p-6">
+          {/* Mobile Controls - Above search bar */}
+          <div className="md:hidden mb-4">
+            <div className="flex gap-2 w-full">
+              <Button 
+                onClick={handleExportCSV}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
+              </Button>
+              <Button onClick={() => setShowAddPaymentModal(true)} size="sm" className="flex-1">
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Pembayaran
+              </Button>
+            </div>
+          </div>
+
           <ResponsiveTable
             data={payments}
             columns={columns}
             actions={actions}
-            extraControls={extraControls}
+            extraControls={
+              <div className="hidden md:flex gap-2">
+                <Button 
+                  onClick={handleExportCSV}
+                  variant="outline"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export CSV
+                </Button>
+                <Button onClick={() => setShowAddPaymentModal(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Tambah Pembayaran
+                </Button>
+              </div>
+            }
           />
           
-          {/* Total Payment Footer for Desktop */}
-          <div className="hidden md:block mt-4">
-            <div className="border-t-2 border-gray-300 dark:border-gray-600">
-              <div className="grid grid-cols-6 py-3 bg-gray-50 dark:bg-gray-800">
-                <div className="col-span-4 px-4 text-center font-bold text-gray-900 dark:text-white">
-                  Total Pembayaran
-                </div>
-                <div className="col-span-2 px-4 text-center font-bold text-green-700 dark:text-green-300">
-                  {formatCurrency(totalAmount)}
+          {/* Total Payment - Right after data, before pagination */}
+          <div className="mt-4 mb-4">
+            {/* Desktop Total */}
+            <div className="hidden md:block">
+              <div className="border-t-2 border-gray-300 dark:border-gray-600">
+                <div className="grid grid-cols-6 py-3 bg-gray-50 dark:bg-gray-800">
+                  <div className="col-span-4 px-4 text-center font-bold text-gray-900 dark:text-white">
+                    Total Pembayaran
+                  </div>
+                  <div className="col-span-2 px-4 text-center font-bold text-green-700 dark:text-green-300">
+                    {formatCurrency(totalAmount)}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Mobile Total */}
-          <div className="md:hidden mt-4">
-            <Card className="bg-gray-50 dark:bg-gray-800">
-              <CardContent className="p-4">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-gray-900 dark:text-white">Total Pembayaran</span>
-                  <span className="font-bold text-green-700 dark:text-green-300">
-                    {formatCurrency(totalAmount)}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Mobile Total */}
+            <div className="md:hidden">
+              <Card className="bg-gray-50 dark:bg-gray-800">
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-gray-900 dark:text-white">Total Pembayaran</span>
+                    <span className="font-bold text-green-700 dark:text-green-300">
+                      {formatCurrency(totalAmount)}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </CardContent>
       </Card>
