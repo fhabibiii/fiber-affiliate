@@ -24,7 +24,8 @@ const PaymentHistoryAdmin: React.FC = () => {
   const [formData, setFormData] = useState({
     month: '',
     year: '',
-    amount: ''
+    amount: '',
+    proofImage: null as File | null
   });
 
   // Mock affiliator data
@@ -78,6 +79,24 @@ const PaymentHistoryAdmin: React.FC = () => {
     });
   };
 
+  const formatMobileMonth = (month: string, year: number) => {
+    const monthMap: { [key: string]: string } = {
+      'Januari': 'JAN',
+      'Februari': 'FEB',
+      'Maret': 'MAR',
+      'April': 'APR',
+      'Mei': 'MEI',
+      'Juni': 'JUN',
+      'Juli': 'JUL',
+      'Agustus': 'AGU',
+      'September': 'SEP',
+      'Oktober': 'OKT',
+      'November': 'NOV',
+      'Desember': 'DES'
+    };
+    return `${monthMap[month]} ${year.toString().slice(-2)}`;
+  };
+
   const handleExportCSV = () => {
     const csvContent = [
       ['Bulan', 'Tahun', 'Jumlah', 'Tanggal Pembayaran'],
@@ -101,7 +120,8 @@ const PaymentHistoryAdmin: React.FC = () => {
     setFormData({
       month: payment.month,
       year: payment.year.toString(),
-      amount: payment.amount.toString()
+      amount: payment.amount.toString(),
+      proofImage: null
     });
     setShowEditModal(true);
   };
@@ -157,7 +177,7 @@ const PaymentHistoryAdmin: React.FC = () => {
       });
 
       setShowAddPaymentModal(false);
-      setFormData({ month: '', year: '', amount: '' });
+      setFormData({ month: '', year: '', amount: '', proofImage: null });
     } catch (error) {
       toast({
         title: "Error",
@@ -194,11 +214,20 @@ const PaymentHistoryAdmin: React.FC = () => {
   const columns = [
     {
       key: 'month',
-      label: 'Bulan'
+      label: 'Bulan',
+      render: (value: string, row: any) => (
+        <>
+          <span className="hidden sm:inline">{value}</span>
+          <span className="sm:hidden">{formatMobileMonth(value, row.year)}</span>
+        </>
+      )
     },
     {
       key: 'year',
-      label: 'Tahun'
+      label: 'Tahun',
+      render: (value: number) => (
+        <span className="hidden sm:inline">{value}</span>
+      )
     },
     {
       key: 'amount',
@@ -260,39 +289,62 @@ const PaymentHistoryAdmin: React.FC = () => {
             Riwayat pembayaran untuk affiliator ini
           </p>
         </div>
-
-        <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 w-full lg:w-auto">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">
-                Total Pembayaran
-              </p>
-              <p className="text-xl font-bold text-green-700 dark:text-green-300">
-                {formatCurrency(totalAmount)}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Payment Table */}
       <Card className="w-full">
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Riwayat Pembayaran</CardTitle>
-            <Button onClick={() => setShowAddPaymentModal(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Pembayaran
-            </Button>
-          </div>
+          <CardTitle>Riwayat Pembayaran</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <ResponsiveTable
             data={payments}
             columns={columns}
-            onExport={handleExportCSV}
             actions={actions}
+            extraControls={
+              <div className="flex gap-2">
+                <div className="flex gap-2 sm:hidden">
+                  <Button 
+                    onClick={handleExportCSV}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
+                  <Button onClick={() => setShowAddPaymentModal(true)} size="sm">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="hidden sm:flex gap-2">
+                  <Button 
+                    onClick={handleExportCSV}
+                    variant="outline"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
+                  <Button onClick={() => setShowAddPaymentModal(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Tambah Pembayaran
+                  </Button>
+                </div>
+              </div>
+            }
           />
+          
+          {/* Total Payment Footer */}
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-end">
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Total Pembayaran
+                </p>
+                <p className="text-xl font-bold text-green-700 dark:text-green-300">
+                  {formatCurrency(totalAmount)}
+                </p>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -397,6 +449,16 @@ const PaymentHistoryAdmin: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editProofImage">Bukti Pembayaran (Opsional)</Label>
+              <Input
+                id="editProofImage"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFormData({ ...formData, proofImage: e.target.files?.[0] || null })}
+              />
+              <p className="text-xs text-gray-500">Maksimal ukuran file 10MB</p>
             </div>
             <Button type="submit" className="w-full">
               Simpan Perubahan
