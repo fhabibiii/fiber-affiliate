@@ -53,6 +53,25 @@ const AffiliatorList: React.FC = () => {
     }
   ];
 
+  const formatWhatsAppNumber = (phoneNumber: string) => {
+    let cleanNumber = phoneNumber.replace(/\D/g, '');
+    if (cleanNumber.startsWith('0')) {
+      cleanNumber = '62' + cleanNumber.substring(1);
+    } else if (!cleanNumber.startsWith('62')) {
+      cleanNumber = '62' + cleanNumber;
+    }
+    return cleanNumber;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  };
+
   const handleExportCSV = () => {
     const csvContent = [
       ['Nama Lengkap', 'No. HP', 'Username', 'Jumlah Pelanggan', 'Tanggal Bergabung'],
@@ -61,7 +80,7 @@ const AffiliatorList: React.FC = () => {
         affiliator.phoneNumber,
         affiliator.username,
         affiliator.customerCount,
-        new Date(affiliator.joinDate).toLocaleDateString('id-ID')
+        formatDate(affiliator.joinDate)
       ])
     ].map(row => row.join(',')).join('\n');
 
@@ -149,7 +168,18 @@ const AffiliatorList: React.FC = () => {
     },
     {
       key: 'phoneNumber',
-      label: 'No. HP'
+      label: 'No. HP',
+      render: (value: string) => (
+        <a
+          href={`https://wa.me/${formatWhatsAppNumber(value)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-900 hover:text-blue-700"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {value}
+        </a>
+      )
     },
     {
       key: 'username',
@@ -162,7 +192,7 @@ const AffiliatorList: React.FC = () => {
     {
       key: 'joinDate',
       label: 'Tanggal Bergabung',
-      render: (value: string) => new Date(value).toLocaleDateString('id-ID')
+      render: (value: string) => formatDate(value)
     }
   ];
 
@@ -195,18 +225,77 @@ const AffiliatorList: React.FC = () => {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Daftar Affiliator
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Kelola semua affiliator dalam sistem
-          </p>
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                Daftar Affiliator
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
+                Kelola semua affiliator dalam sistem
+              </p>
+            </div>
+            <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+              <DialogTrigger asChild>
+                <Button className="sm:hidden w-10 h-10 p-0">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Tambah Affiliator Baru</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Nama Lengkap</Label>
+                    <Input
+                      id="fullName"
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phoneNumber">No. HP</Label>
+                    <Input
+                      id="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      value={formData.username}
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={loading} className="w-full">
+                    {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    {loading ? 'Menambahkan...' : 'Tambah Affiliator'}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="hidden sm:flex">
               <Plus className="w-4 h-4 mr-2" />
               Tambah Affiliator
             </Button>

@@ -331,12 +331,10 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
         {/* Page Content - Scrollable with hidden scrollbar */}
         <main className="flex-1 p-4 sm:p-6 overflow-hidden">
-          <div className="max-w-full h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <style jsx>{`
-              div::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
+          <div className="max-w-full h-full overflow-y-auto scrollbar-hide">
+            <style>
+              {`.scrollbar-hide::-webkit-scrollbar { display: none; } .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }`}
+            </style>
             {children}
           </div>
         </main>
