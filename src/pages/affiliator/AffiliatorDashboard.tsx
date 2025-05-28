@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ResponsiveTable from '@/components/ui/responsive-table';
 
 const AffiliatorDashboard: React.FC = () => {
@@ -173,28 +173,11 @@ const AffiliatorDashboard: React.FC = () => {
     link.click();
   };
 
-  const formatName = (fullName: string) => {
-    const words = fullName.split(' ');
-    if (words.length <= 2) return fullName;
-    
-    return words.map((word, index) => {
-      if (index === 0 || index === words.length - 1) {
-        return word;
-      }
-      return word.charAt(0) + '.';
-    }).join(' ');
-  };
-
   const columns = [
     {
       key: 'fullName',
       label: 'Nama',
-      render: (value: string) => (
-        <span className="block md:hidden">{formatName(value)}</span>
-      ),
-      fullRender: (value: string) => (
-        <span className="hidden md:block">{value}</span>
-      )
+      render: (value: string) => value
     },
     {
       key: 'phoneNumber',
@@ -213,13 +196,19 @@ const AffiliatorDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Customer Table - directly without page header */}
+      {/* Customer Table */}
       <Card className="w-full">
-        <CardContent className="p-6">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl text-gray-900 dark:text-white">
+            Data Pelanggan Saya
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6 pt-2">
           <ResponsiveTable
             data={customers}
             columns={columns}
             onExport={handleExportCSV}
+            defaultPageSize={5}
           />
         </CardContent>
       </Card>

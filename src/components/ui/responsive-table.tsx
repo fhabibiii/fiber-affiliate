@@ -20,6 +20,7 @@ interface ResponsiveTableProps {
   actions?: (row: any) => React.ReactNode;
   onRowClick?: (row: any) => void;
   extraControls?: React.ReactNode;
+  defaultPageSize?: number;
 }
 
 const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
@@ -28,11 +29,12 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
   onExport,
   actions,
   onRowClick,
-  extraControls
+  extraControls,
+  defaultPageSize = 10
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   // Filter data based on search term
@@ -211,7 +213,7 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
         })}
       </div>
 
-      {/* Pagination */}
+      {/* Pagination and Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-2">
           <Select value={pageSize.toString()} onValueChange={(value) => {
@@ -228,6 +230,17 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
               <SelectItem value="50">50</SelectItem>
             </SelectContent>
           </Select>
+          <span className="text-sm text-gray-600 dark:text-gray-400">per halaman</span>
+        </div>
+
+        <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+          {filteredData.length > 0 ? (
+            <>
+              {startIndex + 1} dari {filteredData.length} data ditampilkan
+            </>
+          ) : (
+            '0 dari 0 data ditampilkan'
+          )}
         </div>
 
         <div className="flex items-center gap-2">

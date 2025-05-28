@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Download, Eye } from 'lucide-react';
@@ -190,10 +190,9 @@ const PaymentHistory: React.FC = () => {
 
   const handleExportCSV = () => {
     const csvContent = [
-      ['Bulan', 'Tahun', 'Jumlah', 'Tanggal Pembayaran'],
+      ['Bulan', 'Jumlah', 'Tanggal Pembayaran'],
       ...payments.map(payment => [
-        payment.month,
-        payment.year,
+        `${payment.month} ${payment.year}`,
         payment.amount,
         formatDate(payment.paymentDate)
       ])
@@ -216,12 +215,9 @@ const PaymentHistory: React.FC = () => {
 
   const columns = [
     {
-      key: 'month',
-      label: 'Bulan'
-    },
-    {
-      key: 'year',
-      label: 'Tahun'
+      key: 'monthYear',
+      label: 'Bulan',
+      render: (value: any, row: any) => `${row.month} ${row.year}`
     },
     {
       key: 'amount',
@@ -281,11 +277,17 @@ const PaymentHistory: React.FC = () => {
 
       {/* Payment Table */}
       <Card className="w-full">
-        <CardContent className="p-6">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl text-gray-900 dark:text-white">
+            Histori Pembayaran dari Admin
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6 pt-2">
           <ResponsiveTable
             data={payments}
             columns={columns}
             onExport={handleExportCSV}
+            defaultPageSize={5}
           />
         </CardContent>
       </Card>
