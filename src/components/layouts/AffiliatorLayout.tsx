@@ -39,8 +39,8 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
   return (
     <div className="min-h-screen bg-[#ecf3ff] dark:bg-gray-900 flex flex-col">
-      {/* Top Navbar with shadow */}
-      <header className="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700">
+      {/* Top Navbar with enhanced shadow */}
+      <header className="bg-white dark:bg-gray-800 shadow-xl border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Main header */}
           <div className="h-16 flex items-center justify-between">
@@ -87,12 +87,12 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       <div className="bg-[#ecf3ff] dark:bg-gray-900 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 flex gap-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2 flex gap-2 justify-center sm:justify-start">
               {navigationTabs.map((tab) => (
                 <Link
                   key={tab.href}
                   to={tab.href}
-                  className={`px-6 py-2 text-sm font-medium transition-all duration-300 rounded-md ${
+                  className={`px-4 py-2 text-xs sm:text-sm font-medium transition-all duration-300 rounded-md ${
                     isActive(tab.href, tab.exact)
                       ? 'text-white bg-blue-600'
                       : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -113,8 +113,8 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 mt-auto">
+      {/* Footer with increased height */}
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-6 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
             © 2023 Fibernode Internet. All rights reserved.

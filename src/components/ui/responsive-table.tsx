@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -89,14 +90,14 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="pl-10"
+            className="pl-10 text-sm md:text-base"
           />
         </div>
         
         {extraControls && extraControls}
         
         {onExport && !extraControls && (
-          <Button onClick={onExport} variant="outline" className="w-full sm:w-auto">
+          <Button onClick={onExport} variant="outline" className="w-full sm:w-auto text-sm">
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>
@@ -111,13 +112,13 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className="text-left py-2 px-4 font-medium text-gray-900 dark:text-white"
+                  className="text-left py-1.5 px-3 font-medium text-gray-900 dark:text-white text-sm"
                 >
                   {column.label}
                 </th>
               ))}
               {actions && (
-                <th className="text-left py-2 px-4 font-medium text-gray-900 dark:text-white">
+                <th className="text-left py-1.5 px-3 font-medium text-gray-900 dark:text-white text-sm">
                   Aksi
                 </th>
               )}
@@ -133,12 +134,12 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
                 onClick={(e) => handleRowClick(row, e)}
               >
                 {columns.map((column) => (
-                  <td key={column.key} className="py-2 px-4 text-gray-700 dark:text-gray-300">
+                  <td key={column.key} className="py-1.5 px-3 text-gray-700 dark:text-gray-300 text-sm">
                     {renderCellContent(column, row[column.key], row)}
                   </td>
                 ))}
                 {actions && (
-                  <td className="py-2 px-4" onClick={(e) => e.stopPropagation()}>
+                  <td className="py-1.5 px-3" onClick={(e) => e.stopPropagation()}>
                     {actions(row)}
                   </td>
                 )}
@@ -158,12 +159,12 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
               className={`${onRowClick ? 'cursor-pointer' : ''} transition-all duration-200`}
               onClick={(e) => handleRowClick(row, e)}
             >
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="space-y-2">
                   {/* First column always visible */}
                   <div className="flex justify-between items-center">
                     <div>
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="font-medium text-gray-900 dark:text-white text-sm">
                         {renderCellContent(columns[0], row[columns[0].key], row)}
                       </span>
                     </div>
@@ -195,7 +196,7 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
                     <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                       {columns.slice(1).map((column) => (
                         <div key={column.key}>
-                          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                          <div className="text-xs font-medium text-gray-600 dark:text-gray-400">
                             {column.label}:
                           </div>
                           <div className="text-sm text-gray-900 dark:text-white mt-1">
@@ -219,7 +220,7 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
             setPageSize(Number(value));
             setCurrentPage(1);
           }}>
-            <SelectTrigger className="w-20">
+            <SelectTrigger className="w-16 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -229,10 +230,10 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
               <SelectItem value="50">50</SelectItem>
             </SelectContent>
           </Select>
-          <span className="text-sm text-gray-600 dark:text-gray-400">per halaman</span>
+          <span className="text-xs text-gray-600 dark:text-gray-400">per halaman</span>
         </div>
 
-        <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-center text-xs text-gray-600 dark:text-gray-400">
           {filteredData.length > 0 ? (
             <>
               {startIndex + 1} dari {filteredData.length} data ditampilkan
@@ -248,11 +249,12 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
             size="sm"
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
+            className="text-xs"
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
           
-          <span className="text-sm text-gray-600 dark:text-gray-400 px-3">
+          <span className="text-xs text-gray-600 dark:text-gray-400 px-3">
             {currentPage} / {totalPages || 1}
           </span>
           
@@ -261,6 +263,7 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
             size="sm"
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages || totalPages === 0}
+            className="text-xs"
           >
             <ChevronRight className="w-4 h-4" />
           </Button>
@@ -270,7 +273,7 @@ const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
       {/* No data message */}
       {filteredData.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             {searchTerm ? 'Tidak ada data yang ditemukan' : 'Tidak ada data tersedia'}
           </p>
         </div>

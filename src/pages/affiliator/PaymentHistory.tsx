@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -238,9 +237,9 @@ const PaymentHistory: React.FC = () => {
           variant="outline"
           size="sm"
           onClick={() => setSelectedImage(value)}
-          className="flex items-center gap-2 w-full md:w-auto"
+          className="flex items-center gap-2 w-full md:w-auto text-xs"
         >
-          <Eye className="w-4 h-4" />
+          <Eye className="w-3 h-3" />
           Lihat Bukti
         </Button>
       )
@@ -250,9 +249,9 @@ const PaymentHistory: React.FC = () => {
   return (
     <div className="w-full">
       {/* Payment Table - Full width spanning entire container */}
-      <Card className="w-full mb-8">
+      <Card className="w-full mb-8 shadow-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base text-gray-900 dark:text-white">
+          <CardTitle className="text-sm text-gray-900 dark:text-white">
             Histori Pembayaran dari Admin
           </CardTitle>
         </CardHeader>
@@ -268,7 +267,7 @@ const PaymentHistory: React.FC = () => {
 
       {/* Empty State */}
       {payments.length === 0 && (
-        <Card className="mt-6">
+        <Card className="mt-6 shadow-lg">
           <CardContent className="p-12 text-center">
             <div className="text-4xl mb-4">💰</div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
