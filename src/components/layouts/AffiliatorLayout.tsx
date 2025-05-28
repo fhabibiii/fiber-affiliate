@@ -15,12 +15,12 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   const navigationTabs = [
     {
       href: '/affiliator',
-      label: indonesianTexts.navigation.customerList,
+      label: 'Data Pelanggan',
       exact: true
     },
     {
       href: '/affiliator/payments',
-      label: indonesianTexts.navigation.paymentHistory,
+      label: 'Histori Pembayaran',
       exact: false
     }
   ];
@@ -38,7 +38,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col">
       {/* Top Navbar */}
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,19 +83,19 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
       </header>
 
-      {/* Navigation Tabs */}
-      <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      {/* Navigation Menu - Rectangular below navbar */}
+      <div className="bg-gray-100 dark:bg-gray-900 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center md:justify-start">
-            <div className="flex space-x-8 overflow-x-auto py-2">
+          <div className="flex justify-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-1 flex">
               {navigationTabs.map((tab) => (
                 <Link
                   key={tab.href}
                   to={tab.href}
-                  className={`px-4 py-3 text-sm font-medium transition-all duration-300 whitespace-nowrap relative ${
+                  className={`px-6 py-3 text-sm font-medium transition-all duration-300 rounded-md ${
                     isActive(tab.href, tab.exact)
-                      ? 'text-white bg-blue-600 rounded-md'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                      ? 'text-white bg-blue-600'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   {tab.label}
@@ -104,7 +104,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
             </div>
           </div>
         </div>
-      </nav>
+      </div>
 
       {/* Page Content */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -112,7 +112,7 @@ const AffiliatorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       </main>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4">
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
             © 2023 Fibernode Internet. All rights reserved.

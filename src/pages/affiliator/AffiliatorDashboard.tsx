@@ -1,7 +1,5 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Phone, MapPin, Calendar } from 'lucide-react';
-import { indonesianTexts } from '@/constants/texts';
 import ResponsiveTable from '@/components/ui/responsive-table';
 
 const AffiliatorDashboard: React.FC = () => {
@@ -215,32 +213,7 @@ const AffiliatorDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-        <div className="text-center lg:text-left w-full lg:w-auto">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {indonesianTexts.navigation.customerList}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Daftar pelanggan yang telah Anda daftarkan
-          </p>
-        </div>
-        
-        <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 w-full lg:w-auto">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
-                Total Pelanggan
-              </p>
-              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-                {customers.length}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Customer Table */}
+      {/* Customer Table - directly without page header */}
       <Card className="w-full">
         <CardContent className="p-6">
           <ResponsiveTable
