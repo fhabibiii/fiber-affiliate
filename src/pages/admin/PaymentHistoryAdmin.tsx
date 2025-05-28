@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, Eye, Download, Plus } from 'lucide-react';
+import { Edit, Trash2, Eye, Download, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ResponsiveTable from '@/components/ui/responsive-table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 
 const PaymentHistoryAdmin: React.FC = () => {
@@ -20,6 +21,7 @@ const PaymentHistoryAdmin: React.FC = () => {
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
+  const [isTotalOpen, setIsTotalOpen] = useState(false);
   const [formData, setFormData] = useState({
     month: '',
     year: '',
@@ -269,37 +271,6 @@ const PaymentHistoryAdmin: React.FC = () => {
 
   const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
-  const extraControls = (
-    <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
-      <div className="flex gap-2 sm:hidden w-full">
-        <Button 
-          onClick={handleExportCSV}
-          variant="outline"
-          size="sm"
-          className="flex-1"
-        >
-          <Download className="w-4 h-4" />
-        </Button>
-        <Button onClick={() => setShowAddPaymentModal(true)} size="sm" className="flex-1">
-          <Plus className="w-4 h-4" />
-        </Button>
-      </div>
-      <div className="hidden sm:flex gap-2">
-        <Button 
-          onClick={handleExportCSV}
-          variant="outline"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          Export CSV
-        </Button>
-        <Button onClick={() => setShowAddPaymentModal(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Tambah Pembayaran
-        </Button>
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-4 w-full max-w-full">
       {/* Page Header */}
@@ -316,6 +287,9 @@ const PaymentHistoryAdmin: React.FC = () => {
 
       {/* Payment Table */}
       <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Riwayat Pembayaran</CardTitle>
+        </CardHeader>
         <CardContent className="p-6">
           {/* Mobile Controls - Above search bar */}
           <div className="md:hidden mb-4">
@@ -326,12 +300,10 @@ const PaymentHistoryAdmin: React.FC = () => {
                 size="sm"
                 className="flex-1"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Export CSV
+                <Download className="w-4 h-4" />
               </Button>
               <Button onClick={() => setShowAddPaymentModal(true)} size="sm" className="flex-1">
-                <Plus className="w-4 h-4 mr-2" />
-                Tambah Pembayaran
+                <Plus className="w-4 h-4" />
               </Button>
             </div>
           </div>
@@ -356,39 +328,46 @@ const PaymentHistoryAdmin: React.FC = () => {
               </div>
             }
           />
-          
-          {/* Total Payment - Right after data, before pagination */}
-          <div className="mt-4 mb-4">
-            {/* Desktop Total */}
-            <div className="hidden md:block">
-              <div className="border-t-2 border-gray-300 dark:border-gray-600">
-                <div className="grid grid-cols-6 py-3 bg-gray-50 dark:bg-gray-800">
-                  <div className="col-span-4 px-4 text-center font-bold text-gray-900 dark:text-white">
-                    Total Pembayaran
-                  </div>
-                  <div className="col-span-2 px-4 text-center font-bold text-green-700 dark:text-green-300">
-                    {formatCurrency(totalAmount)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile Total */}
-            <div className="md:hidden">
-              <Card className="bg-gray-50 dark:bg-gray-800">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-gray-900 dark:text-white">Total Pembayaran</span>
-                    <span className="font-bold text-green-700 dark:text-green-300">
-                      {formatCurrency(totalAmount)}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
         </CardContent>
       </Card>
+
+      {/* Total Payment Card */}
+      <div className="block md:hidden">
+        <Collapsible open={isTotalOpen} onOpenChange={setIsTotalOpen}>
+          <Card className="w-full">
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                <CardTitle className="text-left text-lg">Total Pembayaran</CardTitle>
+                {isTotalOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="pt-0">
+                <div className="text-2xl font-bold text-green-700 dark:text-green-300">
+                  {formatCurrency(totalAmount)}
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+      </div>
+
+      <div className="hidden md:block">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Total Pembayaran</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-green-700 dark:text-green-300">
+              {formatCurrency(totalAmount)}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Add Payment Modal */}
       <Dialog open={showAddPaymentModal} onOpenChange={setShowAddPaymentModal}>
