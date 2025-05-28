@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Trash2, Plus, Loader2 } from 'lucide-react';
+import { Edit, Trash2, Plus, Loader2, Download } from 'lucide-react';
 import ResponsiveTable from '@/components/ui/responsive-table';
 import { useNavigate } from 'react-router-dom';
+import { formatWhatsAppNumber, formatIndonesianDate } from '@/utils/formatUtils';
 
 const AffiliatorList: React.FC = () => {
   const { toast } = useToast();
@@ -61,7 +61,7 @@ const AffiliatorList: React.FC = () => {
         affiliator.phoneNumber,
         affiliator.username,
         affiliator.customerCount,
-        new Date(affiliator.joinDate).toLocaleDateString('id-ID')
+        formatIndonesianDate(affiliator.joinDate)
       ])
     ].map(row => row.join(',')).join('\n');
 
@@ -70,6 +70,11 @@ const AffiliatorList: React.FC = () => {
     link.href = URL.createObjectURL(blob);
     link.download = 'daftar-affiliator.csv';
     link.click();
+  };
+
+  const handleWhatsAppClick = (phoneNumber: string) => {
+    const formattedNumber = formatWhatsAppNumber(phoneNumber);
+    window.open(`https://wa.me/${formattedNumber}`, '_blank');
   };
 
   const handleRowClick = (affiliator: any) => {
@@ -149,7 +154,15 @@ const AffiliatorList: React.FC = () => {
     },
     {
       key: 'phoneNumber',
-      label: 'No. HP'
+      label: 'No. HP',
+      render: (value: string) => (
+        <button
+          onClick={() => handleWhatsAppClick(value)}
+          className="text-primary font-medium hover:opacity-80 transition-opacity"
+        >
+          {value}
+        </button>
+      )
     },
     {
       key: 'username',
@@ -162,7 +175,7 @@ const AffiliatorList: React.FC = () => {
     {
       key: 'joinDate',
       label: 'Tanggal Bergabung',
-      render: (value: string) => new Date(value).toLocaleDateString('id-ID')
+      render: (value: string) => formatIndonesianDate(value)
     }
   ];
 
@@ -204,62 +217,72 @@ const AffiliatorList: React.FC = () => {
           </p>
         </div>
 
-        <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Affiliator
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Tambah Affiliator Baru</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Nama Lengkap</Label>
-                <Input
-                  id="fullName"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber">No. HP</Label>
-                <Input
-                  id="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                />
-              </div>
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {loading ? 'Menambahkan...' : 'Tambah Affiliator'}
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button 
+            onClick={handleExportCSV}
+            variant="outline"
+            className="flex-1 sm:flex-none"
+          >
+            <Download className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Export CSV</span>
+          </Button>
+          <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+            <DialogTrigger asChild>
+              <Button className="flex-1 sm:flex-none">
+                <Plus className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Tambah Affiliator</span>
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Tambah Affiliator Baru</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Nama Lengkap</Label>
+                  <Input
+                    id="fullName"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">No. HP</Label>
+                  <Input
+                    id="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                  />
+                </div>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {loading ? 'Menambahkan...' : 'Tambah Affiliator'}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Affiliator Table */}
@@ -268,7 +291,6 @@ const AffiliatorList: React.FC = () => {
           <ResponsiveTable
             data={affiliators}
             columns={columns}
-            onExport={handleExportCSV}
             actions={actions}
             onRowClick={handleRowClick}
           />

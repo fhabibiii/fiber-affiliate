@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, Plus, Phone } from 'lucide-react';
+import { Edit, Trash2, Plus, Download, ChevronDown, ChevronUp } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ResponsiveTable from '@/components/ui/responsive-table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -10,7 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
+import { formatWhatsAppNumber, formatIndonesianDate } from '@/utils/formatUtils';
 
 const AffiliatorDetail: React.FC = () => {
   const { id } = useParams();
@@ -20,6 +22,7 @@ const AffiliatorDetail: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -82,7 +85,7 @@ const AffiliatorDetail: React.FC = () => {
         customer.fullName,
         customer.phoneNumber,
         customer.address,
-        new Date(customer.joinDate).toLocaleDateString('id-ID')
+        formatIndonesianDate(customer.joinDate)
       ])
     ].map(row => row.join(',')).join('\n');
 
@@ -181,10 +184,9 @@ const AffiliatorDetail: React.FC = () => {
       render: (value: string) => (
         <button
           onClick={() => handleWhatsAppClick(value)}
-          className="text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
+          className="text-primary font-medium hover:opacity-80 transition-opacity"
         >
           {value}
-          <Phone className="w-3 h-3" />
         </button>
       )
     },
@@ -195,7 +197,7 @@ const AffiliatorDetail: React.FC = () => {
     {
       key: 'joinDate',
       label: 'Tanggal Bergabung',
-      render: (value: string) => new Date(value).toLocaleDateString('id-ID')
+      render: (value: string) => formatIndonesianDate(value)
     }
   ];
 
@@ -231,52 +233,104 @@ const AffiliatorDetail: React.FC = () => {
       </div>
 
       {/* Affiliator Info */}
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Informasi Affiliator</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
-              <button
-                onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
-                className="text-lg font-semibold text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
-              >
-                {affiliator.phoneNumber}
-                <Phone className="w-4 h-4" />
-              </button>
+      <div className="block md:hidden">
+        <Collapsible open={isInfoOpen} onOpenChange={setIsInfoOpen}>
+          <Card className="w-full">
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="flex flex-row items-center justify-center space-y-0 p-4">
+                <CardTitle className="text-center flex-1">Informasi Affiliator</CardTitle>
+                {isInfoOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="pt-0">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
+                    <button
+                      onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
+                      className="text-lg font-semibold text-primary hover:opacity-80 transition-opacity"
+                    >
+                      {affiliator.phoneNumber}
+                    </button>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {formatIndonesianDate(affiliator.joinDate)}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+      </div>
+
+      <div className="hidden md:block">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Informasi Affiliator</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
+                <button
+                  onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
+                  className="text-lg font-semibold text-primary hover:opacity-80 transition-opacity"
+                >
+                  {affiliator.phoneNumber}
+                </button>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {formatIndonesianDate(affiliator.joinDate)}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                {new Date(affiliator.joinDate).toLocaleDateString('id-ID')}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Customer Table */}
       <Card className="w-full">
-        <CardHeader>
-          <div className="flex justify-between items-center">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <CardTitle>Daftar Pelanggan</CardTitle>
-            <Button onClick={() => setShowAddCustomerModal(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Pelanggan
-            </Button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button 
+                onClick={handleExportCSV}
+                variant="outline"
+                className="flex-1 sm:flex-none"
+              >
+                <Download className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Export CSV</span>
+              </Button>
+              <Button onClick={() => setShowAddCustomerModal(true)} className="flex-1 sm:flex-none">
+                <Plus className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Tambah Pelanggan</span>
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-6">
           <ResponsiveTable
             data={customers}
             columns={columns}
-            onExport={handleExportCSV}
             actions={actions}
           />
         </CardContent>
