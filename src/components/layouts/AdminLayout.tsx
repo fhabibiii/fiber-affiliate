@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -97,7 +96,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Mobile Overlay - only show when sidebar is open on mobile */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -107,8 +106,8 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         className={`${
           sidebarOpen 
             ? 'w-64 translate-x-0' 
-            : 'w-0 -translate-x-full md:translate-x-0 md:w-16'
-        } bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 flex-shrink-0 h-screen overflow-hidden fixed md:relative z-50`}
+            : 'w-0 -translate-x-full lg:translate-x-0 lg:w-16'
+        } bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 flex-shrink-0 h-screen overflow-hidden fixed lg:relative z-50`}
       >
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
@@ -281,14 +280,14 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </div>
 
-      {/* Toggle Button - Hidden on mobile, positioned at sidebar edge on desktop */}
-      <div className="relative hidden md:block">
+      {/* Toggle Button - Hidden on small screens */}
+      <div className="relative hidden lg:block">
         <Button
           variant="outline"
           size="icon"
           onClick={handleSidebarToggle}
           className={`absolute top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full shadow-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 z-50 ${
-            sidebarOpen ? '-left-3' : 'left-5 md:-left-3'
+            sidebarOpen ? '-left-3' : 'left-5 lg:-left-3'
           } transition-all duration-300`}
         >
           {sidebarOpen ? (
@@ -299,7 +298,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </Button>
       </div>
 
-      {/* Main Content - No sidebar width adjustment needed since sidebar is overlay on mobile */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
         {/* Top Navbar */}
         <header className="h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
@@ -308,7 +307,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               variant="ghost"
               size="sm"
               onClick={handleSidebarToggle}
-              className="md:hidden"
+              className="lg:hidden"
             >
               <Menu className="w-4 h-4" />
             </Button>
@@ -330,9 +329,14 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </header>
 
-        {/* Page Content - Scrollable */}
+        {/* Page Content - Scrollable with hidden scrollbar */}
         <main className="flex-1 p-4 sm:p-6 overflow-hidden">
-          <div className="max-w-full h-full">
+          <div className="max-w-full h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <style jsx>{`
+              div::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
             {children}
           </div>
         </main>

@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -83,7 +84,13 @@ const AddCustomer: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 w-full max-w-full h-full overflow-y-auto">
+    <div className="space-y-6 w-full max-w-full h-full overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+      
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -127,16 +134,16 @@ const AddCustomer: React.FC = () => {
               />
             </div>
 
-            {/* Address */}
+            {/* Address - Changed to Textarea */}
             <div className="space-y-2">
               <Label htmlFor="address">Alamat</Label>
-              <Input
+              <Textarea
                 id="address"
-                type="text"
                 placeholder="Masukkan alamat lengkap"
                 value={formData.address}
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 required
+                className="min-h-[100px]"
               />
             </div>
 

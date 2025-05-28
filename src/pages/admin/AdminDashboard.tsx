@@ -194,7 +194,7 @@ const AdminDashboard: React.FC = () => {
             </Select>
           </CardHeader>
           <CardContent>
-            <div className="h-80 w-full flex items-center justify-center">
+            <div className="h-80 w-full flex items-center justify-start">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyCustomerData}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
@@ -244,7 +244,7 @@ const AdminDashboard: React.FC = () => {
             </Select>
           </CardHeader>
           <CardContent>
-            <div className="h-80 w-full flex items-center justify-center">
+            <div className="h-80 w-full flex items-center justify-start">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyTransferData}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
