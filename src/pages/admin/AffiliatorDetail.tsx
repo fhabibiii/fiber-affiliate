@@ -11,8 +11,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
 
 const AffiliatorDetail: React.FC = () => {
   const { id } = useParams();
@@ -22,7 +20,6 @@ const AffiliatorDetail: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-  const [infoOpen, setInfoOpen] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -73,15 +70,6 @@ const AffiliatorDetail: React.FC = () => {
     return cleanNumber;
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-    ];
-    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-  };
-
   const handleWhatsAppClick = (phoneNumber: string) => {
     const formattedNumber = formatWhatsAppNumber(phoneNumber);
     window.open(`https://wa.me/${formattedNumber}`, '_blank');
@@ -94,7 +82,7 @@ const AffiliatorDetail: React.FC = () => {
         customer.fullName,
         customer.phoneNumber,
         customer.address,
-        formatDate(customer.joinDate)
+        new Date(customer.joinDate).toLocaleDateString('id-ID')
       ])
     ].map(row => row.join(',')).join('\n');
 
@@ -191,15 +179,13 @@ const AffiliatorDetail: React.FC = () => {
       key: 'phoneNumber',
       label: 'No. HP',
       render: (value: string) => (
-        <a
-          href={`https://wa.me/${formatWhatsAppNumber(value)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-900 hover:text-blue-700"
-          onClick={(e) => e.stopPropagation()}
+        <button
+          onClick={() => handleWhatsAppClick(value)}
+          className="text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
         >
           {value}
-        </a>
+          <Phone className="w-3 h-3" />
+        </button>
       )
     },
     {
@@ -209,7 +195,7 @@ const AffiliatorDetail: React.FC = () => {
     {
       key: 'joinDate',
       label: 'Tanggal Bergabung',
-      render: (value: string) => formatDate(value)
+      render: (value: string) => new Date(value).toLocaleDateString('id-ID')
     }
   ];
 
@@ -244,94 +230,43 @@ const AffiliatorDetail: React.FC = () => {
         </p>
       </div>
 
-      {/* Affiliator Info - Desktop: Card, Mobile: Collapsible */}
-      <div className="hidden md:block">
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Informasi Affiliator</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
-                <a
-                  href={`https://wa.me/${formatWhatsAppNumber(affiliator.phoneNumber)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-lg font-semibold text-blue-900 hover:text-blue-700"
-                >
-                  {affiliator.phoneNumber}
-                </a>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {formatDate(affiliator.joinDate)}
-                </p>
-              </div>
+      {/* Affiliator Info */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Informasi Affiliator</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
+              <button
+                onClick={() => handleWhatsAppClick(affiliator.phoneNumber)}
+                className="text-lg font-semibold text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
+              >
+                {affiliator.phoneNumber}
+                <Phone className="w-4 h-4" />
+              </button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Mobile Collapsible Info */}
-      <div className="md:hidden">
-        <Collapsible open={infoOpen} onOpenChange={setInfoOpen}>
-          <CollapsibleTrigger asChild>
-            <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Informasi Affiliator</CardTitle>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${infoOpen ? 'rotate-180' : ''}`} />
-                </div>
-              </CardHeader>
-            </Card>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <Card className="mt-2">
-              <CardContent className="pt-4">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</p>
-                    <a
-                      href={`https://wa.me/${formatWhatsAppNumber(affiliator.phoneNumber)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-lg font-semibold text-blue-900 hover:text-blue-700"
-                    >
-                      {affiliator.phoneNumber}
-                    </a>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {formatDate(affiliator.joinDate)}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Username</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">{affiliator.username}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {new Date(affiliator.joinDate).toLocaleDateString('id-ID')}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Customer Table */}
       <Card className="w-full">
         <CardHeader>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex justify-between items-center">
             <CardTitle>Daftar Pelanggan</CardTitle>
-            <Button 
-              onClick={() => setShowAddCustomerModal(true)}
-              className="w-full md:w-auto"
-            >
+            <Button onClick={() => setShowAddCustomerModal(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Tambah Pelanggan
             </Button>
