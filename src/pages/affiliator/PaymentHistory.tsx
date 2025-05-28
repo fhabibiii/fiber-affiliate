@@ -248,15 +248,15 @@ const PaymentHistory: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Payment Table */}
-      <Card className="w-full text-sm">
+    <div className="w-full">
+      {/* Payment Table - Full width from logo to logout */}
+      <Card className="w-full">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg text-gray-900 dark:text-white">
+          <CardTitle className="text-base text-gray-900 dark:text-white">
             Histori Pembayaran dari Admin
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6 pt-2">
+        <CardContent className="p-4 pt-2">
           <ResponsiveTable
             data={payments}
             columns={columns}
@@ -268,7 +268,7 @@ const PaymentHistory: React.FC = () => {
 
       {/* Empty State */}
       {payments.length === 0 && (
-        <Card>
+        <Card className="mt-6">
           <CardContent className="p-12 text-center">
             <div className="text-4xl mb-4">💰</div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
