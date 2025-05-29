@@ -1,3 +1,4 @@
+
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 
 const API_BASE_URL = 'https://be2e-103-105-57-35.ngrok-free.app/api/v1';
@@ -272,7 +273,7 @@ class ApiService {
 
   // Affiliator methods
   async getAffiliators(page = 1, limit = 10, search = ''): Promise<{ data: Affiliator[]; pagination: any }> {
-    const response = await this.makeRequest<Affiliator[]>(`/affiliators?page=${page}&limit=${limit}&search=${search}`);
+    const response = await this.makeRequest<ApiResponse<Affiliator[]>>(`/affiliators?page=${page}&limit=${limit}&search=${search}`);
     if (response.success && response.data) {
       return {
         data: response.data,
@@ -283,7 +284,7 @@ class ApiService {
   }
 
   async getAffiliator(uuid: string): Promise<Affiliator> {
-    const response = await this.makeRequest<Affiliator>(`/affiliators/${uuid}`);
+    const response = await this.makeRequest<ApiResponse<Affiliator>>(`/affiliators/${uuid}`);
     if (response.success && response.data) {
       return response.data;
     }
@@ -291,7 +292,7 @@ class ApiService {
   }
 
   async createAffiliator(data: Omit<Affiliator, 'uuid' | 'createdAt'> & { password: string }): Promise<Affiliator> {
-    const response = await this.makeRequest<Affiliator>('/affiliators', {
+    const response = await this.makeRequest<ApiResponse<Affiliator>>('/affiliators', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -302,7 +303,7 @@ class ApiService {
   }
 
   async updateAffiliator(uuid: string, data: Partial<Affiliator>): Promise<Affiliator> {
-    const response = await this.makeRequest<Affiliator>(`/affiliators/${uuid}`, {
+    const response = await this.makeRequest<ApiResponse<Affiliator>>(`/affiliators/${uuid}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -313,7 +314,7 @@ class ApiService {
   }
 
   async deleteAffiliator(uuid: string): Promise<void> {
-    const response = await this.makeRequest(`/affiliators/${uuid}`, {
+    const response = await this.makeRequest<ApiResponse<void>>(`/affiliators/${uuid}`, {
       method: 'DELETE',
     });
     if (!response.success) {
@@ -322,7 +323,7 @@ class ApiService {
   }
 
   async getAffiliatorSummary(uuid: string): Promise<AffiliatorSummary> {
-    const response = await this.makeRequest<AffiliatorSummary>(`/affiliators/${uuid}/summary`);
+    const response = await this.makeRequest<ApiResponse<AffiliatorSummary>>(`/affiliators/${uuid}/summary`);
     if (response.success && response.data) {
       return response.data;
     }
@@ -331,7 +332,7 @@ class ApiService {
 
   // Customer methods
   async getCustomersByAffiliator(affiliatorUuid: string, page = 1, limit = 10): Promise<{ data: Customer[]; pagination: any }> {
-    const response = await this.makeRequest<Customer[]>(`/customers/by-affiliator/${affiliatorUuid}?page=${page}&limit=${limit}`);
+    const response = await this.makeRequest<ApiResponse<Customer[]>>(`/customers/by-affiliator/${affiliatorUuid}?page=${page}&limit=${limit}`);
     if (response.success && response.data) {
       return {
         data: response.data,
@@ -342,7 +343,7 @@ class ApiService {
   }
 
   async getCustomer(uuid: string): Promise<Customer> {
-    const response = await this.makeRequest<Customer>(`/customers/${uuid}`);
+    const response = await this.makeRequest<ApiResponse<Customer>>(`/customers/${uuid}`);
     if (response.success && response.data) {
       return response.data;
     }
@@ -350,7 +351,7 @@ class ApiService {
   }
 
   async createCustomer(data: Omit<Customer, 'uuid' | 'createdAt' | 'affiliatorName'>): Promise<Customer> {
-    const response = await this.makeRequest<Customer>('/customers', {
+    const response = await this.makeRequest<ApiResponse<Customer>>('/customers', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -361,7 +362,7 @@ class ApiService {
   }
 
   async updateCustomer(uuid: string, data: Partial<Customer>): Promise<Customer> {
-    const response = await this.makeRequest<Customer>(`/customers/${uuid}`, {
+    const response = await this.makeRequest<ApiResponse<Customer>>(`/customers/${uuid}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -372,7 +373,7 @@ class ApiService {
   }
 
   async deleteCustomer(uuid: string): Promise<void> {
-    const response = await this.makeRequest(`/customers/${uuid}`, {
+    const response = await this.makeRequest<ApiResponse<void>>(`/customers/${uuid}`, {
       method: 'DELETE',
     });
     if (!response.success) {
@@ -382,7 +383,7 @@ class ApiService {
 
   // Payment methods
   async getPaymentsByAffiliator(affiliatorUuid: string, page = 1, limit = 10): Promise<{ data: Payment[]; pagination: any }> {
-    const response = await this.makeRequest<Payment[]>(`/payments/by-affiliator/${affiliatorUuid}?page=${page}&limit=${limit}`);
+    const response = await this.makeRequest<ApiResponse<Payment[]>>(`/payments/by-affiliator/${affiliatorUuid}?page=${page}&limit=${limit}`);
     if (response.success && response.data) {
       return {
         data: response.data,
@@ -393,7 +394,7 @@ class ApiService {
   }
 
   async getPayment(uuid: string): Promise<Payment> {
-    const response = await this.makeRequest<Payment>(`/payments/${uuid}`);
+    const response = await this.makeRequest<ApiResponse<Payment>>(`/payments/${uuid}`);
     if (response.success && response.data) {
       return response.data;
     }
@@ -401,7 +402,7 @@ class ApiService {
   }
 
   async createPayment(data: Omit<Payment, 'uuid' | 'createdAt' | 'affiliatorName'>): Promise<Payment> {
-    const response = await this.makeRequest<Payment>('/payments', {
+    const response = await this.makeRequest<ApiResponse<Payment>>('/payments', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -412,7 +413,7 @@ class ApiService {
   }
 
   async updatePayment(uuid: string, data: Partial<Payment>): Promise<Payment> {
-    const response = await this.makeRequest<Payment>(`/payments/${uuid}`, {
+    const response = await this.makeRequest<ApiResponse<Payment>>(`/payments/${uuid}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -423,7 +424,7 @@ class ApiService {
   }
 
   async deletePayment(uuid: string): Promise<void> {
-    const response = await this.makeRequest(`/payments/${uuid}`, {
+    const response = await this.makeRequest<ApiResponse<void>>(`/payments/${uuid}`, {
       method: 'DELETE',
     });
     if (!response.success) {
@@ -433,7 +434,7 @@ class ApiService {
 
   // Affiliator dashboard methods
   async getAffiliatorCustomers(): Promise<Customer[]> {
-    const response = await this.makeRequest<Customer[]>('/affiliator/customers');
+    const response = await this.makeRequest<ApiResponse<Customer[]>>('/affiliator/customers');
     if (response.success && response.data) {
       return response.data;
     }
@@ -441,7 +442,7 @@ class ApiService {
   }
 
   async getAffiliatorPayments(): Promise<Payment[]> {
-    const response = await this.makeRequest<Payment[]>('/affiliator/payments');
+    const response = await this.makeRequest<ApiResponse<Payment[]>>('/affiliator/payments');
     if (response.success && response.data) {
       return response.data;
     }
