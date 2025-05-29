@@ -31,8 +31,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const savedUser = localStorage.getItem('user');
         const token = localStorage.getItem('token');
         
+        console.log('Checking existing auth:', { hasUser: !!savedUser, hasToken: !!token });
+        
         if (savedUser && token) {
-          setUser(JSON.parse(savedUser));
+          const parsedUser = JSON.parse(savedUser);
+          console.log('Found saved user:', parsedUser);
+          setUser(parsedUser);
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -70,17 +74,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
+      console.log('AuthContext: Starting login process');
+      
       const response = await apiService.login(credentials);
+      console.log('AuthContext: Login response received:', response);
       
       setUser(response.user);
       localStorage.setItem('user', JSON.stringify(response.user));
+      
+      console.log('AuthContext: User set and saved to localStorage');
       
       toast({
         title: "Login berhasil",
         description: `Selamat datang, ${response.user.fullName}!`,
       });
     } catch (error) {
+      console.error('AuthContext: Login failed:', error);
       const errorMessage = error instanceof Error ? error.message : indonesianTexts.login.errors.invalid;
+      
       toast({
         title: "Login gagal",
         description: errorMessage,

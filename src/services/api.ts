@@ -102,60 +102,104 @@ class ApiService {
       headers['Authorization'] = `Bearer ${this.accessToken}`;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    console.log('Making API request:', { url, method: options.method || 'GET', headers });
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Token expired, try to refresh
-        if (this.refreshToken) {
-          try {
-            await this.refreshTokenRequest();
-            // Retry the original request with new token
-            headers['Authorization'] = `Bearer ${this.accessToken}`;
-            const retryResponse = await fetch(url, {
-              ...options,
-              headers,
-            });
-            return retryResponse.json();
-          } catch (refreshError) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
+
+      console.log('API response status:', response.status);
+
+      // Check if response is HTML (ngrok warning page)
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        console.error('Received HTML response instead of JSON:', await response.text());
+        throw new Error('Server returned HTML instead of JSON. This might be an ngrok warning page.');
+      }
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Token expired, try to refresh
+          if (this.refreshToken && endpoint !== '/auth/refresh') {
+            try {
+              console.log('Token expired, attempting refresh...');
+              await this.refreshTokenRequest();
+              // Retry the original request with new token
+              headers['Authorization'] = `Bearer ${this.accessToken}`;
+              const retryResponse = await fetch(url, {
+                ...options,
+                headers,
+              });
+              
+              if (!retryResponse.ok) {
+                throw new Error(`HTTP error! status: ${retryResponse.status}`);
+              }
+              
+              return retryResponse.json();
+            } catch (refreshError) {
+              console.error('Token refresh failed:', refreshError);
+              this.clearTokens();
+              throw new Error('Session expired. Please login again.');
+            }
+          } else {
             this.clearTokens();
             throw new Error('Session expired. Please login again.');
           }
-        } else {
-          this.clearTokens();
-          throw new Error('Session expired. Please login again.');
         }
+        
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { message: `HTTP error! status: ${response.status}` };
+        }
+        
+        console.error('API error response:', errorData);
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
-      
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
 
-    return response.json();
+      const responseData = await response.json();
+      console.log('API response data:', responseData);
+      return responseData;
+    } catch (error) {
+      console.error('API request failed:', error);
+      throw error;
+    }
   }
 
   // Auth methods
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await this.makeRequest<AuthResponse>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-    });
+    console.log('Attempting login with credentials:', { username: credentials.username });
+    
+    try {
+      const response = await this.makeRequest<AuthResponse>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+      });
 
-    if (response.success && response.data) {
-      this.setTokens(response.data.token, response.data.refreshToken);
-      return response.data;
+      console.log('Login response:', response);
+
+      if (response.success && response.data) {
+        this.setTokens(response.data.token, response.data.refreshToken);
+        console.log('Login successful, tokens saved');
+        return response.data;
+      }
+
+      throw new Error(response.message || 'Login failed');
+    } catch (error) {
+      console.error('Login error details:', error);
+      throw error;
     }
-
-    throw new Error(response.message || 'Login failed');
   }
 
   async refreshTokenRequest(): Promise<{ token: string; user: User }> {
     if (!this.refreshToken) {
       throw new Error('No refresh token available');
     }
+
+    console.log('Attempting token refresh...');
 
     const response = await this.makeRequest<{ token: string; user: User }>('/auth/refresh', {
       method: 'POST',
@@ -165,6 +209,7 @@ class ApiService {
     if (response.success && response.data) {
       this.accessToken = response.data.token;
       localStorage.setItem('token', response.data.token);
+      console.log('Token refresh successful');
       return response.data;
     }
 
@@ -176,6 +221,8 @@ class ApiService {
       await this.makeRequest('/auth/logout', {
         method: 'POST',
       });
+    } catch (error) {
+      console.error('Logout error:', error);
     } finally {
       this.clearTokens();
     }

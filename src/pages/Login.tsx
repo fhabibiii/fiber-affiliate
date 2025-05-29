@@ -39,6 +39,7 @@ const Login: React.FC = () => {
   // Redirect if already logged in
   React.useEffect(() => {
     if (user) {
+      console.log('User already logged in, redirecting...', user);
       const redirectPath = user.role === 'ADMIN' ? '/admin' : '/affiliator';
       navigate(redirectPath, { replace: true });
     }
@@ -47,17 +48,22 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
+      console.log('Login form submitted with data:', { username: data.username });
+      
       const credentials: LoginCredentials = {
         username: data.username,
         password: data.password,
       };
+      
+      console.log('Calling login function...');
       await login(credentials);
+      console.log('Login successful, should redirect soon...');
       
       if (from !== '/') {
         navigate(from, { replace: true });
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login form error:', error);
     } finally {
       setIsLoading(false);
     }
