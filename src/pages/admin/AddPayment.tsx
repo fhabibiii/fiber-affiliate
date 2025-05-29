@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,48 +11,68 @@ import { Loader2, Upload, Search } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { apiService, Affiliator } from '@/services/api';
 
 const AddPayment: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [affiliators, setAffiliators] = useState<Affiliator[]>([]);
   const [formData, setFormData] = useState({
-    affiliatorId: '',
+    affiliatorUuid: '',
     month: '',
     year: new Date().getFullYear().toString(),
     amount: '',
     paymentDate: '',
-    proofImage: null as File | null
+    proofImage: null as File | null,
+    proofImageUrl: ''
   });
 
-  // Mock affiliator data
-  const affiliators = [
-    { uuid: '1', fullName: 'John Doe' },
-    { uuid: '2', fullName: 'Jane Smith' },
-    { uuid: '3', fullName: 'Bob Johnson' },
-    { uuid: '4', fullName: 'Alice Brown' },
-    { uuid: '5', fullName: 'Charlie Wilson' },
-    { uuid: '6', fullName: 'Diana Davis' },
-    { uuid: '7', fullName: 'Edward Miller' },
-    { uuid: '8', fullName: 'Fiona Garcia' },
+  const months = [
+    { value: '01', label: 'Januari' },
+    { value: '02', label: 'Februari' },
+    { value: '03', label: 'Maret' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'Mei' },
+    { value: '06', label: 'Juni' },
+    { value: '07', label: 'Juli' },
+    { value: '08', label: 'Agustus' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'Oktober' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'Desember' }
   ];
 
-  const months = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-  ];
+  useEffect(() => {
+    const loadAffiliators = async () => {
+      try {
+        const response = await apiService.getAffiliators(1, 100); // Get all affiliators
+        setAffiliators(response.data);
+      } catch (error) {
+        console.error('Failed to load affiliators:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memuat daftar affiliator",
+          variant: "destructive"
+        });
+      }
+    };
+
+    loadAffiliators();
+  }, [toast]);
 
   const filteredAffiliators = useMemo(() => {
     return affiliators.filter(affiliator =>
       affiliator.fullName.toLowerCase().includes(searchValue.toLowerCase())
     );
-  }, [searchValue]);
+  }, [affiliators, searchValue]);
 
-  const selectedAffiliator = affiliators.find(a => a.uuid === formData.affiliatorId);
+  const selectedAffiliator = affiliators.find(a => a.uuid === formData.affiliatorUuid);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
@@ -63,16 +83,55 @@ const AddPayment: React.FC = () => {
         });
         return;
       }
-      setFormData({ ...formData, proofImage: file });
+
+      setUploading(true);
+      try {
+        const uploadResult = await apiService.uploadProofPayment(file);
+        setFormData({ 
+          ...formData, 
+          proofImage: file,
+          proofImageUrl: uploadResult.url
+        });
+        toast({
+          title: "Berhasil",
+          description: "File berhasil diupload",
+        });
+      } catch (error) {
+        console.error('Upload failed:', error);
+        toast({
+          title: "Error",
+          description: "Gagal mengupload file",
+          variant: "destructive"
+        });
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.affiliatorUuid || !formData.month || !formData.year || !formData.amount || !formData.paymentDate || !formData.proofImageUrl) {
+      toast({
+        title: "Error",
+        description: "Semua field harus diisi",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await apiService.createPayment({
+        affiliatorUuid: formData.affiliatorUuid,
+        month: formData.month,
+        year: parseInt(formData.year),
+        amount: parseInt(formData.amount),
+        paymentDate: formData.paymentDate,
+        proofImage: formData.proofImageUrl
+      });
       
       toast({
         title: "Berhasil",
@@ -80,8 +139,9 @@ const AddPayment: React.FC = () => {
       });
 
       // Navigate to payment history for the selected affiliator
-      navigate(`/admin/payments/affiliator/${formData.affiliatorId}`);
+      navigate(`/admin/payments/affiliator/${formData.affiliatorUuid}`);
     } catch (error) {
+      console.error('Failed to create payment:', error);
       toast({
         title: "Error",
         description: "Gagal menambahkan pembayaran",
@@ -143,7 +203,7 @@ const AddPayment: React.FC = () => {
                                   key={affiliator.uuid}
                                   value={affiliator.fullName}
                                   onSelect={() => {
-                                    setFormData({ ...formData, affiliatorId: affiliator.uuid });
+                                    setFormData({ ...formData, affiliatorUuid: affiliator.uuid });
                                     setOpen(false);
                                     setSearchValue('');
                                   }}
@@ -169,8 +229,8 @@ const AddPayment: React.FC = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {months.map((month) => (
-                          <SelectItem key={month} value={month}>
-                            {month}
+                          <SelectItem key={month.value} value={month.value}>
+                            {month.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -220,7 +280,11 @@ const AddPayment: React.FC = () => {
                   <Label htmlFor="proofImage">Upload Foto Bukti *</Label>
                   <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6">
                     <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                      {uploading ? (
+                        <Loader2 className="mx-auto h-12 w-12 text-gray-400 animate-spin" />
+                      ) : (
+                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                      )}
                       <div className="mt-4">
                         <label htmlFor="proofImage" className="cursor-pointer">
                           <span className="mt-2 block text-sm font-medium text-gray-900 dark:text-white">
@@ -237,13 +301,14 @@ const AddPayment: React.FC = () => {
                           accept="image/*"
                           onChange={handleFileChange}
                           required
+                          disabled={uploading}
                         />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <Button type="submit" disabled={loading} className="w-full">
+                <Button type="submit" disabled={loading || uploading} className="w-full">
                   {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   {loading ? 'Menambahkan...' : 'Tambah Pembayaran'}
                 </Button>

@@ -1,143 +1,114 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, CreditCard, TrendingUp, ArrowUpDown } from 'lucide-react';
+import { Users, CreditCard, TrendingUp } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { indonesianTexts } from '@/constants/texts';
+import { apiService, AdminSummary, StatItem } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 const AdminDashboard: React.FC = () => {
+  const { toast } = useToast();
   const [selectedCustomerYear, setSelectedCustomerYear] = useState('2024');
   const [selectedTransferYear, setSelectedTransferYear] = useState('2024');
+  const [summary, setSummary] = useState<AdminSummary | null>(null);
+  const [customerStats, setCustomerStats] = useState<StatItem[]>([]);
+  const [paymentStats, setPaymentStats] = useState<StatItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for dashboard
-  const stats = {
-    totalAffiliators: 24,
-    totalCustomers: 156,
-    monthlyPayments: 12400000,
-  };
+  const availableYears = ['2024', '2023', '2022', '2025'];
+
+  // Load summary data
+  useEffect(() => {
+    const loadSummary = async () => {
+      try {
+        const data = await apiService.getAdminSummary();
+        setSummary(data);
+      } catch (error) {
+        console.error('Failed to load admin summary:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memuat ringkasan admin",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSummary();
+  }, [toast]);
+
+  // Load customer statistics
+  useEffect(() => {
+    const loadCustomerStats = async () => {
+      try {
+        const data = await apiService.getCustomerStats(parseInt(selectedCustomerYear));
+        setCustomerStats(data);
+      } catch (error) {
+        console.error('Failed to load customer stats:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memuat statistik pelanggan",
+          variant: "destructive"
+        });
+      }
+    };
+
+    loadCustomerStats();
+  }, [selectedCustomerYear, toast]);
+
+  // Load payment statistics
+  useEffect(() => {
+    const loadPaymentStats = async () => {
+      try {
+        const data = await apiService.getPaymentStats(parseInt(selectedTransferYear));
+        setPaymentStats(data);
+      } catch (error) {
+        console.error('Failed to load payment stats:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memuat statistik pembayaran",
+          variant: "destructive"
+        });
+      }
+    };
+
+    loadPaymentStats();
+  }, [selectedTransferYear, toast]);
 
   const statCards = [
     {
       title: 'Total Affiliator',
-      value: stats.totalAffiliators,
+      value: summary?.totalAffiliators || 0,
       icon: Users,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50 dark:bg-blue-900/20'
     },
     {
       title: 'Total Pelanggan',
-      value: stats.totalCustomers,
+      value: summary?.totalCustomers || 0,
       icon: TrendingUp,
       color: 'text-green-600',
       bgColor: 'bg-green-50 dark:bg-green-900/20'
     },
     {
       title: 'Pembayaran Bulan Ini',
-      value: `Rp ${stats.monthlyPayments.toLocaleString('id-ID')}`,
+      value: `Rp ${(summary?.totalPaymentThisMonth || 0).toLocaleString('id-ID')}`,
       icon: CreditCard,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50 dark:bg-purple-900/20'
     }
   ];
 
-  // Mock data for years
-  const availableYears = ['2024', '2023', '2022'];
-
-  // Mock data for monthly customer statistics
-  const customerDataByYear = {
-    '2024': [
-      { month: 'Jan', customers: 8 },
-      { month: 'Feb', customers: 12 },
-      { month: 'Mar', customers: 18 },
-      { month: 'Apr', customers: 15 },
-      { month: 'Mei', customers: 22 },
-      { month: 'Jun', customers: 28 },
-      { month: 'Jul', customers: 35 },
-      { month: 'Agu', customers: 30 },
-      { month: 'Sep', customers: 42 },
-      { month: 'Okt', customers: 38 },
-      { month: 'Nov', customers: 45 },
-      { month: 'Des', customers: 50 }
-    ],
-    '2023': [
-      { month: 'Jan', customers: 5 },
-      { month: 'Feb', customers: 8 },
-      { month: 'Mar', customers: 12 },
-      { month: 'Apr', customers: 10 },
-      { month: 'Mei', customers: 15 },
-      { month: 'Jun', customers: 20 },
-      { month: 'Jul', customers: 25 },
-      { month: 'Agu', customers: 22 },
-      { month: 'Sep', customers: 28 },
-      { month: 'Okt', customers: 32 },
-      { month: 'Nov', customers: 35 },
-      { month: 'Des', customers: 40 }
-    ],
-    '2022': [
-      { month: 'Jan', customers: 2 },
-      { month: 'Feb', customers: 4 },
-      { month: 'Mar', customers: 6 },
-      { month: 'Apr', customers: 5 },
-      { month: 'Mei', customers: 8 },
-      { month: 'Jun', customers: 12 },
-      { month: 'Jul', customers: 15 },
-      { month: 'Agu', customers: 18 },
-      { month: 'Sep', customers: 20 },
-      { month: 'Okt', customers: 22 },
-      { month: 'Nov', customers: 25 },
-      { month: 'Des', customers: 28 }
-    ]
-  };
-
-  // Mock data for transfer statistics
-  const transferDataByYear = {
-    '2024': [
-      { month: 'Jan', transfer: 15000000 },
-      { month: 'Feb', transfer: 18000000 },
-      { month: 'Mar', transfer: 22000000 },
-      { month: 'Apr', transfer: 20000000 },
-      { month: 'Mei', transfer: 25000000 },
-      { month: 'Jun', transfer: 30000000 },
-      { month: 'Jul', transfer: 35000000 },
-      { month: 'Agu', transfer: 32000000 },
-      { month: 'Sep', transfer: 38000000 },
-      { month: 'Okt', transfer: 42000000 },
-      { month: 'Nov', transfer: 45000000 },
-      { month: 'Des', transfer: 50000000 }
-    ],
-    '2023': [
-      { month: 'Jan', transfer: 8000000 },
-      { month: 'Feb', transfer: 12000000 },
-      { month: 'Mar', transfer: 15000000 },
-      { month: 'Apr', transfer: 14000000 },
-      { month: 'Mei', transfer: 18000000 },
-      { month: 'Jun', transfer: 22000000 },
-      { month: 'Jul', transfer: 25000000 },
-      { month: 'Agu', transfer: 23000000 },
-      { month: 'Sep', transfer: 28000000 },
-      { month: 'Okt', transfer: 32000000 },
-      { month: 'Nov', transfer: 35000000 },
-      { month: 'Des', transfer: 40000000 }
-    ],
-    '2022': [
-      { month: 'Jan', transfer: 3000000 },
-      { month: 'Feb', transfer: 5000000 },
-      { month: 'Mar', transfer: 8000000 },
-      { month: 'Apr', transfer: 7000000 },
-      { month: 'Mei', transfer: 10000000 },
-      { month: 'Jun', transfer: 12000000 },
-      { month: 'Jul', transfer: 15000000 },
-      { month: 'Agu', transfer: 18000000 },
-      { month: 'Sep', transfer: 20000000 },
-      { month: 'Okt', transfer: 22000000 },
-      { month: 'Nov', transfer: 25000000 },
-      { month: 'Des', transfer: 28000000 }
-    ]
-  };
-
-  const monthlyCustomerData = customerDataByYear[selectedCustomerYear as keyof typeof customerDataByYear] || customerDataByYear['2024'];
-  const monthlyTransferData = transferDataByYear[selectedTransferYear as keyof typeof transferDataByYear] || transferDataByYear['2024'];
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 w-full max-w-full h-full overflow-y-auto">
@@ -196,7 +167,7 @@ const AdminDashboard: React.FC = () => {
           <CardContent>
             <div className="h-80 w-full flex items-center justify-start">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyCustomerData}>
+                <LineChart data={customerStats}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                   <XAxis 
                     dataKey="month" 
@@ -213,7 +184,7 @@ const AdminDashboard: React.FC = () => {
                   <Legend />
                   <Line 
                     type="monotone" 
-                    dataKey="customers" 
+                    dataKey="count" 
                     stroke="#3b82f6" 
                     strokeWidth={3}
                     dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
@@ -246,7 +217,7 @@ const AdminDashboard: React.FC = () => {
           <CardContent>
             <div className="h-80 w-full flex items-center justify-start">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyTransferData}>
+                <LineChart data={paymentStats}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                   <XAxis 
                     dataKey="month" 
@@ -267,7 +238,7 @@ const AdminDashboard: React.FC = () => {
                   <Legend />
                   <Line 
                     type="monotone" 
-                    dataKey="transfer" 
+                    dataKey="amount" 
                     stroke="#10b981" 
                     strokeWidth={3}
                     dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}

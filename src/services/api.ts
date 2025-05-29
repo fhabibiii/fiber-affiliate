@@ -1,26 +1,97 @@
 
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 
-const API_BASE_URL = 'http://localhost:3001/api/v1';
+const API_BASE_URL = 'https://be2e-103-105-57-35.ngrok-free.app/api/v1';
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
+export interface Customer {
+  uuid: string;
+  fullName: string;
+  phoneNumber: string;
+  fullAddress: string;
+  affiliatorUuid?: string;
+  affiliatorName?: string;
+  createdAt: string;
+}
+
+export interface Payment {
+  uuid: string;
+  affiliatorUuid: string;
+  affiliatorName?: string;
+  month: string;
+  year: number;
+  amount: number;
+  paymentDate: string;
+  proofImage: string;
+  createdAt: string;
+}
+
+export interface Affiliator {
+  uuid: string;
+  fullName: string;
+  username: string;
+  phoneNumber: string;
+  role?: string;
+  totalCustomers?: number;
+  createdAt: string;
+}
+
+export interface AdminSummary {
+  totalAffiliators: number;
+  totalCustomers: number;
+  totalPaymentThisMonth: number;
+}
+
+export interface StatItem {
+  month: string;
+  count?: number;
+  amount?: number;
+}
+
+export interface AffiliatorSummary {
+  totalCustomers: number;
+  totalPaymentsSinceJoin: number;
+}
 
 class ApiService {
   private accessToken: string | null = null;
   private refreshToken: string | null = null;
 
+  constructor() {
+    // Load tokens from localStorage on initialization
+    this.accessToken = localStorage.getItem('token');
+    this.refreshToken = localStorage.getItem('refreshToken');
+  }
+
   setTokens(accessToken: string, refreshToken: string) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
   }
 
   clearTokens() {
     this.accessToken = null;
     this.refreshToken = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
   }
 
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<T> {
+  ): Promise<ApiResponse<T>> {
     const url = `${API_BASE_URL}${endpoint}`;
     const headers = {
       'Content-Type': 'application/json',
@@ -37,20 +108,48 @@ class ApiService {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.status === 401) {
+        // Token expired, try to refresh
+        if (this.refreshToken) {
+          try {
+            await this.refreshTokenRequest();
+            // Retry the original request with new token
+            headers['Authorization'] = `Bearer ${this.accessToken}`;
+            const retryResponse = await fetch(url, {
+              ...options,
+              headers,
+            });
+            return retryResponse.json();
+          } catch (refreshError) {
+            this.clearTokens();
+            throw new Error('Session expired. Please login again.');
+          }
+        } else {
+          this.clearTokens();
+          throw new Error('Session expired. Please login again.');
+        }
+      }
+      
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
     return response.json();
   }
 
+  // Auth methods
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await this.makeRequest<AuthResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
 
-    this.setTokens(response.token, response.refreshToken);
-    return response;
+    if (response.success && response.data) {
+      this.setTokens(response.data.token, response.data.refreshToken);
+      return response.data;
+    }
+
+    throw new Error(response.message || 'Login failed');
   }
 
   async refreshTokenRequest(): Promise<{ token: string; user: User }> {
@@ -63,8 +162,13 @@ class ApiService {
       body: JSON.stringify({ refreshToken: this.refreshToken }),
     });
 
-    this.accessToken = response.token;
-    return response;
+    if (response.success && response.data) {
+      this.accessToken = response.data.token;
+      localStorage.setItem('token', response.data.token);
+      return response.data;
+    }
+
+    throw new Error(response.message || 'Token refresh failed');
   }
 
   async logout(): Promise<void> {
@@ -75,6 +179,236 @@ class ApiService {
     } finally {
       this.clearTokens();
     }
+  }
+
+  // Admin methods
+  async getAdminSummary(): Promise<AdminSummary> {
+    const response = await this.makeRequest<AdminSummary>('/admin/summary');
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get admin summary');
+  }
+
+  async getCustomerStats(year: number): Promise<StatItem[]> {
+    const response = await this.makeRequest<StatItem[]>(`/admin/stats/customers?year=${year}`);
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get customer statistics');
+  }
+
+  async getPaymentStats(year: number): Promise<StatItem[]> {
+    const response = await this.makeRequest<StatItem[]>(`/admin/stats/payments?year=${year}`);
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get payment statistics');
+  }
+
+  // Affiliator methods
+  async getAffiliators(page = 1, limit = 10, search = ''): Promise<{ data: Affiliator[]; pagination: any }> {
+    const response = await this.makeRequest<Affiliator[]>(`/affiliators?page=${page}&limit=${limit}&search=${search}`);
+    if (response.success && response.data) {
+      return {
+        data: response.data,
+        pagination: response.pagination || { total: response.data.length, page, limit, pages: 1 }
+      };
+    }
+    throw new Error(response.message || 'Failed to get affiliators');
+  }
+
+  async getAffiliator(uuid: string): Promise<Affiliator> {
+    const response = await this.makeRequest<Affiliator>(`/affiliators/${uuid}`);
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get affiliator');
+  }
+
+  async createAffiliator(data: Omit<Affiliator, 'uuid' | 'createdAt'> & { password: string }): Promise<Affiliator> {
+    const response = await this.makeRequest<Affiliator>('/affiliators', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to create affiliator');
+  }
+
+  async updateAffiliator(uuid: string, data: Partial<Affiliator>): Promise<Affiliator> {
+    const response = await this.makeRequest<Affiliator>(`/affiliators/${uuid}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to update affiliator');
+  }
+
+  async deleteAffiliator(uuid: string): Promise<void> {
+    const response = await this.makeRequest(`/affiliators/${uuid}`, {
+      method: 'DELETE',
+    });
+    if (!response.success) {
+      throw new Error(response.message || 'Failed to delete affiliator');
+    }
+  }
+
+  async getAffiliatorSummary(uuid: string): Promise<AffiliatorSummary> {
+    const response = await this.makeRequest<AffiliatorSummary>(`/affiliators/${uuid}/summary`);
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get affiliator summary');
+  }
+
+  // Customer methods
+  async getCustomersByAffiliator(affiliatorUuid: string, page = 1, limit = 10): Promise<{ data: Customer[]; pagination: any }> {
+    const response = await this.makeRequest<Customer[]>(`/customers/by-affiliator/${affiliatorUuid}?page=${page}&limit=${limit}`);
+    if (response.success && response.data) {
+      return {
+        data: response.data,
+        pagination: response.pagination || { total: response.data.length, page, limit, pages: 1 }
+      };
+    }
+    throw new Error(response.message || 'Failed to get customers');
+  }
+
+  async getCustomer(uuid: string): Promise<Customer> {
+    const response = await this.makeRequest<Customer>(`/customers/${uuid}`);
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get customer');
+  }
+
+  async createCustomer(data: Omit<Customer, 'uuid' | 'createdAt' | 'affiliatorName'>): Promise<Customer> {
+    const response = await this.makeRequest<Customer>('/customers', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to create customer');
+  }
+
+  async updateCustomer(uuid: string, data: Partial<Customer>): Promise<Customer> {
+    const response = await this.makeRequest<Customer>(`/customers/${uuid}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to update customer');
+  }
+
+  async deleteCustomer(uuid: string): Promise<void> {
+    const response = await this.makeRequest(`/customers/${uuid}`, {
+      method: 'DELETE',
+    });
+    if (!response.success) {
+      throw new Error(response.message || 'Failed to delete customer');
+    }
+  }
+
+  // Payment methods
+  async getPaymentsByAffiliator(affiliatorUuid: string, page = 1, limit = 10): Promise<{ data: Payment[]; pagination: any }> {
+    const response = await this.makeRequest<Payment[]>(`/payments/by-affiliator/${affiliatorUuid}?page=${page}&limit=${limit}`);
+    if (response.success && response.data) {
+      return {
+        data: response.data,
+        pagination: response.pagination || { total: response.data.length, page, limit, pages: 1 }
+      };
+    }
+    throw new Error(response.message || 'Failed to get payments');
+  }
+
+  async getPayment(uuid: string): Promise<Payment> {
+    const response = await this.makeRequest<Payment>(`/payments/${uuid}`);
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get payment');
+  }
+
+  async createPayment(data: Omit<Payment, 'uuid' | 'createdAt' | 'affiliatorName'>): Promise<Payment> {
+    const response = await this.makeRequest<Payment>('/payments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to create payment');
+  }
+
+  async updatePayment(uuid: string, data: Partial<Payment>): Promise<Payment> {
+    const response = await this.makeRequest<Payment>(`/payments/${uuid}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to update payment');
+  }
+
+  async deletePayment(uuid: string): Promise<void> {
+    const response = await this.makeRequest(`/payments/${uuid}`, {
+      method: 'DELETE',
+    });
+    if (!response.success) {
+      throw new Error(response.message || 'Failed to delete payment');
+    }
+  }
+
+  // Affiliator dashboard methods
+  async getAffiliatorCustomers(): Promise<Customer[]> {
+    const response = await this.makeRequest<Customer[]>('/affiliator/customers');
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get affiliator customers');
+  }
+
+  async getAffiliatorPayments(): Promise<Payment[]> {
+    const response = await this.makeRequest<Payment[]>('/affiliator/payments');
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get affiliator payments');
+  }
+
+  // File upload methods
+  async uploadProofPayment(file: File): Promise<{ filename: string; url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const headers: Record<string, string> = {};
+    if (this.accessToken) {
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/upload/proof-payment`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (result.success && result.data) {
+      return result.data;
+    }
+    throw new Error(result.message || 'Upload failed');
   }
 }
 

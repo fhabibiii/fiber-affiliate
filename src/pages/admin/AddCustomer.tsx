@@ -1,43 +1,51 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { apiService, Affiliator } from '@/services/api';
 
 const AddCustomer: React.FC = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
-    address: '',
-    affiliatorId: ''
+    fullAddress: '',
+    affiliatorUuid: ''
   });
   
   const [affiliatorSearch, setAffiliatorSearch] = useState('');
   const [showAffiliatorDropdown, setShowAffiliatorDropdown] = useState(false);
+  const [affiliators, setAffiliators] = useState<Affiliator[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Mock affiliator data
-  const mockAffiliators = [
-    { uuid: '1', fullName: 'John Doe' },
-    { uuid: '2', fullName: 'Jane Smith' },
-    { uuid: '3', fullName: 'Bob Johnson' },
-    { uuid: '4', fullName: 'Alice Brown' },
-    { uuid: '5', fullName: 'Charlie Wilson' },
-    { uuid: '6', fullName: 'Diana Chen' },
-    { uuid: '7', fullName: 'Edward Martinez' },
-    { uuid: '8', fullName: 'Fiona Davis' }
-  ];
+  useEffect(() => {
+    const loadAffiliators = async () => {
+      try {
+        const response = await apiService.getAffiliators(1, 100); // Get all affiliators
+        setAffiliators(response.data);
+      } catch (error) {
+        console.error('Failed to load affiliators:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memuat daftar affiliator",
+          variant: "destructive"
+        });
+      }
+    };
 
-  const filteredAffiliators = mockAffiliators.filter(affiliator =>
+    loadAffiliators();
+  }, [toast]);
+
+  const filteredAffiliators = affiliators.filter(affiliator =>
     affiliator.fullName.toLowerCase().includes(affiliatorSearch.toLowerCase())
   );
 
-  const selectedAffiliator = mockAffiliators.find(a => a.uuid === formData.affiliatorId);
+  const selectedAffiliator = affiliators.find(a => a.uuid === formData.affiliatorUuid);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -46,19 +54,19 @@ const AddCustomer: React.FC = () => {
     }));
   };
 
-  const handleAffiliatorSelect = (affiliatorId: string) => {
+  const handleAffiliatorSelect = (affiliatorUuid: string) => {
     setFormData(prev => ({
       ...prev,
-      affiliatorId
+      affiliatorUuid
     }));
     setShowAffiliatorDropdown(false);
     setAffiliatorSearch('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.fullName || !formData.phoneNumber || !formData.address || !formData.affiliatorId) {
+    if (!formData.fullName || !formData.phoneNumber || !formData.fullAddress || !formData.affiliatorUuid) {
       toast({
         title: "Error",
         description: "Semua field harus diisi",
@@ -67,20 +75,37 @@ const AddCustomer: React.FC = () => {
       return;
     }
 
-    console.log('Adding customer:', formData);
-    
-    toast({
-      title: "Berhasil",
-      description: "Pelanggan baru berhasil ditambahkan"
-    });
+    setLoading(true);
+    try {
+      await apiService.createCustomer({
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        fullAddress: formData.fullAddress,
+        affiliatorUuid: formData.affiliatorUuid
+      });
 
-    // Reset form
-    setFormData({
-      fullName: '',
-      phoneNumber: '',
-      address: '',
-      affiliatorId: ''
-    });
+      toast({
+        title: "Berhasil",
+        description: "Pelanggan baru berhasil ditambahkan"
+      });
+
+      // Reset form
+      setFormData({
+        fullName: '',
+        phoneNumber: '',
+        fullAddress: '',
+        affiliatorUuid: ''
+      });
+    } catch (error) {
+      console.error('Failed to create customer:', error);
+      toast({
+        title: "Error",
+        description: "Gagal menambahkan pelanggan",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -136,14 +161,14 @@ const AddCustomer: React.FC = () => {
               />
             </div>
 
-            {/* Address - Changed to Textarea */}
+            {/* Address */}
             <div className="space-y-2">
-              <Label htmlFor="address">Alamat</Label>
+              <Label htmlFor="fullAddress">Alamat</Label>
               <Textarea
-                id="address"
+                id="fullAddress"
                 placeholder="Masukkan alamat lengkap"
-                value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                value={formData.fullAddress}
+                onChange={(e) => handleInputChange('fullAddress', e.target.value)}
                 required
                 className="min-h-[100px]"
               />
@@ -213,8 +238,8 @@ const AddCustomer: React.FC = () => {
             </div>
 
             {/* Submit Button */}
-            <Button type="submit" className="w-full">
-              Tambah Pelanggan
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Menambahkan...' : 'Tambah Pelanggan'}
             </Button>
           </form>
         </CardContent>
