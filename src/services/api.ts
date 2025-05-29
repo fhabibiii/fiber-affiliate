@@ -1,4 +1,3 @@
-
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 
 const API_BASE_URL = 'https://be2e-103-105-57-35.ngrok-free.app/api/v1';
@@ -93,8 +92,9 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning
       ...options.headers,
     };
 
@@ -115,8 +115,8 @@ class ApiService {
       // Check if response is HTML (ngrok warning page)
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('text/html')) {
-        console.error('Received HTML response instead of JSON:', await response.text());
-        throw new Error('Server returned HTML instead of JSON. This might be an ngrok warning page.');
+        console.error('Received HTML response instead of JSON');
+        throw new Error('Server returned HTML instead of JSON. Please check if the API server is running correctly.');
       }
 
       if (!response.ok) {
@@ -454,7 +454,9 @@ class ApiService {
     const formData = new FormData();
     formData.append('file', file);
 
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = {
+      'ngrok-skip-browser-warning': 'true',
+    };
     if (this.accessToken) {
       headers['Authorization'] = `Bearer ${this.accessToken}`;
     }
