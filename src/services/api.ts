@@ -95,7 +95,7 @@ class ApiService {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning
-      ...options.headers,
+      ...(options.headers as Record<string, string> || {}),
     };
 
     if (this.accessToken) {

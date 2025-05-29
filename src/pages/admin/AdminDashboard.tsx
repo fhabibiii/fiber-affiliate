@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,14 +9,15 @@ import { useToast } from '@/hooks/use-toast';
 
 const AdminDashboard: React.FC = () => {
   const { toast } = useToast();
-  const [selectedCustomerYear, setSelectedCustomerYear] = useState('2024');
-  const [selectedTransferYear, setSelectedTransferYear] = useState('2024');
+  const currentYear = new Date().getFullYear().toString();
+  const [selectedCustomerYear, setSelectedCustomerYear] = useState(currentYear);
+  const [selectedTransferYear, setSelectedTransferYear] = useState(currentYear);
   const [summary, setSummary] = useState<AdminSummary | null>(null);
   const [customerStats, setCustomerStats] = useState<StatItem[]>([]);
   const [paymentStats, setPaymentStats] = useState<StatItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const availableYears = ['2024', '2023', '2022', '2025'];
+  const availableYears = ['2025', '2024', '2023', '2022'];
 
   // Load summary data
   useEffect(() => {
