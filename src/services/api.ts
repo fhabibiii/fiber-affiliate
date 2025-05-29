@@ -1,4 +1,3 @@
-
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 
 const API_BASE_URL = 'https://be2e-103-105-57-35.ngrok-free.app/api/v1';
@@ -91,7 +90,7 @@ class ApiService {
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     const headers = {
       'Content-Type': 'application/json',
@@ -174,17 +173,27 @@ class ApiService {
     console.log('Attempting login with credentials:', { username: credentials.username });
     
     try {
-      const response = await this.makeRequest<AuthResponse>('/auth/login', {
+      const response = await this.makeRequest<{
+        success: boolean;
+        token: string;
+        refreshToken: string;
+        user: User;
+        message?: string;
+      }>('/auth/login', {
         method: 'POST',
         body: JSON.stringify(credentials),
       });
 
       console.log('Login response:', response);
 
-      if (response.success && response.data) {
-        this.setTokens(response.data.token, response.data.refreshToken);
+      if (response.success) {
+        this.setTokens(response.token, response.refreshToken);
         console.log('Login successful, tokens saved');
-        return response.data;
+        return {
+          token: response.token,
+          refreshToken: response.refreshToken,
+          user: response.user
+        };
       }
 
       throw new Error(response.message || 'Login failed');
@@ -201,16 +210,24 @@ class ApiService {
 
     console.log('Attempting token refresh...');
 
-    const response = await this.makeRequest<{ token: string; user: User }>('/auth/refresh', {
+    const response = await this.makeRequest<{
+      success: boolean;
+      token: string;
+      user: User;
+      message?: string;
+    }>('/auth/refresh', {
       method: 'POST',
       body: JSON.stringify({ refreshToken: this.refreshToken }),
     });
 
-    if (response.success && response.data) {
-      this.accessToken = response.data.token;
-      localStorage.setItem('token', response.data.token);
+    if (response.success) {
+      this.accessToken = response.token;
+      localStorage.setItem('token', response.token);
       console.log('Token refresh successful');
-      return response.data;
+      return {
+        token: response.token,
+        user: response.user
+      };
     }
 
     throw new Error(response.message || 'Token refresh failed');
@@ -230,7 +247,7 @@ class ApiService {
 
   // Admin methods
   async getAdminSummary(): Promise<AdminSummary> {
-    const response = await this.makeRequest<AdminSummary>('/admin/summary');
+    const response = await this.makeRequest<ApiResponse<AdminSummary>>('/admin/summary');
     if (response.success && response.data) {
       return response.data;
     }
@@ -238,7 +255,7 @@ class ApiService {
   }
 
   async getCustomerStats(year: number): Promise<StatItem[]> {
-    const response = await this.makeRequest<StatItem[]>(`/admin/stats/customers?year=${year}`);
+    const response = await this.makeRequest<ApiResponse<StatItem[]>>(`/admin/stats/customers?year=${year}`);
     if (response.success && response.data) {
       return response.data;
     }
@@ -246,7 +263,7 @@ class ApiService {
   }
 
   async getPaymentStats(year: number): Promise<StatItem[]> {
-    const response = await this.makeRequest<StatItem[]>(`/admin/stats/payments?year=${year}`);
+    const response = await this.makeRequest<ApiResponse<StatItem[]>>(`/admin/stats/payments?year=${year}`);
     if (response.success && response.data) {
       return response.data;
     }

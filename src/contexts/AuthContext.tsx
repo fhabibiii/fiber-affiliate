@@ -88,6 +88,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         title: "Login berhasil",
         description: `Selamat datang, ${response.user.fullName}!`,
       });
+      
+      // Redirect to appropriate dashboard
+      const redirectPath = response.user.role === 'ADMIN' ? '/admin' : '/affiliator';
+      window.location.href = redirectPath;
     } catch (error) {
       console.error('AuthContext: Login failed:', error);
       const errorMessage = error instanceof Error ? error.message : indonesianTexts.login.errors.invalid;

@@ -57,13 +57,11 @@ const Login: React.FC = () => {
       
       console.log('Calling login function...');
       await login(credentials);
-      console.log('Login successful, should redirect soon...');
+      console.log('Login successful, redirect will happen automatically...');
       
-      if (from !== '/') {
-        navigate(from, { replace: true });
-      }
     } catch (error) {
       console.error('Login form error:', error);
+      // Error handling is done in AuthContext
     } finally {
       setIsLoading(false);
     }
