@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -20,14 +21,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import LogoutModal from '@/components/LogoutModal';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const queryClient = useQueryClient();
   const [affiliatorSearchOpen, setAffiliatorSearchOpen] = useState(false);
   const [paymentSearchOpen, setPaymentSearchOpen] = useState(false);
   const [affiliatorSearch, setAffiliatorSearch] = useState('');
@@ -61,20 +61,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     queryFn: () => apiService.getAffiliators(1, 100),
     enabled: paymentSearchOpen,
   });
-
-  // Listen for affiliator creation to refetch
-  React.useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'affiliator-created') {
-        queryClient.invalidateQueries({ queryKey: ['affiliators-all'] });
-        queryClient.invalidateQueries({ queryKey: ['affiliators-payment-all'] });
-        localStorage.removeItem('affiliator-created');
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [queryClient]);
 
   const navigationItems = [
     {
@@ -235,21 +221,26 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         </div>
                       )
                     ) : (
-                      allAffiliators.length > 0 ? (
-                        allAffiliators.map((affiliator) => (
-                          <Link
-                            key={affiliator.uuid}
-                            to={`/admin/affiliators/${affiliator.uuid}`}
-                            className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
-                          >
-                            {affiliator.fullName}
-                          </Link>
-                        ))
-                      ) : (
-                        <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                          Belum ada affiliator
+                      <div className="space-y-1">
+                        <div className="px-3 py-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                          Semua Affiliator:
                         </div>
-                      )
+                        {allAffiliators.length > 0 ? (
+                          allAffiliators.map((affiliator) => (
+                            <Link
+                              key={affiliator.uuid}
+                              to={`/admin/affiliators/${affiliator.uuid}`}
+                              className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                            >
+                              {affiliator.fullName}
+                            </Link>
+                          ))
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                            Belum ada affiliator
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -317,21 +308,26 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         </div>
                       )
                     ) : (
-                      allPaymentAffiliators.length > 0 ? (
-                        allPaymentAffiliators.map((affiliator) => (
-                          <Link
-                            key={affiliator.uuid}
-                            to={`/admin/payments/affiliator/${affiliator.uuid}`}
-                            className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
-                          >
-                            {affiliator.fullName}
-                          </Link>
-                        ))
-                      ) : (
-                        <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                          Belum ada affiliator
+                      <div className="space-y-1">
+                        <div className="px-3 py-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                          Semua Affiliator:
                         </div>
-                      )
+                        {allPaymentAffiliators.length > 0 ? (
+                          allPaymentAffiliators.map((affiliator) => (
+                            <Link
+                              key={affiliator.uuid}
+                              to={`/admin/payments/affiliator/${affiliator.uuid}`}
+                              className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                            >
+                              {affiliator.fullName}
+                            </Link>
+                          ))
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                            Belum ada affiliator
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

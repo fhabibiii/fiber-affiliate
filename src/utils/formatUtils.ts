@@ -22,22 +22,3 @@ export const formatIndonesianDate = (dateString: string) => {
   
   return `${day} ${month} ${year}`;
 };
-
-export const formatDateForDisplay = (dateString: string) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
-export const getMonthAbbreviation = (monthIndex: number, isSmallScreen: boolean = false) => {
-  const fullMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-  
-  if (isSmallScreen) {
-    return ''; // Return empty string for small screens
-  }
-  
-  return fullMonths[monthIndex] || '';
-};
