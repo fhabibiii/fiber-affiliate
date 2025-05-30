@@ -21,6 +21,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import LogoutModal from '@/components/LogoutModal';
+import { useQuery } from '@tanstack/react-query';
+import { apiService } from '@/services/api';
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
@@ -32,6 +34,19 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [paymentSearch, setPaymentSearch] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Fetch affiliators for search
+  const { data: affiliatorData } = useQuery({
+    queryKey: ['affiliators-search', affiliatorSearch],
+    queryFn: () => apiService.getAffiliators(1, 50, affiliatorSearch),
+    enabled: affiliatorSearchOpen && !!affiliatorSearch.trim(),
+  });
+
+  const { data: paymentAffiliatorData } = useQuery({
+    queryKey: ['affiliators-payment-search', paymentSearch],
+    queryFn: () => apiService.getAffiliators(1, 50, paymentSearch),
+    enabled: paymentSearchOpen && !!paymentSearch.trim(),
+  });
 
   const navigationItems = [
     {
@@ -55,20 +70,8 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return location.pathname.startsWith(href);
   };
 
-  // Mock affiliator data for search functionality
-  const mockAffiliators = [
-    { uuid: '1', fullName: 'John Doe' },
-    { uuid: '2', fullName: 'Jane Smith' },
-    { uuid: '3', fullName: 'Bob Johnson' },
-  ];
-
-  const filteredAffiliators = mockAffiliators.filter(affiliator =>
-    affiliator.fullName.toLowerCase().includes(affiliatorSearch.toLowerCase())
-  );
-
-  const filteredPaymentAffiliators = mockAffiliators.filter(affiliator =>
-    affiliator.fullName.toLowerCase().includes(paymentSearch.toLowerCase())
-  );
+  const filteredAffiliators = affiliatorData?.data || [];
+  const filteredPaymentAffiliators = paymentAffiliatorData?.data || [];
 
   const handleLogout = () => {
     logout();
@@ -185,19 +188,25 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   </div>
 
                   <div className="max-h-40 overflow-y-auto space-y-1">
-                    {filteredAffiliators.length > 0 ? (
-                      filteredAffiliators.map((affiliator) => (
-                        <Link
-                          key={affiliator.uuid}
-                          to={`/admin/affiliators/${affiliator.uuid}`}
-                          className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
-                        >
-                          {affiliator.fullName}
-                        </Link>
-                      ))
+                    {affiliatorSearch.trim() ? (
+                      filteredAffiliators.length > 0 ? (
+                        filteredAffiliators.map((affiliator) => (
+                          <Link
+                            key={affiliator.uuid}
+                            to={`/admin/affiliators/${affiliator.uuid}`}
+                            className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                          >
+                            {affiliator.fullName}
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                          Tidak ada hasil ditemukan
+                        </div>
+                      )
                     ) : (
                       <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                        Tidak ada hasil ditemukan
+                        Ketik untuk mencari...
                       </div>
                     )}
                   </div>
@@ -249,19 +258,25 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   </div>
 
                   <div className="max-h-40 overflow-y-auto space-y-1">
-                    {filteredPaymentAffiliators.length > 0 ? (
-                      filteredPaymentAffiliators.map((affiliator) => (
-                        <Link
-                          key={affiliator.uuid}
-                          to={`/admin/payments/affiliator/${affiliator.uuid}`}
-                          className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
-                        >
-                          {affiliator.fullName}
-                        </Link>
-                      ))
+                    {paymentSearch.trim() ? (
+                      filteredPaymentAffiliators.length > 0 ? (
+                        filteredPaymentAffiliators.map((affiliator) => (
+                          <Link
+                            key={affiliator.uuid}
+                            to={`/admin/payments/affiliator/${affiliator.uuid}`}
+                            className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                          >
+                            {affiliator.fullName}
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                          Tidak ada hasil ditemukan
+                        </div>
+                      )
                     ) : (
                       <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                        Tidak ada hasil ditemukan
+                        Ketik untuk mencari...
                       </div>
                     )}
                   </div>

@@ -1,3 +1,4 @@
+
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 
 const API_BASE_URL = 'https://d54f-103-105-57-35.ngrok-free.app/api/v1';
@@ -137,6 +138,11 @@ class ApiService {
                 throw new Error(`HTTP error! status: ${retryResponse.status}`);
               }
               
+              // Handle empty response for delete operations
+              if (retryResponse.status === 204 || retryResponse.headers.get('content-length') === '0') {
+                return { success: true } as T;
+              }
+              
               return retryResponse.json();
             } catch (refreshError) {
               console.error('Token refresh failed:', refreshError);
@@ -158,6 +164,11 @@ class ApiService {
         
         console.error('API error response:', errorData);
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      // Handle empty response for delete operations (204 No Content)
+      if (response.status === 204 || response.headers.get('content-length') === '0') {
+        return { success: true } as T;
       }
 
       const responseData = await response.json();
@@ -314,11 +325,11 @@ class ApiService {
   }
 
   async deleteAffiliator(uuid: string): Promise<void> {
-    const response = await this.makeRequest<ApiResponse<void>>(`/affiliators/${uuid}`, {
+    const response = await this.makeRequest<{ success: boolean }>(`/affiliators/${uuid}`, {
       method: 'DELETE',
     });
     if (!response.success) {
-      throw new Error(response.message || 'Failed to delete affiliator');
+      throw new Error('Failed to delete affiliator');
     }
   }
 
@@ -373,11 +384,11 @@ class ApiService {
   }
 
   async deleteCustomer(uuid: string): Promise<void> {
-    const response = await this.makeRequest<ApiResponse<void>>(`/customers/${uuid}`, {
+    const response = await this.makeRequest<{ success: boolean }>(`/customers/${uuid}`, {
       method: 'DELETE',
     });
     if (!response.success) {
-      throw new Error(response.message || 'Failed to delete customer');
+      throw new Error('Failed to delete customer');
     }
   }
 
@@ -424,11 +435,11 @@ class ApiService {
   }
 
   async deletePayment(uuid: string): Promise<void> {
-    const response = await this.makeRequest<ApiResponse<void>>(`/payments/${uuid}`, {
+    const response = await this.makeRequest<{ success: boolean }>(`/payments/${uuid}`, {
       method: 'DELETE',
     });
     if (!response.success) {
-      throw new Error(response.message || 'Failed to delete payment');
+      throw new Error('Failed to delete payment');
     }
   }
 
