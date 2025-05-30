@@ -203,56 +203,17 @@ const PaymentHistoryAdmin: React.FC = () => {
     setShowImageModal(true);
   };
 
-  const handleDownloadImage = async (imageUrl: string, filename: string) => {
-    try {
-      const response = await fetch(imageUrl, {
-        mode: 'cors',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.style.display = 'none';
-      link.href = url;
-      link.download = filename || 'bukti-pembayaran.jpg';
-      
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
-      
-    } catch (error) {
-      console.error('Download failed:', error);
-      
-      // Fallback: try to download using direct link
-      try {
-        const link = document.createElement('a');
-        link.style.display = 'none';
-        link.href = imageUrl;
-        link.download = filename || 'bukti-pembayaran.jpg';
-        link.setAttribute('target', '_blank');
-        
-        document.body.appendChild(link);
-        link.click();
-        
-        setTimeout(() => {
-          document.body.removeChild(link);
-        }, 100);
-        
-      } catch (fallbackError) {
-        console.error('Fallback download also failed:', fallbackError);
-        // Last resort: open in new tab
-        window.open(imageUrl, '_blank');
-      }
-    }
+  const handleDownloadImage = (imageUrl: string, filename: string) => {
+    // Force download using a different approach
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = imageUrl;
+    link.download = filename || 'bukti-pembayaran.jpg';
+    link.target = '_self'; // Ensure it doesn't open in new tab
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleSubmitEdit = async (e: React.FormEvent) => {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -74,56 +75,17 @@ const PaymentHistory: React.FC = () => {
     link.click();
   };
 
-  const handleDownloadImage = async (imageUrl: string, filename: string) => {
-    try {
-      const response = await fetch(imageUrl, {
-        mode: 'cors',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.style.display = 'none';
-      link.href = url;
-      link.download = filename || 'bukti-pembayaran.jpg';
-      
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
-      
-    } catch (error) {
-      console.error('Download failed:', error);
-      
-      // Fallback: try to download using direct link
-      try {
-        const link = document.createElement('a');
-        link.style.display = 'none';
-        link.href = imageUrl;
-        link.download = filename || 'bukti-pembayaran.jpg';
-        link.setAttribute('target', '_blank');
-        
-        document.body.appendChild(link);
-        link.click();
-        
-        setTimeout(() => {
-          document.body.removeChild(link);
-        }, 100);
-        
-      } catch (fallbackError) {
-        console.error('Fallback download also failed:', fallbackError);
-        // Last resort: open in new tab
-        window.open(imageUrl, '_blank');
-      }
-    }
+  const handleDownloadImage = (imageUrl: string, filename: string) => {
+    // Force download using a different approach
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = imageUrl;
+    link.download = filename || 'bukti-pembayaran.jpg';
+    link.target = '_self'; // Ensure it doesn't open in new tab
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const columns = [
@@ -185,21 +147,6 @@ const PaymentHistory: React.FC = () => {
           />
         </CardContent>
       </Card>
-
-      {/* Empty State */}
-      {payments.length === 0 && (
-        <Card className="mt-6 shadow-lg">
-          <CardContent className="p-12 text-center">
-            <div className="text-4xl mb-4">💰</div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Belum Ada Pembayaran
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Riwayat pembayaran Anda akan muncul di sini
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Image Modal */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
