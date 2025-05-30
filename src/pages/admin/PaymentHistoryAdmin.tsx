@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,16 +11,20 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiService, Payment, Affiliator, AffiliatorSummary } from '@/services/api';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const PaymentHistoryAdmin: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [isTotalOpen, setIsTotalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -29,40 +34,100 @@ const PaymentHistoryAdmin: React.FC = () => {
     proofImage: null as File | null
   });
 
-  // Mock affiliator data
-  const affiliator = {
-    uuid: id,
-    fullName: 'John Doe',
-    phoneNumber: '081234567890'
-  };
+  // Fetch affiliator data
+  const { data: affiliator, isLoading: isLoadingAffiliator, error: affiliatorError } = useQuery({
+    queryKey: ['affiliator', id],
+    queryFn: () => apiService.getAffiliator(id!),
+    enabled: !!id,
+  });
 
-  // Mock payment data for this affiliator
-  const payments = [
-    {
-      uuid: '1',
-      month: 'Januari',
-      year: 2024,
-      amount: 2500000,
-      paymentDate: '2024-02-05T10:30:00Z',
-      proofImage: 'https://via.placeholder.com/600x400/007bff/ffffff?text=Bukti+Pembayaran+1'
+  // Fetch affiliator summary
+  const { data: affiliatorSummary, isLoading: isLoadingSummary } = useQuery({
+    queryKey: ['affiliatorSummary', id],
+    queryFn: () => apiService.getAffiliatorSummary(id!),
+    enabled: !!id,
+  });
+
+  // Fetch payments data
+  const { data: paymentsResponse, isLoading: isLoadingPayments, error: paymentsError } = useQuery({
+    queryKey: ['payments', id],
+    queryFn: () => apiService.getPaymentsByAffiliator(id!, 1, 100),
+    enabled: !!id,
+  });
+
+  // Create payment mutation
+  const createPaymentMutation = useMutation({
+    mutationFn: (data: Omit<Payment, 'uuid' | 'createdAt' | 'affiliatorName'>) => 
+      apiService.createPayment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payments', id] });
+      queryClient.invalidateQueries({ queryKey: ['affiliatorSummary', id] });
+      toast({
+        title: "Berhasil",
+        description: "Pembayaran berhasil ditambahkan",
+      });
+      setShowAddPaymentModal(false);
+      setFormData({ month: '', year: '', amount: '', proofImage: null });
     },
-    {
-      uuid: '2',
-      month: 'Februari',
-      year: 2024,
-      amount: 1800000,
-      paymentDate: '2024-03-05T14:20:00Z',
-      proofImage: 'https://via.placeholder.com/600x400/28a745/ffffff?text=Bukti+Pembayaran+2'
-    },
-    {
-      uuid: '3',
-      month: 'Maret',
-      year: 2024,
-      amount: 3200000,
-      paymentDate: '2024-04-05T09:15:00Z',
-      proofImage: 'https://via.placeholder.com/600x400/dc3545/ffffff?text=Bukti+Pembayaran+3'
+    onError: (error) => {
+      console.error('Create payment error:', error);
+      toast({
+        title: "Error",
+        description: "Gagal menambahkan pembayaran",
+        variant: "destructive"
+      });
     }
-  ];
+  });
+
+  // Update payment mutation
+  const updatePaymentMutation = useMutation({
+    mutationFn: ({ uuid, data }: { uuid: string; data: Partial<Payment> }) => 
+      apiService.updatePayment(uuid, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payments', id] });
+      queryClient.invalidateQueries({ queryKey: ['affiliatorSummary', id] });
+      toast({
+        title: "Berhasil",
+        description: "Data pembayaran berhasil diperbarui",
+      });
+      setShowEditModal(false);
+    },
+    onError: (error) => {
+      console.error('Update payment error:', error);
+      toast({
+        title: "Error",
+        description: "Gagal memperbarui data pembayaran",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Delete payment mutation
+  const deletePaymentMutation = useMutation({
+    mutationFn: (uuid: string) => apiService.deletePayment(uuid),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payments', id] });
+      queryClient.invalidateQueries({ queryKey: ['affiliatorSummary', id] });
+      toast({
+        title: "Berhasil",
+        description: "Pembayaran berhasil dihapus",
+      });
+      setShowDeleteModal(false);
+    },
+    onError: (error) => {
+      console.error('Delete payment error:', error);
+      toast({
+        title: "Error",
+        description: "Gagal menghapus pembayaran",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Upload proof image mutation
+  const uploadProofMutation = useMutation({
+    mutationFn: (file: File) => apiService.uploadProofPayment(file),
+  });
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -82,27 +147,29 @@ const PaymentHistoryAdmin: React.FC = () => {
 
   const formatMobileMonth = (month: string, year: number) => {
     const monthMap: { [key: string]: string } = {
-      'Januari': 'JAN',
-      'Februari': 'FEB',
-      'Maret': 'MAR',
-      'April': 'APR',
-      'Mei': 'MEI',
-      'Juni': 'JUN',
-      'Juli': 'JUL',
-      'Agustus': 'AGU',
-      'September': 'SEP',
-      'Oktober': 'OKT',
-      'November': 'NOV',
-      'Desember': 'DES'
+      '01': 'JAN', '02': 'FEB', '03': 'MAR', '04': 'APR',
+      '05': 'MEI', '06': 'JUN', '07': 'JUL', '08': 'AGU',
+      '09': 'SEP', '10': 'OKT', '11': 'NOV', '12': 'DES'
     };
     return `${monthMap[month]} ${year.toString().slice(-2)}`;
   };
 
+  const formatMonthName = (monthNumber: string) => {
+    const monthNames: { [key: string]: string } = {
+      '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+      '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+      '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
+    };
+    return monthNames[monthNumber] || monthNumber;
+  };
+
   const handleExportCSV = () => {
+    if (!paymentsResponse?.data) return;
+
     const csvContent = [
       ['Bulan', 'Tahun', 'Jumlah', 'Tanggal Pembayaran'],
-      ...payments.map(payment => [
-        payment.month,
+      ...paymentsResponse.data.map(payment => [
+        formatMonthName(payment.month),
         payment.year,
         payment.amount,
         formatDate(payment.paymentDate)
@@ -112,11 +179,11 @@ const PaymentHistoryAdmin: React.FC = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `riwayat-pembayaran-${affiliator.fullName}.csv`;
+    link.download = `riwayat-pembayaran-${affiliator?.fullName || 'affiliator'}.csv`;
     link.click();
   };
 
-  const handleEdit = (payment: any) => {
+  const handleEdit = (payment: Payment) => {
     setSelectedPayment(payment);
     setFormData({
       month: payment.month,
@@ -127,7 +194,7 @@ const PaymentHistoryAdmin: React.FC = () => {
     setShowEditModal(true);
   };
 
-  const handleDelete = (payment: any) => {
+  const handleDelete = (payment: Payment) => {
     setSelectedPayment(payment);
     setShowDeleteModal(true);
   };
@@ -148,78 +215,134 @@ const PaymentHistoryAdmin: React.FC = () => {
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Berhasil",
-        description: "Data pembayaran berhasil diperbarui",
-      });
+    if (!selectedPayment) return;
 
-      setShowEditModal(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Gagal memperbarui data pembayaran",
-        variant: "destructive"
+    try {
+      let proofImageUrl = selectedPayment.proofImage;
+      
+      // Upload new proof image if provided
+      if (formData.proofImage) {
+        const uploadResult = await uploadProofMutation.mutateAsync(formData.proofImage);
+        proofImageUrl = uploadResult.url;
+      }
+
+      await updatePaymentMutation.mutateAsync({
+        uuid: selectedPayment.uuid,
+        data: {
+          month: formData.month,
+          year: parseInt(formData.year),
+          amount: parseFloat(formData.amount),
+          proofImage: proofImageUrl
+        }
       });
+    } catch (error) {
+      console.error('Edit payment error:', error);
     }
   };
 
   const handleSubmitAddPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Berhasil",
-        description: "Pembayaran berhasil ditambahkan",
-      });
+    if (!id) return;
 
-      setShowAddPaymentModal(false);
-      setFormData({ month: '', year: '', amount: '', proofImage: null });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Gagal menambahkan pembayaran",
-        variant: "destructive"
+    try {
+      let proofImageUrl = '';
+      
+      // Upload proof image if provided
+      if (formData.proofImage) {
+        const uploadResult = await uploadProofMutation.mutateAsync(formData.proofImage);
+        proofImageUrl = uploadResult.url;
+      }
+
+      await createPaymentMutation.mutateAsync({
+        affiliatorUuid: id,
+        month: formData.month,
+        year: parseInt(formData.year),
+        amount: parseFloat(formData.amount),
+        paymentDate: new Date().toISOString(),
+        proofImage: proofImageUrl
       });
+    } catch (error) {
+      console.error('Add payment error:', error);
     }
   };
 
   const handleDeleteConfirm = async () => {
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Berhasil",
-        description: "Pembayaran berhasil dihapus",
-      });
-
-      setShowDeleteModal(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Gagal menghapus pembayaran",
-        variant: "destructive"
-      });
-    }
+    if (!selectedPayment) return;
+    await deletePaymentMutation.mutateAsync(selectedPayment.uuid);
   };
 
   const months = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    { value: '01', label: 'Januari' },
+    { value: '02', label: 'Februari' },
+    { value: '03', label: 'Maret' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'Mei' },
+    { value: '06', label: 'Juni' },
+    { value: '07', label: 'Juli' },
+    { value: '08', label: 'Agustus' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'Oktober' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'Desember' }
   ];
+
+  // Show loading state
+  if (isLoadingAffiliator || isLoadingPayments) {
+    return (
+      <div className="space-y-4 w-full max-w-full">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div>
+            <Skeleton className="h-8 w-48 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+        </div>
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (affiliatorError || paymentsError) {
+    return (
+      <div className="space-y-4 w-full max-w-full">
+        <div className="text-center py-8">
+          <p className="text-red-600 dark:text-red-400">
+            Error: {(affiliatorError as Error)?.message || (paymentsError as Error)?.message}
+          </p>
+          <Button onClick={() => navigate('/admin/affiliators')} className="mt-4">
+            Kembali ke Daftar Affiliator
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!affiliator) {
+    return (
+      <div className="space-y-4 w-full max-w-full">
+        <div className="text-center py-8">
+          <p className="text-gray-600 dark:text-gray-400">Affiliator tidak ditemukan</p>
+          <Button onClick={() => navigate('/admin/affiliators')} className="mt-4">
+            Kembali ke Daftar Affiliator
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const payments = paymentsResponse?.data || [];
+  const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
   const columns = [
     {
       key: 'month',
       label: 'Bulan',
-      render: (value: string) => (
+      render: (value: string, row: Payment) => (
         <>
-          <span className="hidden sm:inline">{value}</span>
-          <span className="sm:hidden">{formatMobileMonth(value, 2024)}</span>
+          <span className="hidden sm:inline">{formatMonthName(value)}</span>
+          <span className="sm:hidden">{formatMobileMonth(value, row.year)}</span>
         </>
       )
     },
@@ -250,7 +373,7 @@ const PaymentHistoryAdmin: React.FC = () => {
     }
   ];
 
-  const actions = (row: any) => (
+  const actions = (row: Payment) => (
     <div className="flex gap-2">
       <Button
         variant="outline"
@@ -268,8 +391,6 @@ const PaymentHistoryAdmin: React.FC = () => {
       </Button>
     </div>
   );
-
-  const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
   return (
     <div className="space-y-4 w-full max-w-full">
@@ -302,7 +423,11 @@ const PaymentHistoryAdmin: React.FC = () => {
             <CollapsibleContent>
               <CardContent className="pt-0">
                 <div className="text-xl font-bold text-green-700 dark:text-green-300">
-                  {formatCurrency(totalAmount)}
+                  {isLoadingSummary ? (
+                    <Skeleton className="h-6 w-32" />
+                  ) : (
+                    formatCurrency(affiliatorSummary?.totalPaymentsSinceJoin || totalAmount)
+                  )}
                 </div>
               </CardContent>
             </CollapsibleContent>
@@ -326,7 +451,11 @@ const PaymentHistoryAdmin: React.FC = () => {
             <CollapsibleContent>
               <CardContent className="pt-0">
                 <div className="text-xl font-bold text-green-700 dark:text-green-300">
-                  {formatCurrency(totalAmount)}
+                  {isLoadingSummary ? (
+                    <Skeleton className="h-6 w-32" />
+                  ) : (
+                    formatCurrency(affiliatorSummary?.totalPaymentsSinceJoin || totalAmount)
+                  )}
                 </div>
               </CardContent>
             </CollapsibleContent>
@@ -348,6 +477,7 @@ const PaymentHistoryAdmin: React.FC = () => {
                 variant="outline"
                 size="sm"
                 className="flex-1"
+                disabled={!payments.length}
               >
                 <Download className="w-4 h-4" />
               </Button>
@@ -366,6 +496,7 @@ const PaymentHistoryAdmin: React.FC = () => {
                 <Button 
                   onClick={handleExportCSV}
                   variant="outline"
+                  disabled={!payments.length}
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export CSV
@@ -406,8 +537,8 @@ const PaymentHistoryAdmin: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {months.map((month) => (
-                    <SelectItem key={month} value={month}>
-                      {month}
+                    <SelectItem key={month.value} value={month.value}>
+                      {month.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -433,8 +564,22 @@ const PaymentHistoryAdmin: React.FC = () => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
-              Tambah Pembayaran
+            <div className="space-y-2">
+              <Label htmlFor="addProofImage">Bukti Pembayaran</Label>
+              <Input
+                id="addProofImage"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFormData({ ...formData, proofImage: e.target.files?.[0] || null })}
+              />
+              <p className="text-xs text-gray-500">Maksimal ukuran file 10MB</p>
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={createPaymentMutation.isPending || uploadProofMutation.isPending}
+            >
+              {createPaymentMutation.isPending || uploadProofMutation.isPending ? 'Menambahkan...' : 'Tambah Pembayaran'}
             </Button>
           </form>
         </DialogContent>
@@ -455,8 +600,8 @@ const PaymentHistoryAdmin: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {months.map((month) => (
-                    <SelectItem key={month} value={month}>
-                      {month}
+                    <SelectItem key={month.value} value={month.value}>
+                      {month.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -492,8 +637,12 @@ const PaymentHistoryAdmin: React.FC = () => {
               />
               <p className="text-xs text-gray-500">Maksimal ukuran file 10MB</p>
             </div>
-            <Button type="submit" className="w-full">
-              Simpan Perubahan
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={updatePaymentMutation.isPending || uploadProofMutation.isPending}
+            >
+              {updatePaymentMutation.isPending || uploadProofMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
             </Button>
           </form>
         </DialogContent>
@@ -506,13 +655,17 @@ const PaymentHistoryAdmin: React.FC = () => {
             <DialogTitle>Konfirmasi Hapus</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p>Apakah Anda yakin ingin menghapus pembayaran <strong>{selectedPayment?.month} {selectedPayment?.year}</strong>?</p>
+            <p>Apakah Anda yakin ingin menghapus pembayaran <strong>{selectedPayment && formatMonthName(selectedPayment.month)} {selectedPayment?.year}</strong>?</p>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
                 Batal
               </Button>
-              <Button variant="destructive" onClick={handleDeleteConfirm}>
-                Hapus
+              <Button 
+                variant="destructive" 
+                onClick={handleDeleteConfirm}
+                disabled={deletePaymentMutation.isPending}
+              >
+                {deletePaymentMutation.isPending ? 'Menghapus...' : 'Hapus'}
               </Button>
             </div>
           </div>
