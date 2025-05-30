@@ -1,4 +1,3 @@
-
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 
 const API_BASE_URL = 'https://d54f-103-105-57-35.ngrok-free.app/api/v1';
@@ -487,6 +486,29 @@ class ApiService {
       return result.data;
     }
     throw new Error(result.message || 'Upload failed');
+  }
+
+  // Download payment proof with new endpoint
+  async downloadPaymentProof(paymentUuid: string): Promise<ArrayBuffer> {
+    const url = `${API_BASE_URL}/payment/proof-image/${paymentUuid}/download`;
+    const headers: Record<string, string> = {
+      'ngrok-skip-browser-warning': 'true',
+    };
+    
+    if (this.accessToken) {
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      throw new Error(`Download failed: ${response.status}`);
+    }
+
+    return await response.arrayBuffer();
   }
 }
 

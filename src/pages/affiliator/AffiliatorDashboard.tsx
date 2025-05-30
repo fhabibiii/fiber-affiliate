@@ -103,21 +103,6 @@ const AffiliatorDashboard: React.FC = () => {
           />
         </CardContent>
       </Card>
-
-      {/* Empty State */}
-      {customers.length === 0 && (
-        <Card className="mt-6">
-          <CardContent className="p-12 text-center">
-            <div className="text-4xl mb-4">📋</div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Belum Ada Pelanggan
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Anda belum memiliki pelanggan yang terdaftar
-            </p>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };

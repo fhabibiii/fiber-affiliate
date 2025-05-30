@@ -203,17 +203,25 @@ const PaymentHistoryAdmin: React.FC = () => {
     setShowImageModal(true);
   };
 
-  const handleDownloadImage = (imageUrl: string, filename: string) => {
-    // Force download using a different approach
-    const link = document.createElement('a');
-    link.style.display = 'none';
-    link.href = imageUrl;
-    link.download = filename || 'bukti-pembayaran.jpg';
-    link.target = '_self'; // Ensure it doesn't open in new tab
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadImage = async (paymentUuid: string, filename: string) => {
+    try {
+      const response = await apiService.downloadPaymentProof(paymentUuid);
+      const blob = new Blob([response], { type: 'image/jpeg' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename || 'bukti-pembayaran.jpg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast({
+        title: "Error",
+        description: "Gagal mengunduh bukti pembayaran",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSubmitEdit = async (e: React.FormEvent) => {
@@ -363,7 +371,7 @@ const PaymentHistoryAdmin: React.FC = () => {
     {
       key: 'proofImage',
       label: 'Bukti Pembayaran',
-      render: (value: string) => (
+      render: (value: string, row: Payment) => (
         <Button
           variant="outline"
           size="sm"
@@ -690,7 +698,12 @@ const PaymentHistoryAdmin: React.FC = () => {
             />
             <div className="flex justify-end">
               <Button
-                onClick={() => handleDownloadImage(selectedImage, 'bukti-pembayaran.jpg')}
+                onClick={() => {
+                  const payment = payments.find(p => p.proofImage === selectedImage);
+                  if (payment) {
+                    handleDownloadImage(payment.uuid, 'bukti-pembayaran.jpg');
+                  }
+                }}
                 className="flex items-center gap-2"
               >
                 <Download className="w-4 h-4" />
