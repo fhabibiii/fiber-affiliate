@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiService, Payment, Affiliator, AffiliatorSummary } from '@/services/api';
 import { Skeleton } from '@/components/ui/skeleton';
-import { exportPaymentsToExcel } from '@/utils/excelUtils';
 
 const PaymentHistoryAdmin: React.FC = () => {
   const { id } = useParams();
@@ -163,17 +163,24 @@ const PaymentHistoryAdmin: React.FC = () => {
     return monthNames[monthNumber] || monthNumber;
   };
 
-  const handleExportExcel = () => {
-    if (!paymentsResponse?.data || !affiliator) return;
+  const handleExportCSV = () => {
+    if (!paymentsResponse?.data) return;
 
-    const paymentsData = paymentsResponse.data.map(payment => ({
-      month: formatMonthName(payment.month),
-      year: payment.year,
-      amount: formatCurrency(payment.amount),
-      paymentDate: formatDate(payment.paymentDate)
-    }));
+    const csvContent = [
+      ['Bulan', 'Tahun', 'Jumlah', 'Tanggal Pembayaran'],
+      ...paymentsResponse.data.map(payment => [
+        formatMonthName(payment.month),
+        payment.year,
+        payment.amount,
+        formatDate(payment.paymentDate)
+      ])
+    ].map(row => row.join(',')).join('\n');
 
-    exportPaymentsToExcel(paymentsData, affiliator.fullName);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `riwayat-pembayaran-${affiliator?.fullName || 'affiliator'}.csv`;
+    link.click();
   };
 
   const handleEdit = (payment: Payment) => {
@@ -213,6 +220,7 @@ const PaymentHistoryAdmin: React.FC = () => {
     try {
       let proofImageUrl = selectedPayment.proofImage;
       
+      // Upload new proof image if provided
       if (formData.proofImage) {
         const uploadResult = await uploadProofMutation.mutateAsync(formData.proofImage);
         proofImageUrl = uploadResult.url;
@@ -240,6 +248,7 @@ const PaymentHistoryAdmin: React.FC = () => {
     try {
       let proofImageUrl = '';
       
+      // Upload proof image if provided
       if (formData.proofImage) {
         const uploadResult = await uploadProofMutation.mutateAsync(formData.proofImage);
         proofImageUrl = uploadResult.url;
@@ -464,7 +473,7 @@ const PaymentHistoryAdmin: React.FC = () => {
           <div className="md:hidden mb-4">
             <div className="flex gap-2 w-full">
               <Button 
-                onClick={handleExportExcel}
+                onClick={handleExportCSV}
                 variant="outline"
                 size="sm"
                 className="flex-1"
@@ -485,12 +494,12 @@ const PaymentHistoryAdmin: React.FC = () => {
             extraControls={
               <div className="hidden md:flex gap-2">
                 <Button 
-                  onClick={handleExportExcel}
+                  onClick={handleExportCSV}
                   variant="outline"
                   disabled={!payments.length}
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Download
+                  Export CSV
                 </Button>
                 <Button onClick={() => setShowAddPaymentModal(true)}>
                   <Plus className="w-4 h-4 mr-2" />
