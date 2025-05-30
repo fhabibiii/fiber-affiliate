@@ -28,16 +28,27 @@ export const usePWA = (): PWAState => {
     // Check if app is running in standalone mode
     const checkStandalone = () => {
       const standalone = window.matchMedia('(display-mode: standalone)').matches || 
-                        (window.navigator as any).standalone === true;
+                        (window.navigator as any).standalone === true ||
+                        window.location.search.includes('standalone=true');
       setIsStandalone(standalone);
     };
 
-    // Check if app is already installed
+    // Check if app is already installed - only in secure context and top-level
     const checkInstalled = () => {
-      if ('getInstalledRelatedApps' in navigator) {
-        (navigator as any).getInstalledRelatedApps().then((relatedApps: any[]) => {
-          setIsInstalled(relatedApps.length > 0);
-        });
+      try {
+        if ('getInstalledRelatedApps' in navigator && 
+            window.location.protocol === 'https:' && 
+            window === window.top) {
+          (navigator as any).getInstalledRelatedApps().then((relatedApps: any[]) => {
+            setIsInstalled(relatedApps.length > 0);
+          }).catch(() => {
+            // Silently fail if not supported
+            setIsInstalled(false);
+          });
+        }
+      } catch (error) {
+        // Silently fail if not supported
+        setIsInstalled(false);
       }
     };
 
@@ -46,6 +57,7 @@ export const usePWA = (): PWAState => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setCanInstall(true);
+      console.log('PWA install prompt available');
     };
 
     // Listen for app installed event
@@ -53,6 +65,7 @@ export const usePWA = (): PWAState => {
       setIsInstalled(true);
       setCanInstall(false);
       setDeferredPrompt(null);
+      console.log('PWA installed successfully');
     };
 
     checkStandalone();
@@ -68,15 +81,22 @@ export const usePWA = (): PWAState => {
   }, []);
 
   const installApp = async (): Promise<void> => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      console.log('No install prompt available');
+      return;
+    }
 
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-    } else {
-      console.log('User dismissed the install prompt');
+    try {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+    } catch (error) {
+      console.error('Install prompt failed:', error);
     }
     
     setDeferredPrompt(null);
