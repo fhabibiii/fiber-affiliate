@@ -11,7 +11,11 @@ import { Loader2, Upload, Search, Calendar } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { apiService, Affiliator } from '@/services/api';
+import { format } from 'date-fns';
+import { formatIndonesianDate } from '@/utils/formatUtils';
+import { cn } from '@/lib/utils';
 
 const AddPayment: React.FC = () => {
   const { showErrorToast, showSuccessToast } = useToast();
@@ -19,6 +23,7 @@ const AddPayment: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [affiliators, setAffiliators] = useState<Affiliator[]>([]);
   const [formData, setFormData] = useState({
@@ -26,7 +31,7 @@ const AddPayment: React.FC = () => {
     month: '',
     year: new Date().getFullYear().toString(),
     amount: '',
-    paymentDate: '',
+    paymentDate: undefined as Date | undefined,
     proofImage: null as File | null,
     proofImageUrl: ''
   });
@@ -111,12 +116,15 @@ const AddPayment: React.FC = () => {
     setLoading(true);
 
     try {
+      // Format date to yyyy-mm-dd for API
+      const formattedDate = format(formData.paymentDate, 'yyyy-MM-dd');
+      
       await apiService.createPayment({
         affiliatorUuid: formData.affiliatorUuid,
         month: formData.month,
         year: parseInt(formData.year),
         amount: parseInt(formData.amount),
-        paymentDate: formData.paymentDate,
+        paymentDate: formattedDate,
         proofImage: formData.proofImageUrl
       });
       
@@ -246,17 +254,36 @@ const AddPayment: React.FC = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="paymentDate">Tanggal Bayar *</Label>
-                    <div className="relative">
-                      <Input
-                        id="paymentDate"
-                        type="date"
-                        value={formData.paymentDate}
-                        onChange={handleDateChange}
-                        required
-                        className="pl-10"
-                      />
-                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    </div>
+                    <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !formData.paymentDate && "text-muted-foreground"
+                          )}
+                        >
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {formData.paymentDate ? (
+                            format(formData.paymentDate, "dd/MM/yyyy")
+                          ) : (
+                            <span>Pilih tanggal</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={formData.paymentDate}
+                          onSelect={(date) => {
+                            setFormData({ ...formData, paymentDate: date });
+                            setDatePickerOpen(false);
+                          }}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
 
