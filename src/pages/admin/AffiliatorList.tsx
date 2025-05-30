@@ -10,15 +10,17 @@ import { Edit, Trash2, Plus, Loader2, Download } from 'lucide-react';
 import ResponsiveTable from '@/components/ui/responsive-table';
 import { useNavigate } from 'react-router-dom';
 import { formatWhatsAppNumber, formatIndonesianDate } from '@/utils/formatUtils';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiService } from '@/services/api';
 
 const AffiliatorList: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedAffiliator, setSelectedAffiliator] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -26,33 +28,78 @@ const AffiliatorList: React.FC = () => {
     password: ''
   });
 
-  // Mock affiliator data
-  const affiliators = [
-    {
-      uuid: '1',
-      fullName: 'John Doe',
-      phoneNumber: '081234567890',
-      username: 'johndoe',
-      customerCount: 15,
-      joinDate: '2024-01-15T00:00:00Z'
+  // Fetch affiliators with React Query
+  const { data: affiliatorsData, isLoading: isLoadingAffiliators, error } = useQuery({
+    queryKey: ['affiliators'],
+    queryFn: () => apiService.getAffiliators(1, 100, ''),
+  });
+
+  const affiliators = affiliatorsData?.data || [];
+
+  // Create affiliator mutation
+  const createAffiliatorMutation = useMutation({
+    mutationFn: (data: { fullName: string; username: string; password: string; phoneNumber: string }) =>
+      apiService.createAffiliator(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['affiliators'] });
+      toast({
+        title: "Berhasil",
+        description: "Affiliator berhasil ditambahkan",
+      });
+      setShowAddModal(false);
+      setFormData({ fullName: '', phoneNumber: '', username: '', password: '' });
     },
-    {
-      uuid: '2',
-      fullName: 'Jane Smith',
-      phoneNumber: '081234567891',
-      username: 'janesmith',
-      customerCount: 23,
-      joinDate: '2024-02-10T00:00:00Z'
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menambahkan affiliator",
+        variant: "destructive"
+      });
     },
-    {
-      uuid: '3',
-      fullName: 'Bob Johnson',
-      phoneNumber: '081234567892',
-      username: 'bobjohnson',
-      customerCount: 8,
-      joinDate: '2024-03-05T00:00:00Z'
-    }
-  ];
+  });
+
+  // Update affiliator mutation
+  const updateAffiliatorMutation = useMutation({
+    mutationFn: ({ uuid, data }: { uuid: string; data: Partial<any> }) =>
+      apiService.updateAffiliator(uuid, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['affiliators'] });
+      toast({
+        title: "Berhasil",
+        description: "Affiliator berhasil diperbarui",
+      });
+      setShowEditModal(false);
+      setFormData({ fullName: '', phoneNumber: '', username: '', password: '' });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal memperbarui affiliator",
+        variant: "destructive"
+      });
+    },
+  });
+
+  // Delete affiliator mutation
+  const deleteAffiliatorMutation = useMutation({
+    mutationFn: (uuid: string) => apiService.deleteAffiliator(uuid),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['affiliators'] });
+      toast({
+        title: "Berhasil",
+        description: "Affiliator berhasil dihapus",
+      });
+      setShowDeleteModal(false);
+      setSelectedAffiliator(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus affiliator",
+        variant: "destructive"
+      });
+    },
+  });
 
   const handleExportCSV = () => {
     const csvContent = [
@@ -61,8 +108,8 @@ const AffiliatorList: React.FC = () => {
         affiliator.fullName,
         affiliator.phoneNumber,
         affiliator.username,
-        affiliator.customerCount,
-        formatIndonesianDate(affiliator.joinDate)
+        affiliator.totalCustomers || 0,
+        formatIndonesianDate(affiliator.createdAt)
       ])
     ].map(row => row.join(',')).join('\n');
 
@@ -100,51 +147,30 @@ const AffiliatorList: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    if (showEditModal && selectedAffiliator) {
+      const updateData: any = {
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        username: formData.username,
+      };
       
-      toast({
-        title: "Berhasil",
-        description: showEditModal ? "Affiliator berhasil diperbarui" : "Affiliator berhasil ditambahkan",
+      if (formData.password) {
+        updateData.password = formData.password;
+      }
+      
+      updateAffiliatorMutation.mutate({
+        uuid: selectedAffiliator.uuid,
+        data: updateData
       });
-
-      setShowAddModal(false);
-      setShowEditModal(false);
-      setFormData({ fullName: '', phoneNumber: '', username: '', password: '' });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Gagal menyimpan data affiliator",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
+    } else {
+      createAffiliatorMutation.mutate(formData);
     }
   };
 
-  const handleDeleteConfirm = async () => {
-    setLoading(true);
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Berhasil",
-        description: "Affiliator berhasil dihapus",
-      });
-
-      setShowDeleteModal(false);
-      setSelectedAffiliator(null);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Gagal menghapus affiliator",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
+  const handleDeleteConfirm = () => {
+    if (selectedAffiliator) {
+      deleteAffiliatorMutation.mutate(selectedAffiliator.uuid);
     }
   };
 
@@ -170,11 +196,12 @@ const AffiliatorList: React.FC = () => {
       label: 'Username'
     },
     {
-      key: 'customerCount',
-      label: 'Jumlah Pelanggan'
+      key: 'totalCustomers',
+      label: 'Jumlah Pelanggan',
+      render: (value: number) => value || 0
     },
     {
-      key: 'joinDate',
+      key: 'createdAt',
       label: 'Tanggal Bergabung',
       render: (value: string) => formatIndonesianDate(value)
     }
@@ -205,6 +232,30 @@ const AffiliatorList: React.FC = () => {
     </div>
   );
 
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Daftar Affiliator
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Kelola semua affiliator dalam sistem
+          </p>
+        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center py-8">
+              <p className="text-red-500 dark:text-red-400">
+                Error: {error.message}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -226,6 +277,7 @@ const AffiliatorList: React.FC = () => {
               onClick={handleExportCSV}
               variant="outline"
               className="flex-1"
+              disabled={isLoadingAffiliators}
             >
               <Download className="w-4 h-4" />
             </Button>
@@ -277,9 +329,9 @@ const AffiliatorList: React.FC = () => {
                       required
                     />
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full">
-                    {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                    {loading ? 'Menambahkan...' : 'Tambah Affiliator'}
+                  <Button type="submit" disabled={createAffiliatorMutation.isPending} className="w-full">
+                    {createAffiliatorMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    {createAffiliatorMutation.isPending ? 'Menambahkan...' : 'Tambah Affiliator'}
                   </Button>
                 </form>
               </DialogContent>
@@ -296,6 +348,7 @@ const AffiliatorList: React.FC = () => {
                 <Button 
                   onClick={handleExportCSV}
                   variant="outline"
+                  disabled={isLoadingAffiliators}
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export CSV
@@ -349,9 +402,9 @@ const AffiliatorList: React.FC = () => {
                           required
                         />
                       </div>
-                      <Button type="submit" disabled={loading} className="w-full">
-                        {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        {loading ? 'Menambahkan...' : 'Tambah Affiliator'}
+                      <Button type="submit" disabled={createAffiliatorMutation.isPending} className="w-full">
+                        {createAffiliatorMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        {createAffiliatorMutation.isPending ? 'Menambahkan...' : 'Tambah Affiliator'}
                       </Button>
                     </form>
                   </DialogContent>
@@ -359,6 +412,13 @@ const AffiliatorList: React.FC = () => {
               </div>
             }
           />
+
+          {isLoadingAffiliators && (
+            <div className="text-center py-8">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+              <p className="text-gray-500 dark:text-gray-400">Memuat data affiliator...</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -406,9 +466,9 @@ const AffiliatorList: React.FC = () => {
                 placeholder="Kosongkan jika tidak ingin mengubah"
               />
             </div>
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+            <Button type="submit" disabled={updateAffiliatorMutation.isPending} className="w-full">
+              {updateAffiliatorMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {updateAffiliatorMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
             </Button>
           </form>
         </DialogContent>
@@ -426,9 +486,9 @@ const AffiliatorList: React.FC = () => {
               <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
                 Batal
               </Button>
-              <Button variant="destructive" onClick={handleDeleteConfirm} disabled={loading}>
-                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {loading ? 'Menghapus...' : 'Hapus'}
+              <Button variant="destructive" onClick={handleDeleteConfirm} disabled={deleteAffiliatorMutation.isPending}>
+                {deleteAffiliatorMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {deleteAffiliatorMutation.isPending ? 'Menghapus...' : 'Hapus'}
               </Button>
             </div>
           </div>
