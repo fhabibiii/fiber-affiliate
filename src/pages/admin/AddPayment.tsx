@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,7 +25,6 @@ const AddPayment: React.FC = () => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [affiliators, setAffiliators] = useState<Affiliator[]>([]);
-  const [isDragOver, setIsDragOver] = useState(false);
   const [formData, setFormData] = useState({
     affiliatorUuid: '',
     month: '',
@@ -74,68 +72,29 @@ const AddPayment: React.FC = () => {
 
   const selectedAffiliator = affiliators.find(a => a.uuid === formData.affiliatorUuid);
 
-  const handleFileChange = async (file: File) => {
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      showErrorToast("Ukuran file maksimal 10MB");
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const uploadResult = await apiService.uploadProofPayment(file);
-      setFormData({ 
-        ...formData, 
-        proofImage: file,
-        proofImageUrl: uploadResult.url
-      });
-      showSuccessToast("File berhasil diupload");
-    } catch (error) {
-      console.error('Upload failed:', error);
-      showErrorToast(error, "Gagal mengupload file");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      handleFileChange(file);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(false);
-    
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      const file = files[0];
-      if (file.type.startsWith('image/')) {
-        handleFileChange(file);
-      } else {
-        showErrorToast("Hanya file gambar yang diperbolehkan");
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        showErrorToast("Ukuran file maksimal 10MB");
+        return;
       }
-    }
-  };
 
-  const handleUploadAreaClick = () => {
-    const fileInput = document.getElementById('proofImage') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
+      setUploading(true);
+      try {
+        const uploadResult = await apiService.uploadProofPayment(file);
+        setFormData({ 
+          ...formData, 
+          proofImage: file,
+          proofImageUrl: uploadResult.url
+        });
+        showSuccessToast("File berhasil diupload");
+      } catch (error) {
+        console.error('Upload failed:', error);
+        showErrorToast(error, "Gagal mengupload file");
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
@@ -175,11 +134,11 @@ const AddPayment: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4 md:p-6 max-w-4xl">
-        <div className="space-y-6">
+    <div className="h-full flex flex-col overflow-hidden">
+      <ScrollArea className="flex-1">
+        <div className="space-y-6 p-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               Tambah Pembayaran
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -323,43 +282,33 @@ const AddPayment: React.FC = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="proofImage">Upload Foto Bukti *</Label>
-                  <div 
-                    className={cn(
-                      "relative border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200 min-h-[120px] flex items-center justify-center",
-                      isDragOver 
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-950/20" 
-                        : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500",
-                      uploading && "pointer-events-none opacity-50"
-                    )}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                    onClick={handleUploadAreaClick}
-                  >
-                    <div className="text-center p-6 w-full">
+                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6">
+                    <div className="text-center">
                       {uploading ? (
-                        <Loader2 className="mx-auto h-8 w-8 text-gray-400 animate-spin mb-3" />
+                        <Loader2 className="mx-auto h-12 w-12 text-gray-400 animate-spin" />
                       ) : (
-                        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-3" />
+                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
                       )}
-                      <div>
-                        <span className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
-                          {formData.proofImage ? formData.proofImage.name : 'Klik untuk upload atau drag & drop'}
-                        </span>
-                        <span className="block text-xs text-gray-500">
-                          PNG, JPG, JPEG hingga 10MB
-                        </span>
+                      <div className="mt-4">
+                        <label htmlFor="proofImage" className="cursor-pointer">
+                          <span className="mt-2 block text-sm font-medium text-gray-900 dark:text-white">
+                            {formData.proofImage ? formData.proofImage.name : 'Klik untuk upload atau drag & drop'}
+                          </span>
+                          <span className="mt-1 block text-xs text-gray-500">
+                            PNG, JPG, JPEG hingga 10MB
+                          </span>
+                        </label>
+                        <input
+                          id="proofImage"
+                          type="file"
+                          className="sr-only"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          required
+                          disabled={uploading}
+                        />
                       </div>
                     </div>
-                    <input
-                      id="proofImage"
-                      type="file"
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      accept="image/*"
-                      onChange={handleFileInputChange}
-                      required
-                      disabled={uploading}
-                    />
                   </div>
                 </div>
 
@@ -371,7 +320,7 @@ const AddPayment: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 };
