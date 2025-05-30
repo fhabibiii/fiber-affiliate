@@ -78,16 +78,9 @@ const AddPayment: React.FC = () => {
     return `${day}/${month}/${year}`;
   };
 
-  // Helper function to format date for input (yyyy-mm-dd)
-  const formatDateForInput = (dateString: string) => {
-    if (!dateString) return '';
-    const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`;
-  };
-
   // Helper function to handle date input change
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputDate = e.target.value; // yyyy-mm-dd format
+    const inputDate = e.target.value; // yyyy-mm-dd format from input
     setFormData({ ...formData, paymentDate: inputDate });
   };
 
@@ -276,7 +269,7 @@ const AddPayment: React.FC = () => {
                     </div>
                     {formData.paymentDate && (
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Format tampilan: {formatDateForDisplay(formData.paymentDate)}
+                        Format: {formatDateForDisplay(formData.paymentDate)}
                       </p>
                     )}
                   </div>
