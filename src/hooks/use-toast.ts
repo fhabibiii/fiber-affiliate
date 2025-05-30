@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -168,6 +169,31 @@ function toast({ ...props }: Toast) {
   }
 }
 
+// Helper function to show error toast with backend message
+function showErrorToast(error: any, fallbackMessage: string = "Terjadi kesalahan") {
+  let errorMessage = fallbackMessage;
+  
+  if (error?.message) {
+    errorMessage = error.message;
+  } else if (typeof error === 'string') {
+    errorMessage = error;
+  }
+  
+  toast({
+    title: "Error",
+    description: errorMessage,
+    variant: "destructive"
+  });
+}
+
+// Helper function to show success toast
+function showSuccessToast(message: string) {
+  toast({
+    title: "Berhasil",
+    description: message,
+  });
+}
+
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
 
@@ -184,8 +210,10 @@ function useToast() {
   return {
     ...state,
     toast,
+    showErrorToast,
+    showSuccessToast,
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   }
 }
 
-export { useToast, toast }
+export { useToast, toast, showErrorToast, showSuccessToast }

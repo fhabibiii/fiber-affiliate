@@ -7,14 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Upload, Search } from 'lucide-react';
+import { Loader2, Upload, Search, Calendar } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { apiService, Affiliator } from '@/services/api';
 
 const AddPayment: React.FC = () => {
-  const { toast } = useToast();
+  const { showErrorToast, showSuccessToast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -49,20 +49,16 @@ const AddPayment: React.FC = () => {
   useEffect(() => {
     const loadAffiliators = async () => {
       try {
-        const response = await apiService.getAffiliators(1, 100); // Get all affiliators
+        const response = await apiService.getAffiliators(1, 100);
         setAffiliators(response.data);
       } catch (error) {
         console.error('Failed to load affiliators:', error);
-        toast({
-          title: "Error",
-          description: "Gagal memuat daftar affiliator",
-          variant: "destructive"
-        });
+        showErrorToast(error, "Gagal memuat daftar affiliator");
       }
     };
 
     loadAffiliators();
-  }, [toast]);
+  }, [showErrorToast]);
 
   const filteredAffiliators = useMemo(() => {
     return affiliators.filter(affiliator =>
@@ -72,15 +68,34 @@ const AddPayment: React.FC = () => {
 
   const selectedAffiliator = affiliators.find(a => a.uuid === formData.affiliatorUuid);
 
+  // Helper function to format date for display (dd/mm/yyyy)
+  const formatDateForDisplay = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  // Helper function to format date for input (yyyy-mm-dd)
+  const formatDateForInput = (dateString: string) => {
+    if (!dateString) return '';
+    const [day, month, year] = dateString.split('/');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Helper function to handle date input change
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputDate = e.target.value; // yyyy-mm-dd format
+    setFormData({ ...formData, paymentDate: inputDate });
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        toast({
-          title: "Error",
-          description: "Ukuran file maksimal 10MB",
-          variant: "destructive"
-        });
+        showErrorToast("Ukuran file maksimal 10MB");
         return;
       }
 
@@ -92,17 +107,10 @@ const AddPayment: React.FC = () => {
           proofImage: file,
           proofImageUrl: uploadResult.url
         });
-        toast({
-          title: "Berhasil",
-          description: "File berhasil diupload",
-        });
+        showSuccessToast("File berhasil diupload");
       } catch (error) {
         console.error('Upload failed:', error);
-        toast({
-          title: "Error",
-          description: "Gagal mengupload file",
-          variant: "destructive"
-        });
+        showErrorToast(error, "Gagal mengupload file");
       } finally {
         setUploading(false);
       }
@@ -113,11 +121,7 @@ const AddPayment: React.FC = () => {
     e.preventDefault();
     
     if (!formData.affiliatorUuid || !formData.month || !formData.year || !formData.amount || !formData.paymentDate || !formData.proofImageUrl) {
-      toast({
-        title: "Error",
-        description: "Semua field harus diisi",
-        variant: "destructive"
-      });
+      showErrorToast("Semua field harus diisi");
       return;
     }
 
@@ -133,20 +137,13 @@ const AddPayment: React.FC = () => {
         proofImage: formData.proofImageUrl
       });
       
-      toast({
-        title: "Berhasil",
-        description: "Pembayaran berhasil ditambahkan",
-      });
+      showSuccessToast("Pembayaran berhasil ditambahkan");
 
       // Navigate to payment history for the selected affiliator
       navigate(`/admin/payments/affiliator/${formData.affiliatorUuid}`);
     } catch (error) {
       console.error('Failed to create payment:', error);
-      toast({
-        title: "Error",
-        description: "Gagal menambahkan pembayaran",
-        variant: "destructive"
-      });
+      showErrorToast(error, "Gagal menambahkan pembayaran");
     } finally {
       setLoading(false);
     }
@@ -266,13 +263,22 @@ const AddPayment: React.FC = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="paymentDate">Tanggal Bayar *</Label>
-                    <Input
-                      id="paymentDate"
-                      type="date"
-                      value={formData.paymentDate}
-                      onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="paymentDate"
+                        type="date"
+                        value={formData.paymentDate}
+                        onChange={handleDateChange}
+                        required
+                        className="pl-10"
+                      />
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    </div>
+                    {formData.paymentDate && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Format tampilan: {formatDateForDisplay(formData.paymentDate)}
+                      </p>
+                    )}
                   </div>
                 </div>
 

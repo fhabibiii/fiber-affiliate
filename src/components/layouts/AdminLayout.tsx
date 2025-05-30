@@ -42,10 +42,24 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     enabled: affiliatorSearchOpen && !!affiliatorSearch.trim(),
   });
 
+  // Fetch all affiliators to display in sidebar
+  const { data: allAffiliatorsData } = useQuery({
+    queryKey: ['affiliators-all'],
+    queryFn: () => apiService.getAffiliators(1, 100),
+    enabled: affiliatorSearchOpen,
+  });
+
   const { data: paymentAffiliatorData } = useQuery({
     queryKey: ['affiliators-payment-search', paymentSearch],
     queryFn: () => apiService.getAffiliators(1, 50, paymentSearch),
     enabled: paymentSearchOpen && !!paymentSearch.trim(),
+  });
+
+  // Fetch all affiliators for payment section
+  const { data: allPaymentAffiliatorsData } = useQuery({
+    queryKey: ['affiliators-payment-all'],
+    queryFn: () => apiService.getAffiliators(1, 100),
+    enabled: paymentSearchOpen,
   });
 
   const navigationItems = [
@@ -71,7 +85,9 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   const filteredAffiliators = affiliatorData?.data || [];
+  const allAffiliators = allAffiliatorsData?.data || [];
   const filteredPaymentAffiliators = paymentAffiliatorData?.data || [];
+  const allPaymentAffiliators = allPaymentAffiliatorsData?.data || [];
 
   const handleLogout = () => {
     logout();
@@ -205,8 +221,25 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         </div>
                       )
                     ) : (
-                      <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                        Ketik untuk mencari...
+                      <div className="space-y-1">
+                        <div className="px-3 py-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                          Semua Affiliator:
+                        </div>
+                        {allAffiliators.length > 0 ? (
+                          allAffiliators.map((affiliator) => (
+                            <Link
+                              key={affiliator.uuid}
+                              to={`/admin/affiliators/${affiliator.uuid}`}
+                              className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                            >
+                              {affiliator.fullName}
+                            </Link>
+                          ))
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                            Belum ada affiliator
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -275,8 +308,25 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         </div>
                       )
                     ) : (
-                      <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                        Ketik untuk mencari...
+                      <div className="space-y-1">
+                        <div className="px-3 py-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                          Semua Affiliator:
+                        </div>
+                        {allPaymentAffiliators.length > 0 ? (
+                          allPaymentAffiliators.map((affiliator) => (
+                            <Link
+                              key={affiliator.uuid}
+                              to={`/admin/payments/affiliator/${affiliator.uuid}`}
+                              className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                            >
+                              {affiliator.fullName}
+                            </Link>
+                          ))
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                            Belum ada affiliator
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
