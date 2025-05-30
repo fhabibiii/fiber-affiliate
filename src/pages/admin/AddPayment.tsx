@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,12 +71,6 @@ const AddPayment: React.FC = () => {
   }, [affiliators, searchValue]);
 
   const selectedAffiliator = affiliators.find(a => a.uuid === formData.affiliatorUuid);
-
-  // Helper function to handle date input change
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputDate = e.target.value; // yyyy-mm-dd format from input
-    setFormData({ ...formData, paymentDate: inputDate });
-  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
