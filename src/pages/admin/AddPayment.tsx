@@ -11,7 +11,10 @@ import { Loader2, Upload, Search, Calendar } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { apiService, Affiliator } from '@/services/api';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const AddPayment: React.FC = () => {
   const { showErrorToast, showSuccessToast } = useToast();
@@ -19,6 +22,7 @@ const AddPayment: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [affiliators, setAffiliators] = useState<Affiliator[]>([]);
   const [formData, setFormData] = useState({
@@ -26,7 +30,7 @@ const AddPayment: React.FC = () => {
     month: '',
     year: new Date().getFullYear().toString(),
     amount: '',
-    paymentDate: '',
+    paymentDate: null as Date | null,
     proofImage: null as File | null,
     proofImageUrl: ''
   });
@@ -67,29 +71,6 @@ const AddPayment: React.FC = () => {
   }, [affiliators, searchValue]);
 
   const selectedAffiliator = affiliators.find(a => a.uuid === formData.affiliatorUuid);
-
-  // Helper function to format date from yyyy-mm-dd to dd/mm/yyyy for display
-  const formatDateForDisplay = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  // Helper function to convert dd/mm/yyyy to yyyy-mm-dd for input
-  const formatDateForInput = (displayDate: string) => {
-    if (!displayDate) return '';
-    const [day, month, year] = displayDate.split('/');
-    return `${year}-${month}-${day}`;
-  };
-
-  // Helper function to handle date input change
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputDate = e.target.value; // yyyy-mm-dd format from input
-    setFormData({ ...formData, paymentDate: inputDate });
-  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -133,7 +114,7 @@ const AddPayment: React.FC = () => {
         month: formData.month,
         year: parseInt(formData.year),
         amount: parseInt(formData.amount),
-        paymentDate: formData.paymentDate,
+        paymentDate: formData.paymentDate.toISOString(),
         proofImage: formData.proofImageUrl
       });
       
@@ -262,18 +243,37 @@ const AddPayment: React.FC = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="paymentDate">Tanggal Bayar (dd/mm/yyyy) *</Label>
-                    <div className="relative">
-                      <Input
-                        id="paymentDate"
-                        type="date"
-                        value={formData.paymentDate}
-                        onChange={handleDateChange}
-                        required
-                        className="pl-10"
-                      />
-                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    </div>
+                    <Label htmlFor="paymentDate">Tanggal Bayar *</Label>
+                    <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !formData.paymentDate && "text-muted-foreground"
+                          )}
+                        >
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {formData.paymentDate ? (
+                            format(formData.paymentDate, "dd/MM/yyyy")
+                          ) : (
+                            <span>Pilih tanggal</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={formData.paymentDate || undefined}
+                          onSelect={(date) => {
+                            setFormData({ ...formData, paymentDate: date || null });
+                            setCalendarOpen(false);
+                          }}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
 
