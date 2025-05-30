@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,54 +13,105 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import { formatWhatsAppNumber, formatIndonesianDate } from '@/utils/formatUtils';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiService, Affiliator, Customer } from '@/services/api';
 
 const AffiliatorDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
-    address: ''
+    fullAddress: ''
   });
 
-  // Mock affiliator data
-  const affiliator = {
-    uuid: id,
-    fullName: 'John Doe',
-    phoneNumber: '081234567890',
-    username: 'johndoe',
-    joinDate: '2024-01-15T00:00:00Z'
-  };
+  // Fetch affiliator data
+  const { data: affiliator, isLoading: isLoadingAffiliator, error: affiliatorError } = useQuery({
+    queryKey: ['affiliator', id],
+    queryFn: () => apiService.getAffiliator(id!),
+    enabled: !!id,
+  });
 
-  const customers = [
-    {
-      uuid: '1',
-      fullName: 'Alice Johnson',
-      phoneNumber: '081111111111',
-      address: 'Jl. Merdeka No. 123, Jakarta',
-      joinDate: '2024-02-01T00:00:00Z'
+  // Fetch customers by affiliator
+  const { data: customersData, isLoading: isLoadingCustomers, error: customersError } = useQuery({
+    queryKey: ['customers-by-affiliator', id],
+    queryFn: () => apiService.getCustomersByAffiliator(id!, 1, 100),
+    enabled: !!id,
+  });
+
+  // Create customer mutation
+  const createCustomerMutation = useMutation({
+    mutationFn: (data: Omit<Customer, 'uuid' | 'createdAt' | 'affiliatorName'>) => 
+      apiService.createCustomer(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers-by-affiliator', id] });
+      queryClient.invalidateQueries({ queryKey: ['affiliator', id] });
+      toast({
+        title: "Berhasil",
+        description: "Pelanggan berhasil ditambahkan",
+      });
+      setShowAddCustomerModal(false);
+      setFormData({ fullName: '', phoneNumber: '', fullAddress: '' });
     },
-    {
-      uuid: '2',
-      fullName: 'Bob Wilson',
-      phoneNumber: '081222222222',
-      address: 'Jl. Sudirman No. 456, Jakarta',
-      joinDate: '2024-02-15T00:00:00Z'
-    },
-    {
-      uuid: '3',
-      fullName: 'Carol Davis',
-      phoneNumber: '081333333333',
-      address: 'Jl. Thamrin No. 789, Jakarta',
-      joinDate: '2024-03-01T00:00:00Z'
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menambahkan pelanggan",
+        variant: "destructive"
+      });
     }
-  ];
+  });
+
+  // Update customer mutation
+  const updateCustomerMutation = useMutation({
+    mutationFn: ({ uuid, data }: { uuid: string; data: Partial<Customer> }) => 
+      apiService.updateCustomer(uuid, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers-by-affiliator', id] });
+      toast({
+        title: "Berhasil",
+        description: "Data pelanggan berhasil diperbarui",
+      });
+      setShowEditModal(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal memperbarui data pelanggan",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Delete customer mutation
+  const deleteCustomerMutation = useMutation({
+    mutationFn: (uuid: string) => apiService.deleteCustomer(uuid),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers-by-affiliator', id] });
+      queryClient.invalidateQueries({ queryKey: ['affiliator', id] });
+      toast({
+        title: "Berhasil",
+        description: "Pelanggan berhasil dihapus",
+      });
+      setShowDeleteModal(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal menghapus pelanggan",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const customers = customersData?.data || [];
 
   const handleWhatsAppClick = (phoneNumber: string) => {
     const formattedNumber = formatWhatsAppNumber(phoneNumber);
@@ -72,94 +124,87 @@ const AffiliatorDetail: React.FC = () => {
       ...customers.map(customer => [
         customer.fullName,
         customer.phoneNumber,
-        customer.address,
-        formatIndonesianDate(customer.joinDate)
+        customer.fullAddress,
+        formatIndonesianDate(customer.createdAt)
       ])
     ].map(row => row.join(',')).join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `pelanggan-${affiliator.fullName}.csv`;
+    link.download = `pelanggan-${affiliator?.fullName || 'affiliator'}.csv`;
     link.click();
   };
 
-  const handleEdit = (customer: any) => {
+  const handleEdit = (customer: Customer) => {
     setSelectedCustomer(customer);
     setFormData({
       fullName: customer.fullName,
       phoneNumber: customer.phoneNumber,
-      address: customer.address
+      fullAddress: customer.fullAddress
     });
     setShowEditModal(true);
   };
 
-  const handleDelete = (customer: any) => {
+  const handleDelete = (customer: Customer) => {
     setSelectedCustomer(customer);
     setShowDeleteModal(true);
   };
 
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedCustomer) return;
     
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Berhasil",
-        description: "Data pelanggan berhasil diperbarui",
-      });
-
-      setShowEditModal(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Gagal memperbarui data pelanggan",
-        variant: "destructive"
-      });
-    }
+    updateCustomerMutation.mutate({
+      uuid: selectedCustomer.uuid,
+      data: {
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        fullAddress: formData.fullAddress,
+        affiliatorUuid: id!
+      }
+    });
   };
 
   const handleSubmitAddCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Berhasil",
-        description: "Pelanggan berhasil ditambahkan",
-      });
-
-      setShowAddCustomerModal(false);
-      setFormData({ fullName: '', phoneNumber: '', address: '' });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Gagal menambahkan pelanggan",
-        variant: "destructive"
-      });
-    }
+    createCustomerMutation.mutate({
+      fullName: formData.fullName,
+      phoneNumber: formData.phoneNumber,
+      fullAddress: formData.fullAddress,
+      affiliatorUuid: id!
+    });
   };
 
   const handleDeleteConfirm = async () => {
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Berhasil",
-        description: "Pelanggan berhasil dihapus",
-      });
-
-      setShowDeleteModal(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Gagal menghapus pelanggan",
-        variant: "destructive"
-      });
-    }
+    if (!selectedCustomer) return;
+    deleteCustomerMutation.mutate(selectedCustomer.uuid);
   };
+
+  if (isLoadingAffiliator) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Memuat data affiliator...</div>
+      </div>
+    );
+  }
+
+  if (affiliatorError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-500">Error: {(affiliatorError as any)?.message || 'Failed to load affiliator'}</div>
+      </div>
+    );
+  }
+
+  if (!affiliator) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-500">Affiliator tidak ditemukan</div>
+      </div>
+    );
+  }
 
   const columns = [
     {
@@ -179,17 +224,17 @@ const AffiliatorDetail: React.FC = () => {
       )
     },
     {
-      key: 'address',
+      key: 'fullAddress',
       label: 'Alamat'
     },
     {
-      key: 'joinDate',
+      key: 'createdAt',
       label: 'Tanggal Bergabung',
       render: (value: string) => formatIndonesianDate(value)
     }
   ];
 
-  const actions = (row: any) => (
+  const actions = (row: Customer) => (
     <div className="flex gap-2">
       <Button
         variant="outline"
@@ -253,7 +298,7 @@ const AffiliatorDetail: React.FC = () => {
                   <div>
                     <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
                     <p className="text-xs font-semibold text-gray-900 dark:text-white">
-                      {formatIndonesianDate(affiliator.joinDate)}
+                      {formatIndonesianDate(affiliator.createdAt)}
                     </p>
                   </div>
                   <div>
@@ -299,7 +344,7 @@ const AffiliatorDetail: React.FC = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Bergabung</p>
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                      {formatIndonesianDate(affiliator.joinDate)}
+                      {formatIndonesianDate(affiliator.createdAt)}
                     </p>
                   </div>
                   <div>
@@ -336,26 +381,36 @@ const AffiliatorDetail: React.FC = () => {
             </div>
           </div>
 
-          <ResponsiveTable
-            data={customers}
-            columns={columns}
-            actions={actions}
-            extraControls={
-              <div className="hidden md:flex gap-2">
-                <Button 
-                  onClick={handleExportCSV}
-                  variant="outline"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Export CSV
-                </Button>
-                <Button onClick={() => setShowAddCustomerModal(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Tambah Pelanggan
-                </Button>
-              </div>
-            }
-          />
+          {isLoadingCustomers ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-lg">Memuat data pelanggan...</div>
+            </div>
+          ) : customersError ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-red-500">Error: {(customersError as any)?.message || 'Failed to load customers'}</div>
+            </div>
+          ) : (
+            <ResponsiveTable
+              data={customers}
+              columns={columns}
+              actions={actions}
+              extraControls={
+                <div className="hidden md:flex gap-2">
+                  <Button 
+                    onClick={handleExportCSV}
+                    variant="outline"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
+                  <Button onClick={() => setShowAddCustomerModal(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Tambah Pelanggan
+                  </Button>
+                </div>
+              }
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -399,13 +454,17 @@ const AffiliatorDetail: React.FC = () => {
               <Label htmlFor="addAddress">Alamat</Label>
               <Textarea
                 id="addAddress"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                value={formData.fullAddress}
+                onChange={(e) => setFormData({ ...formData, fullAddress: e.target.value })}
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
-              Tambah Pelanggan
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={createCustomerMutation.isPending}
+            >
+              {createCustomerMutation.isPending ? 'Menambah...' : 'Tambah Pelanggan'}
             </Button>
           </form>
         </DialogContent>
@@ -439,13 +498,17 @@ const AffiliatorDetail: React.FC = () => {
               <Label htmlFor="editAddress">Alamat</Label>
               <Textarea
                 id="editAddress"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                value={formData.fullAddress}
+                onChange={(e) => setFormData({ ...formData, fullAddress: e.target.value })}
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
-              Simpan Perubahan
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={updateCustomerMutation.isPending}
+            >
+              {updateCustomerMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
             </Button>
           </form>
         </DialogContent>
@@ -462,8 +525,12 @@ const AffiliatorDetail: React.FC = () => {
               <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
                 Batal
               </Button>
-              <Button variant="destructive" onClick={handleDeleteConfirm}>
-                Hapus
+              <Button 
+                variant="destructive" 
+                onClick={handleDeleteConfirm}
+                disabled={deleteCustomerMutation.isPending}
+              >
+                {deleteCustomerMutation.isPending ? 'Menghapus...' : 'Hapus'}
               </Button>
             </div>
           </div>
