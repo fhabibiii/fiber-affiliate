@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -82,12 +83,13 @@ const AddPayment: React.FC = () => {
     setUploading(true);
     try {
       const uploadResult = await apiService.uploadProofPayment(file);
-      setFormData({ 
-        ...formData, 
+      setFormData(prev => ({ 
+        ...prev, 
         proofImage: file,
         proofImageUrl: uploadResult.url
-      });
+      }));
       showSuccessToast("File berhasil diupload");
+      console.log('File uploaded successfully:', { filename: file.name, url: uploadResult.url });
     } catch (error) {
       console.error('Upload failed:', error);
       showErrorToast(error, "Gagal mengupload file");
@@ -105,16 +107,19 @@ const AddPayment: React.FC = () => {
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(false);
   };
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(false);
     
     const files = e.dataTransfer.files;
@@ -136,8 +141,15 @@ const AddPayment: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.affiliatorUuid || !formData.month || !formData.year || !formData.amount || !formData.paymentDate || !formData.proofImageUrl) {
+    console.log('Form submission - current form data:', formData);
+    
+    if (!formData.affiliatorUuid || !formData.month || !formData.year || !formData.amount || !formData.paymentDate) {
       showErrorToast("Semua field harus diisi");
+      return;
+    }
+
+    if (!formData.proofImageUrl || !formData.proofImage) {
+      showErrorToast("Bukti pembayaran harus diupload");
       return;
     }
 
@@ -146,6 +158,15 @@ const AddPayment: React.FC = () => {
     try {
       // Format date to yyyy-mm-dd for API
       const formattedDate = format(formData.paymentDate, 'yyyy-MM-dd');
+      
+      console.log('Submitting payment with data:', {
+        affiliatorUuid: formData.affiliatorUuid,
+        month: formData.month,
+        year: parseInt(formData.year),
+        amount: parseInt(formData.amount),
+        paymentDate: formattedDate,
+        proofImage: formData.proofImageUrl
+      });
       
       await apiService.createPayment({
         affiliatorUuid: formData.affiliatorUuid,
@@ -319,7 +340,7 @@ const AddPayment: React.FC = () => {
                   <Label htmlFor="proofImage">Upload Foto Bukti *</Label>
                   <div 
                     className={cn(
-                      "border-2 border-dashed rounded-lg p-6 cursor-pointer transition-colors",
+                      "border-2 border-dashed rounded-lg p-6 cursor-pointer transition-colors w-full",
                       isDragOver 
                         ? "border-blue-400 bg-blue-50 dark:bg-blue-950/20" 
                         : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
@@ -350,7 +371,6 @@ const AddPayment: React.FC = () => {
                       className="sr-only"
                       accept="image/*"
                       onChange={handleFileChange}
-                      required
                       disabled={uploading}
                     />
                   </div>
