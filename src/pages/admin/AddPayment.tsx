@@ -68,26 +68,9 @@ const AddPayment: React.FC = () => {
 
   const selectedAffiliator = affiliators.find(a => a.uuid === formData.affiliatorUuid);
 
-  // Helper function to format date for display (dd/mm/yyyy)
-  const formatDateForDisplay = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  // Helper function to format date for input (yyyy-mm-dd)
-  const formatDateForInput = (dateString: string) => {
-    if (!dateString) return '';
-    const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`;
-  };
-
   // Helper function to handle date input change
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputDate = e.target.value; // yyyy-mm-dd format
+    const inputDate = e.target.value; // yyyy-mm-dd format from input
     setFormData({ ...formData, paymentDate: inputDate });
   };
 
@@ -274,11 +257,6 @@ const AddPayment: React.FC = () => {
                       />
                       <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     </div>
-                    {formData.paymentDate && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Format tampilan: {formatDateForDisplay(formData.paymentDate)}
-                      </p>
-                    )}
                   </div>
                 </div>
 
