@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -221,26 +220,21 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         </div>
                       )
                     ) : (
-                      <div className="space-y-1">
-                        <div className="px-3 py-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
-                          Semua Affiliator:
+                      allAffiliators.length > 0 ? (
+                        allAffiliators.map((affiliator) => (
+                          <Link
+                            key={affiliator.uuid}
+                            to={`/admin/affiliators/${affiliator.uuid}`}
+                            className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                          >
+                            {affiliator.fullName}
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                          Belum ada affiliator
                         </div>
-                        {allAffiliators.length > 0 ? (
-                          allAffiliators.map((affiliator) => (
-                            <Link
-                              key={affiliator.uuid}
-                              to={`/admin/affiliators/${affiliator.uuid}`}
-                              className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
-                            >
-                              {affiliator.fullName}
-                            </Link>
-                          ))
-                        ) : (
-                          <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                            Belum ada affiliator
-                          </div>
-                        )}
-                      </div>
+                      )
                     )}
                   </div>
                 </div>
@@ -308,26 +302,21 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         </div>
                       )
                     ) : (
-                      <div className="space-y-1">
-                        <div className="px-3 py-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
-                          Semua Affiliator:
+                      allPaymentAffiliators.length > 0 ? (
+                        allPaymentAffiliators.map((affiliator) => (
+                          <Link
+                            key={affiliator.uuid}
+                            to={`/admin/payments/affiliator/${affiliator.uuid}`}
+                            className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
+                          >
+                            {affiliator.fullName}
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                          Belum ada affiliator
                         </div>
-                        {allPaymentAffiliators.length > 0 ? (
-                          allPaymentAffiliators.map((affiliator) => (
-                            <Link
-                              key={affiliator.uuid}
-                              to={`/admin/payments/affiliator/${affiliator.uuid}`}
-                              className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors"
-                            >
-                              {affiliator.fullName}
-                            </Link>
-                          ))
-                        ) : (
-                          <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                            Belum ada affiliator
-                          </div>
-                        )}
-                      </div>
+                      )
                     )}
                   </div>
                 </div>
