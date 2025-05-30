@@ -281,6 +281,23 @@ class ApiService {
     throw new Error(response.message || 'Failed to get payment statistics');
   }
 
+  // New methods for getting available years
+  async getCustomerYears(): Promise<string[]> {
+    const response = await this.makeRequest<ApiResponse<string[]>>('/customers/years');
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get customer years');
+  }
+
+  async getPaymentYears(): Promise<string[]> {
+    const response = await this.makeRequest<ApiResponse<string[]>>('/payments/years');
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Failed to get payment years');
+  }
+
   // Affiliator methods
   async getAffiliators(page = 1, limit = 10, search = ''): Promise<{ data: Affiliator[]; pagination: any }> {
     const response = await this.makeRequest<ApiResponse<Affiliator[]>>(`/affiliators?page=${page}&limit=${limit}&search=${search}`);

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,6 +31,7 @@ const PaymentHistoryAdmin: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [isTotalOpen, setIsTotalOpen] = useState(false);
   const [paymentDate, setPaymentDate] = useState<Date>();
+  const [editPaymentDate, setEditPaymentDate] = useState<Date>();
   const [formData, setFormData] = useState({
     month: '',
     year: '',
@@ -73,6 +73,7 @@ const PaymentHistoryAdmin: React.FC = () => {
       });
       setShowAddPaymentModal(false);
       setFormData({ month: '', year: '', amount: '', proofImage: null });
+      setPaymentDate(undefined);
     },
     onError: (error) => {
       console.error('Create payment error:', error);
@@ -196,6 +197,7 @@ const PaymentHistoryAdmin: React.FC = () => {
       amount: payment.amount.toString(),
       proofImage: null
     });
+    setEditPaymentDate(new Date(payment.paymentDate));
     setShowEditModal(true);
   };
 
@@ -233,7 +235,7 @@ const PaymentHistoryAdmin: React.FC = () => {
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedPayment) return;
+    if (!selectedPayment || !editPaymentDate) return;
 
     try {
       let proofImageUrl = selectedPayment.proofImage;
@@ -250,6 +252,7 @@ const PaymentHistoryAdmin: React.FC = () => {
           month: formData.month,
           year: parseInt(formData.year),
           amount: parseFloat(formData.amount),
+          paymentDate: editPaymentDate.toISOString(),
           proofImage: proofImageUrl
         }
       });
@@ -670,6 +673,32 @@ const PaymentHistoryAdmin: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editPaymentDate">Tanggal Pembayaran</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !editPaymentDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {editPaymentDate ? format(editPaymentDate, "PPP") : <span>Pilih tanggal</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={editPaymentDate}
+                    onSelect={setEditPaymentDate}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <Label htmlFor="editProofImage">Bukti Pembayaran (Opsional)</Label>

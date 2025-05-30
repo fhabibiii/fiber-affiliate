@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { indonesianTexts } from '@/constants/texts';
 import { apiService, AdminSummary, StatItem } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
 
 const AdminDashboard: React.FC = () => {
   const { toast } = useToast();
@@ -17,7 +18,17 @@ const AdminDashboard: React.FC = () => {
   const [paymentStats, setPaymentStats] = useState<StatItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const availableYears = ['2025', '2024', '2023', '2022'];
+  // Fetch available years for customer stats
+  const { data: customerYears } = useQuery({
+    queryKey: ['customerYears'],
+    queryFn: () => apiService.getCustomerYears(),
+  });
+
+  // Fetch available years for payment stats
+  const { data: paymentYears } = useQuery({
+    queryKey: ['paymentYears'],
+    queryFn: () => apiService.getPaymentYears(),
+  });
 
   // Load summary data
   useEffect(() => {
@@ -156,7 +167,7 @@ const AdminDashboard: React.FC = () => {
                 <SelectValue placeholder="Tahun" />
               </SelectTrigger>
               <SelectContent>
-                {availableYears.map((year) => (
+                {customerYears?.map((year) => (
                   <SelectItem key={year} value={year}>
                     {year}
                   </SelectItem>
@@ -206,7 +217,7 @@ const AdminDashboard: React.FC = () => {
                 <SelectValue placeholder="Tahun" />
               </SelectTrigger>
               <SelectContent>
-                {availableYears.map((year) => (
+                {paymentYears?.map((year) => (
                   <SelectItem key={year} value={year}>
                     {year}
                   </SelectItem>
