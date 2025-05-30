@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -105,16 +106,19 @@ const AddPayment: React.FC = () => {
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(true);
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(false);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(false);
     
     const files = e.dataTransfer.files;
@@ -171,9 +175,9 @@ const AddPayment: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1 p-4 md:p-6">
-        <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-4 md:p-6 max-w-4xl">
+        <div className="space-y-6">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
               Tambah Pembayaran
@@ -310,7 +314,7 @@ const AddPayment: React.FC = () => {
                             setDatePickerOpen(false);
                           }}
                           initialFocus
-                          className="p-3"
+                          className="p-3 pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>
@@ -321,10 +325,10 @@ const AddPayment: React.FC = () => {
                   <Label htmlFor="proofImage">Upload Foto Bukti *</Label>
                   <div 
                     className={cn(
-                      "border-2 border-dashed rounded-lg p-6 cursor-pointer transition-colors",
+                      "relative border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200 min-h-[120px] flex items-center justify-center",
                       isDragOver 
                         ? "border-blue-500 bg-blue-50 dark:bg-blue-950/20" 
-                        : "border-gray-300 dark:border-gray-600",
+                        : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500",
                       uploading && "pointer-events-none opacity-50"
                     )}
                     onDragOver={handleDragOver}
@@ -332,17 +336,17 @@ const AddPayment: React.FC = () => {
                     onDrop={handleDrop}
                     onClick={handleUploadAreaClick}
                   >
-                    <div className="text-center">
+                    <div className="text-center p-6 w-full">
                       {uploading ? (
-                        <Loader2 className="mx-auto h-12 w-12 text-gray-400 animate-spin" />
+                        <Loader2 className="mx-auto h-8 w-8 text-gray-400 animate-spin mb-3" />
                       ) : (
-                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-3" />
                       )}
-                      <div className="mt-4">
-                        <span className="mt-2 block text-sm font-medium text-gray-900 dark:text-white">
+                      <div>
+                        <span className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                           {formData.proofImage ? formData.proofImage.name : 'Klik untuk upload atau drag & drop'}
                         </span>
-                        <span className="mt-1 block text-xs text-gray-500">
+                        <span className="block text-xs text-gray-500">
                           PNG, JPG, JPEG hingga 10MB
                         </span>
                       </div>
@@ -350,7 +354,7 @@ const AddPayment: React.FC = () => {
                     <input
                       id="proofImage"
                       type="file"
-                      className="sr-only"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       accept="image/*"
                       onChange={handleFileInputChange}
                       required
