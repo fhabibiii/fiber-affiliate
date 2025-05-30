@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, Eye, Download, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Edit, Trash2, Eye, Download, Plus, ChevronDown, ChevronUp, CalendarIcon } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ResponsiveTable from '@/components/ui/responsive-table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -13,6 +14,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiService, Payment, Affiliator, AffiliatorSummary } from '@/services/api';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const PaymentHistoryAdmin: React.FC = () => {
   const { id } = useParams();
@@ -26,6 +31,7 @@ const PaymentHistoryAdmin: React.FC = () => {
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [isTotalOpen, setIsTotalOpen] = useState(false);
+  const [paymentDate, setPaymentDate] = useState<Date>();
   const [formData, setFormData] = useState({
     month: '',
     year: '',
@@ -255,7 +261,7 @@ const PaymentHistoryAdmin: React.FC = () => {
   const handleSubmitAddPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!id) return;
+    if (!id || !paymentDate) return;
 
     try {
       let proofImageUrl = '';
@@ -271,7 +277,7 @@ const PaymentHistoryAdmin: React.FC = () => {
         month: formData.month,
         year: parseInt(formData.year),
         amount: parseFloat(formData.amount),
-        paymentDate: new Date().toISOString(),
+        paymentDate: paymentDate.toISOString(),
         proofImage: proofImageUrl
       });
     } catch (error) {
@@ -353,7 +359,7 @@ const PaymentHistoryAdmin: React.FC = () => {
       label: 'Bulan',
       render: (value: string, row: Payment) => (
         <>
-          <span className="hidden sm:inline">{formatMonthName(value)}</span>
+          <span className="hidden sm:inline">{formatMonthName(value)} {row.year}</span>
           <span className="sm:hidden">{formatMobileMonth(value, row.year)}</span>
         </>
       )
@@ -532,12 +538,12 @@ const PaymentHistoryAdmin: React.FC = () => {
           <form onSubmit={handleSubmitAddPayment} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="addAffiliator">Affiliator</Label>
-              <Select value={affiliator.uuid} disabled>
+              <Select value={affiliator?.uuid} disabled>
                 <SelectTrigger>
-                  <SelectValue placeholder={affiliator.fullName} />
+                  <SelectValue placeholder={affiliator?.fullName} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={affiliator.uuid}>{affiliator.fullName}</SelectItem>
+                  <SelectItem value={affiliator?.uuid || ''}>{affiliator?.fullName}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -575,6 +581,32 @@ const PaymentHistoryAdmin: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="paymentDate">Tanggal Pembayaran</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !paymentDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {paymentDate ? format(paymentDate, "PPP") : <span>Pilih tanggal</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={paymentDate}
+                    onSelect={setPaymentDate}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <Label htmlFor="addProofImage">Bukti Pembayaran</Label>
