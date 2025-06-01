@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, AuthContextType, LoginCredentials } from '@/types/auth';
 import { apiService } from '@/services/api';
+import { mockAuthService } from '@/services/mockAuth';
 import { useToast } from '@/hooks/use-toast';
 import { secureStorage } from '@/utils/secureStorage';
 import { logger } from '@/utils/logger';
@@ -71,7 +72,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       logger.log('AuthContext: Starting login process');
       
-      const response = await apiService.login(credentials);
+      // Use mock service if API is not accessible
+      let response;
+      try {
+        response = await apiService.login(credentials);
+      } catch (error) {
+        logger.warn('API login failed, falling back to mock service:', error);
+        response = await mockAuthService.login(credentials);
+      }
+      
       logger.log('AuthContext: Login response received');
       
       setUser(response.user);

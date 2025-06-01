@@ -1,3 +1,4 @@
+
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 import { APP_CONFIG } from '@/config/environment';
 import { logger } from '@/utils/logger';
@@ -88,7 +89,8 @@ class ApiService {
         ...options,
         headers,
         signal: controller.signal,
-        credentials: 'include',
+        // Temporarily disable credentials for testing
+        // credentials: 'include',
         cache: 'no-store',
       });
 
