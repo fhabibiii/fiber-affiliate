@@ -84,6 +84,12 @@ export default defineConfig(({ mode }) => ({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'
+          },
+          {
+            src: '/android/android-launchericon-192-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any maskable'
           }
         ]
       },
@@ -103,9 +109,7 @@ export default defineConfig(({ mode }) => ({
                 maxAgeSeconds: 60 * 60 * 24 * 365
               }
             }
-          },
-          // Remove API caching to prevent login issues
-          // API calls should not be cached in development
+          }
         ]
       }
     })

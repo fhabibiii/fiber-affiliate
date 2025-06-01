@@ -25,18 +25,13 @@ export const usePWA = (): PWAState => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    // Only enable PWA features in production
-    if (import.meta.env.DEV) {
-      console.log('PWA features disabled in development mode');
-      return;
-    }
-
     // Check if app is running in standalone mode
     const checkStandalone = () => {
       const standalone = window.matchMedia('(display-mode: standalone)').matches || 
                         (window.navigator as any).standalone === true ||
                         window.location.search.includes('standalone=true');
       setIsStandalone(standalone);
+      console.log('Standalone mode:', standalone);
     };
 
     // Check if app is already installed - only in secure context and top-level
@@ -46,7 +41,9 @@ export const usePWA = (): PWAState => {
             window.location.protocol === 'https:' && 
             window === window.top) {
           (navigator as any).getInstalledRelatedApps().then((relatedApps: any[]) => {
-            setIsInstalled(relatedApps.length > 0);
+            const installed = relatedApps.length > 0;
+            setIsInstalled(installed);
+            console.log('App installed:', installed);
           }).catch(() => {
             // Silently fail if not supported
             setIsInstalled(false);
@@ -60,6 +57,7 @@ export const usePWA = (): PWAState => {
 
     // Listen for beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('beforeinstallprompt event fired');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setCanInstall(true);
@@ -79,6 +77,14 @@ export const usePWA = (): PWAState => {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
+    
+    // Debug PWA criteria
+    console.log('PWA Debug Info:', {
+      isSecureContext: window.isSecureContext,
+      hasServiceWorker: 'serviceWorker' in navigator,
+      protocol: window.location.protocol,
+      manifest: document.querySelector('link[rel="manifest"]')?.getAttribute('href')
+    });
     
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
