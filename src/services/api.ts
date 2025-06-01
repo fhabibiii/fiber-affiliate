@@ -1,6 +1,6 @@
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 
-const API_BASE_URL = 'http://localhost:3001/api/v1';
+const API_BASE_URL = 'https://1d18-2404-c0-3650-00-98a6-b79a.ngrok-free.app/api/v1';
 
 export interface ApiResponse<T> {
   success: boolean;
