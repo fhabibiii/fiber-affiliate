@@ -11,10 +11,6 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  define: {
-    // Make environment variables available
-    __DEV__: mode === 'development',
-  },
   plugins: [
     react(),
     mode === 'development' &&
