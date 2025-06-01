@@ -39,17 +39,6 @@ export class MockAuthService {
     }
     
     return {
-      token: 'mock-access-token-' + user.uuid,
-      refreshToken: 'mock-refresh-token-' + user.uuid,
-      user,
-    };
-  }
-
-  async refreshToken(): Promise<{ token: string; user: User }> {
-    // Mock refresh - in real app this would validate refresh token
-    const user = mockUsers.admin; // Default fallback
-    return {
-      token: 'mock-refreshed-token-' + user.uuid,
       user,
     };
   }
