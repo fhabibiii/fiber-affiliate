@@ -1,0 +1,310 @@
+workbox-f001acab.js:44 workbox Precaching did not find a match for /@vite/client
+workbox-f001acab.js:44 workbox No route found for: /@vite/client
+workbox-f001acab.js:44 workbox Precaching did not find a match for https://cdn.gpteng.co/gptengineer.js
+workbox-f001acab.js:44 workbox No route found for: https://cdn.gpteng.co/gptengineer.js
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/main.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/main.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /@react-refresh
+workbox-f001acab.js:44 workbox No route found for: /@react-refresh
+workbox-f001acab.js:44 workbox Precaching did not find a match for /@vite-plugin-pwa/pwa-entry-point-loaded
+workbox-f001acab.js:44 workbox No route found for: /@vite-plugin-pwa/pwa-entry-point-loaded
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/react-dom_client.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/react-dom_client.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/App.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/App.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/index.css
+workbox-f001acab.js:44 workbox No route found for: /src/index.css
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/react.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/react.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/SplashScreen.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/SplashScreen.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/vite/dist/client/env.mjs
+workbox-f001acab.js:44 workbox No route found for: /node_modules/vite/dist/client/env.mjs
+ workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-T2SWDQEL.js?v=d2e82ed7
+ workbox No route found for: /node_modules/.vite/deps/chunk-T2SWDQEL.js?v=d2e82ed7
+ workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-QCHXOAYK.js?v=d2e82ed7
+ workbox No route found for: /node_modules/.vite/deps/chunk-QCHXOAYK.js?v=d2e82ed7
+ workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-WOOG5QLI.js?v=d2e82ed7
+ workbox No route found for: /node_modules/.vite/deps/chunk-WOOG5QLI.js?v=d2e82ed7
+ workbox Precaching did not find a match for /src/components/ui/toaster.tsx
+ workbox No route found for: /src/components/ui/toaster.tsx
+ workbox Precaching did not find a match for /src/components/ui/sonner.tsx
+ workbox No route found for: /src/components/ui/sonner.tsx
+ workbox Precaching did not find a match for /src/components/ui/tooltip.tsx
+ workbox No route found for: /src/components/ui/tooltip.tsx
+ workbox Precaching did not find a match for /node_modules/.vite/deps/@tanstack_react-query.js?v=d2e82ed7
+ workbox No route found for: /node_modules/.vite/deps/@tanstack_react-query.js?v=d2e82ed7
+ workbox Precaching did not find a match for /node_modules/.vite/deps/react-router-dom.js?v=d2e82ed7
+ workbox No route found for: /node_modules/.vite/deps/react-router-dom.js?v=d2e82ed7
+ workbox Precaching did not find a match for /src/contexts/AuthContext.tsx
+ workbox No route found for: /src/contexts/AuthContext.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/contexts/ThemeContext.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/contexts/ThemeContext.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/PrivateRoute.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/PrivateRoute.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/layouts/AdminLayout.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/layouts/AdminLayout.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/layouts/AffiliatorLayout.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/layouts/AffiliatorLayout.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/Login.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/Login.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/admin/AdminDashboard.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/admin/AdminDashboard.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/admin/AddCustomer.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/admin/AddCustomer.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/admin/AffiliatorList.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/admin/AffiliatorList.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/admin/AffiliatorDetail.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/admin/AffiliatorDetail.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/admin/AddPayment.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/admin/AddPayment.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/admin/PaymentHistoryAdmin.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/admin/PaymentHistoryAdmin.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/affiliator/AffiliatorDashboard.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/affiliator/AffiliatorDashboard.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/affiliator/PaymentHistory.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/affiliator/PaymentHistory.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/pages/NotFound.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/pages/NotFound.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ThemeToggle.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ThemeToggle.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/PWAInstallPrompt.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/PWAInstallPrompt.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/hooks/usePWA.ts
+workbox-f001acab.js:44 workbox No route found for: /src/hooks/usePWA.ts
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/lucide-react.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/lucide-react.js?v=d2e82ed7
+client:495 [vite] connecting...
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/hooks/use-toast.ts
+workbox-f001acab.js:44 workbox No route found for: /src/hooks/use-toast.ts
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/toast.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/toast.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/next-themes.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/next-themes.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/sonner.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/sonner.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-KBTYAULA.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-KBTYAULA.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/lib/utils.ts
+workbox-f001acab.js:44 workbox No route found for: /src/lib/utils.ts
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/constants/texts.ts
+workbox-f001acab.js:44 workbox No route found for: /src/constants/texts.ts
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/button.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/button.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/LogoutModal.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/LogoutModal.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/react-hook-form.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/react-hook-form.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@hookform_resolvers_zod.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@hookform_resolvers_zod.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/zod.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/zod.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/input.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/input.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/label.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/label.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/card.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/card.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/select.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/select.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/recharts.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/recharts.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/services/api.ts
+workbox-f001acab.js:44 workbox No route found for: /src/services/api.ts
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/textarea.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/textarea.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/dialog.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/dialog.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/responsive-table.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/responsive-table.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/utils/formatUtils.ts
+workbox-f001acab.js:44 workbox No route found for: /src/utils/formatUtils.ts
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/popover.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/popover.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/command.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/command.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/scroll-area.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/scroll-area.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/calendar.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/calendar.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/date-fns.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/date-fns.js?v=d2e82ed7
+client:618 [vite] connected.
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/collapsible.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/collapsible.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/skeleton.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/skeleton.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-toast.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-toast.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/class-variance-authority.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/class-variance-authority.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-DQBP2KJV.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-DQBP2KJV.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-5YNAG4DX.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-5YNAG4DX.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-FJLDFYJH.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-FJLDFYJH.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-53KADPXK.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-53KADPXK.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-X34MDBNQ.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-X34MDBNQ.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-EXQH4XBX.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-EXQH4XBX.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-KCFVMCIE.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-KCFVMCIE.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-FPRJ6B2S.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-FPRJ6B2S.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-LKOAR5GC.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-LKOAR5GC.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-E7TSFT4J.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-E7TSFT4J.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/clsx.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/clsx.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/tailwind-merge.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/tailwind-merge.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-YDM5GFU2.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-YDM5GFU2.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-label.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-label.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-6PJ6ZD5Z.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-6PJ6ZD5Z.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /src/components/ui/alert-dialog.tsx
+workbox-f001acab.js:44 workbox No route found for: /src/components/ui/alert-dialog.tsx
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-slot.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-slot.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-select.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-select.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-U7P2NEEE.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-U7P2NEEE.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-U4HZQZGT.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-U4HZQZGT.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-dialog.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-dialog.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-popover.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-popover.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/cmdk.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/cmdk.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/react-day-picker.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/react-day-picker.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-BEZZMWBD.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-BEZZMWBD.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-ZTFAICLV.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-ZTFAICLV.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/chunk-NBSWFD3I.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/chunk-NBSWFD3I.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for /node_modules/.vite/deps/@radix-ui_react-alert-dialog.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox No route found for: /node_modules/.vite/deps/@radix-ui_react-alert-dialog.js?v=d2e82ed7
+workbox-f001acab.js:44 workbox Precaching did not find a match for https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap
+workbox-f001acab.js:44 workbox Router is responding to: https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap
+workbox-f001acab.js:44 workbox No cached response found in 'google-fonts-cache'.
+workbox-f001acab.js:44 workbox Network request for 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap' returned a response with status '0'.
+workbox-f001acab.js:44 workbox Using CacheFirst to respond to 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+workbox-f001acab.js:44 workbox Response 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap' will not be cached. undefined
+workbox-f001acab.js:44 workbox Router is responding to: /registerSW.js
+workbox-f001acab.js:44 workbox Found a cached response in 'workbox-precache-v2-http://localhost:8080/'.
+workbox-f001acab.js:44 workbox Precaching did not find a match for https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+workbox-f001acab.js:44 workbox No route found for: https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+workbox-f001acab.js:44 workbox Precaching did not find a match for /manifest.json
+workbox-f001acab.js:44 workbox No route found for: /manifest.json
+workbox-f001acab.js:44 workbox Precaching did not find a match for /android/android-launchericon-144-144.png
+workbox-f001acab.js:44 workbox No route found for: /android/android-launchericon-144-144.png
+react-router-dom.js?v=d2e82ed7:4393 ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+warnOnce @ react-router-dom.js?v=d2e82ed7:4393
+logDeprecation @ react-router-dom.js?v=d2e82ed7:4396
+logV6DeprecationWarnings @ react-router-dom.js?v=d2e82ed7:4399
+(anonymous) @ react-router-dom.js?v=d2e82ed7:5271
+commitHookEffectListMount @ chunk-T2SWDQEL.js?v=d2e82ed7:16915
+commitPassiveMountOnFiber @ chunk-T2SWDQEL.js?v=d2e82ed7:18156
+commitPassiveMountEffects_complete @ chunk-T2SWDQEL.js?v=d2e82ed7:18129
+commitPassiveMountEffects_begin @ chunk-T2SWDQEL.js?v=d2e82ed7:18119
+commitPassiveMountEffects @ chunk-T2SWDQEL.js?v=d2e82ed7:18109
+flushPassiveEffectsImpl @ chunk-T2SWDQEL.js?v=d2e82ed7:19490
+flushPassiveEffects @ chunk-T2SWDQEL.js?v=d2e82ed7:19447
+performSyncWorkOnRoot @ chunk-T2SWDQEL.js?v=d2e82ed7:18868
+flushSyncCallbacks @ chunk-T2SWDQEL.js?v=d2e82ed7:9119
+commitRootImpl @ chunk-T2SWDQEL.js?v=d2e82ed7:19432
+commitRoot @ chunk-T2SWDQEL.js?v=d2e82ed7:19277
+finishConcurrentRender @ chunk-T2SWDQEL.js?v=d2e82ed7:18805
+performConcurrentWorkOnRoot @ chunk-T2SWDQEL.js?v=d2e82ed7:18718
+workLoop @ chunk-T2SWDQEL.js?v=d2e82ed7:197
+flushWork @ chunk-T2SWDQEL.js?v=d2e82ed7:176
+performWorkUntilDeadline @ chunk-T2SWDQEL.js?v=d2e82ed7:384
+react-router-dom.js?v=d2e82ed7:4393 ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+warnOnce @ react-router-dom.js?v=d2e82ed7:4393
+logDeprecation @ react-router-dom.js?v=d2e82ed7:4396
+logV6DeprecationWarnings @ react-router-dom.js?v=d2e82ed7:4402
+(anonymous) @ react-router-dom.js?v=d2e82ed7:5271
+commitHookEffectListMount @ chunk-T2SWDQEL.js?v=d2e82ed7:16915
+commitPassiveMountOnFiber @ chunk-T2SWDQEL.js?v=d2e82ed7:18156
+commitPassiveMountEffects_complete @ chunk-T2SWDQEL.js?v=d2e82ed7:18129
+commitPassiveMountEffects_begin @ chunk-T2SWDQEL.js?v=d2e82ed7:18119
+commitPassiveMountEffects @ chunk-T2SWDQEL.js?v=d2e82ed7:18109
+flushPassiveEffectsImpl @ chunk-T2SWDQEL.js?v=d2e82ed7:19490
+flushPassiveEffects @ chunk-T2SWDQEL.js?v=d2e82ed7:19447
+performSyncWorkOnRoot @ chunk-T2SWDQEL.js?v=d2e82ed7:18868
+flushSyncCallbacks @ chunk-T2SWDQEL.js?v=d2e82ed7:9119
+commitRootImpl @ chunk-T2SWDQEL.js?v=d2e82ed7:19432
+commitRoot @ chunk-T2SWDQEL.js?v=d2e82ed7:19277
+finishConcurrentRender @ chunk-T2SWDQEL.js?v=d2e82ed7:18805
+performConcurrentWorkOnRoot @ chunk-T2SWDQEL.js?v=d2e82ed7:18718
+workLoop @ chunk-T2SWDQEL.js?v=d2e82ed7:197
+flushWork @ chunk-T2SWDQEL.js?v=d2e82ed7:176
+performWorkUntilDeadline @ chunk-T2SWDQEL.js?v=d2e82ed7:384
+AuthContext.tsx:34 Checking existing auth: {hasUser: true, hasToken: true}
+AuthContext.tsx:38 Found saved user: {uuid: '992fedf7-d6ed-4a86-8495-22afadeb3e1c', fullName: 'RT1', username: 'rt1', phoneNumber: '081225510099', role: 'AFFILIATOR', …}
+api.ts:105 Making API request: {url: 'http://localhost:3001/api/v1/affiliator/customers', method: 'GET', headers: {…}}
+workbox-f001acab.js:44 workbox Precaching did not find a match for http://localhost:3001/api/v1/affiliator/customers
+workbox-f001acab.js:44 workbox No route found for: http://localhost:3001/api/v1/affiliator/customers
+api.ts:113 API response status: 200
+api.ts:174 API response data: {success: true, data: Array(15)}
+api.ts:105 Making API request: {url: 'http://localhost:3001/api/v1/affiliator/payments', method: 'GET', headers: {…}}
+workbox-f001acab.js:44 workbox Precaching did not find a match for http://localhost:3001/api/v1/affiliator/payments
+workbox-f001acab.js:44 workbox No route found for: http://localhost:3001/api/v1/affiliator/payments
+api.ts:113 API response status: 200
+api.ts:174 API response data: {success: true, data: Array(1)}
+chunk-NBSWFD3I.js?v=d2e82ed7:338 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ chunk-NBSWFD3I.js?v=d2e82ed7:338
+commitHookEffectListMount @ chunk-T2SWDQEL.js?v=d2e82ed7:16915
+commitPassiveMountOnFiber @ chunk-T2SWDQEL.js?v=d2e82ed7:18156
+commitPassiveMountEffects_complete @ chunk-T2SWDQEL.js?v=d2e82ed7:18129
+commitPassiveMountEffects_begin @ chunk-T2SWDQEL.js?v=d2e82ed7:18119
+commitPassiveMountEffects @ chunk-T2SWDQEL.js?v=d2e82ed7:18109
+flushPassiveEffectsImpl @ chunk-T2SWDQEL.js?v=d2e82ed7:19490
+flushPassiveEffects @ chunk-T2SWDQEL.js?v=d2e82ed7:19447
+commitRootImpl @ chunk-T2SWDQEL.js?v=d2e82ed7:19416
+commitRoot @ chunk-T2SWDQEL.js?v=d2e82ed7:19277
+performSyncWorkOnRoot @ chunk-T2SWDQEL.js?v=d2e82ed7:18895
+flushSyncCallbacks @ chunk-T2SWDQEL.js?v=d2e82ed7:9119
+(anonymous) @ chunk-T2SWDQEL.js?v=d2e82ed7:18627
+workbox-f001acab.js:44 workbox Precaching did not find a match for http://d54f-103-105-57-35.ngrok-free.app/api/v1/files/proof-1748587519456-895263430.jpg
+workbox-f001acab.js:44 workbox No route found for: http://d54f-103-105-57-35.ngrok-free.app/api/v1/files/proof-1748587519456-895263430.jpg
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.
+api.ts:222 Attempting token refresh...
+api.ts:105 Making API request: {url: 'http://localhost:3001/api/v1/auth/refresh', method: 'POST', headers: {…}}
+workbox-f001acab.js:44 workbox No route found for: http://localhost:3001/api/v1/auth/refresh
+api.ts:113 API response status: 200
+api.ts:174 API response data: {success: true, token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiO…MzNX0.LmBi7A9iUitoZEeVITiUSVGLZv_ieao8j8rsUW0VGGc', user: {…}}
+api.ts:237 Token refresh successful
+AuthContext.tsx:62 Token refreshed successfully
+api.ts:105 Making API request: {url: 'http://localhost:3001/api/v1/affiliator/customers', method: 'GET', headers: {…}}
+workbox-f001acab.js:44 workbox Precaching did not find a match for http://localhost:3001/api/v1/affiliator/customers
+workbox-f001acab.js:44 workbox No route found for: http://localhost:3001/api/v1/affiliator/customers
+api.ts:113 API response status: 200
+api.ts:174 API response data: {success: true, data: Array(15)}
+api.ts:105 Making API request: {url: 'http://localhost:3001/api/v1/auth/logout', method: 'POST', headers: {…}}
+workbox-f001acab.js:44 workbox No route found for: http://localhost:3001/api/v1/auth/logout
+api.ts:113 API response status: 200
+api.ts:174 API response data: {success: true, message: 'Logged out successfully'}
