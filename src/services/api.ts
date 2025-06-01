@@ -1,7 +1,7 @@
 
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 
-const API_BASE_URL = 'https://14fd-2404-c0-3740-00-a64c-1454.ngrok-free.app/api/v1';
+const API_BASE_URL = 'https://1d18-2404-c0-3650-00-98a6-b79a.ngrok-free.app/api/v1';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -65,6 +65,29 @@ export interface AffiliatorSummary {
 }
 
 class ApiService {
+  private accessToken: string | null = null;
+  private refreshToken: string | null = null;
+
+  constructor() {
+    // Load tokens from localStorage on initialization
+    this.accessToken = localStorage.getItem('token');
+    this.refreshToken = localStorage.getItem('refreshToken');
+  }
+
+  setTokens(accessToken: string, refreshToken: string) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+  }
+
+  clearTokens() {
+    this.accessToken = null;
+    this.refreshToken = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+  }
+
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -73,23 +96,27 @@ class ApiService {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'ngrok-skip-browser-warning': 'true',
-      'Cache-Control': 'no-cache',
+      'Cache-Control': 'no-cache', // Prevent caching issues
       'Pragma': 'no-cache',
       ...(options.headers as Record<string, string> || {}),
     };
+
+    if (this.accessToken) {
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    }
 
     console.log('Making API request:', { url, method: options.method || 'GET', headers });
 
     // Add timeout to prevent hanging requests
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
     try {
       const response = await fetch(url, {
         ...options,
         headers,
-        credentials: 'include', // Important: send cookies with all requests
         signal: controller.signal,
+        // Disable cache for API requests
         cache: 'no-store',
       });
 
@@ -106,18 +133,38 @@ class ApiService {
 
       if (!response.ok) {
         if (response.status === 401) {
-          console.log('Unauthorized - redirecting to login');
-          window.location.href = '/login';
-          throw new Error('Session expired. Please login again.');
-        }
-        
-        if (response.status === 403) {
-          throw new Error('You do not have permission to access this resource');
-        }
-        
-        if (response.status === 429) {
-          const retryAfter = response.headers.get('retry-after') || '60';
-          throw new Error(`Too many requests. Please try again in ${retryAfter} seconds.`);
+          // Token expired, try to refresh
+          if (this.refreshToken && endpoint !== '/auth/refresh') {
+            try {
+              console.log('Token expired, attempting refresh...');
+              await this.refreshTokenRequest();
+              // Retry the original request with new token
+              headers['Authorization'] = `Bearer ${this.accessToken}`;
+              const retryResponse = await fetch(url, {
+                ...options,
+                headers,
+                cache: 'no-store',
+              });
+              
+              if (!retryResponse.ok) {
+                throw new Error(`HTTP error! status: ${retryResponse.status}`);
+              }
+              
+              // Handle empty response for delete operations
+              if (retryResponse.status === 204 || retryResponse.headers.get('content-length') === '0') {
+                return { success: true } as T;
+              }
+              
+              return retryResponse.json();
+            } catch (refreshError) {
+              console.error('Token refresh failed:', refreshError);
+              this.clearTokens();
+              throw new Error('Session expired. Please login again.');
+            }
+          } else {
+            this.clearTokens();
+            throw new Error('Session expired. Please login again.');
+          }
         }
         
         let errorData;
@@ -157,6 +204,8 @@ class ApiService {
     try {
       const response = await this.makeRequest<{
         success: boolean;
+        token: string;
+        refreshToken: string;
         user: User;
         message?: string;
       }>('/auth/login', {
@@ -167,10 +216,11 @@ class ApiService {
       console.log('Login response:', response);
 
       if (response.success) {
-        console.log('Login successful');
+        this.setTokens(response.token, response.refreshToken);
+        console.log('Login successful, tokens saved');
         return {
-          token: '', // No longer needed with cookies
-          refreshToken: '', // No longer needed with cookies
+          token: response.token,
+          refreshToken: response.refreshToken,
           user: response.user
         };
       }
@@ -182,14 +232,45 @@ class ApiService {
     }
   }
 
+  async refreshTokenRequest(): Promise<{ token: string; user: User }> {
+    if (!this.refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    console.log('Attempting token refresh...');
+
+    const response = await this.makeRequest<{
+      success: boolean;
+      token: string;
+      user: User;
+      message?: string;
+    }>('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken: this.refreshToken }),
+    });
+
+    if (response.success) {
+      this.accessToken = response.token;
+      localStorage.setItem('token', response.token);
+      console.log('Token refresh successful');
+      return {
+        token: response.token,
+        user: response.user
+      };
+    }
+
+    throw new Error(response.message || 'Token refresh failed');
+  }
+
   async logout(): Promise<void> {
     try {
       await this.makeRequest('/auth/logout', {
         method: 'POST',
       });
-      console.log('Logout successful');
     } catch (error) {
       console.error('Logout error:', error);
+    } finally {
+      this.clearTokens();
     }
   }
 
@@ -218,6 +299,7 @@ class ApiService {
     throw new Error(response.message || 'Failed to get payment statistics');
   }
 
+  // New methods for getting available years
   async getCustomerYears(): Promise<string[]> {
     const response = await this.makeRequest<ApiResponse<string[]>>('/customers/years');
     if (response.success && response.data) {
@@ -420,11 +502,13 @@ class ApiService {
     const headers: Record<string, string> = {
       'ngrok-skip-browser-warning': 'true',
     };
+    if (this.accessToken) {
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    }
 
     const response = await fetch(`${API_BASE_URL}/upload/proof-payment`, {
       method: 'POST',
       headers,
-      credentials: 'include',
       body: formData,
     });
 
@@ -445,11 +529,14 @@ class ApiService {
     const headers: Record<string, string> = {
       'ngrok-skip-browser-warning': 'true',
     };
+    
+    if (this.accessToken) {
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    }
 
     const response = await fetch(url, {
       method: 'GET',
-      headers,
-      credentials: 'include'
+      headers
     });
 
     if (!response.ok) {

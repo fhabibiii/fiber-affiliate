@@ -14,8 +14,8 @@ export interface LoginCredentials {
 }
 
 export interface AuthResponse {
-  token: string; // Keep for compatibility, but will be empty string
-  refreshToken: string; // Keep for compatibility, but will be empty string
+  token: string;
+  refreshToken: string;
   user: User;
 }
 
