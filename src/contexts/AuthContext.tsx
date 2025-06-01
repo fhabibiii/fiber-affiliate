@@ -3,7 +3,10 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User, AuthContextType, LoginCredentials } from '@/types/auth';
 import { apiService } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
-import { indonesianTexts } from '@/constants/texts';
+import { secureStorage } from '@/utils/secureStorage';
+import { logger } from '@/utils/logger';
+import { sanitizeError, AppError } from '@/utils/errorHandler';
+import { APP_CONFIG } from '@/config/environment';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -24,26 +27,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // Check for existing session on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const savedUser = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
+        const savedUser = secureStorage.getUser();
         
-        console.log('Checking existing auth:', { hasUser: !!savedUser, hasToken: !!token });
+        logger.log('Checking existing auth:', { hasUser: !!savedUser });
         
-        if (savedUser && token) {
-          const parsedUser = JSON.parse(savedUser);
-          console.log('Found saved user:', parsedUser);
-          setUser(parsedUser);
+        if (savedUser) {
+          logger.log('Found saved user');
+          setUser(savedUser);
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
-        // Clear invalid data
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
+        logger.error('Auth check failed:', error);
+        secureStorage.clearUser();
       } finally {
         setIsLoading(false);
       }
@@ -52,20 +49,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  // Set up token refresh interval
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token && user) {
+    if (user && APP_CONFIG.IS_DEVELOPMENT) {
       const interval = setInterval(async () => {
         try {
-          await apiService.refreshTokenRequest();
-          console.log('Token refreshed successfully');
+          // In cookie-based auth, we can check session validity by making a simple API call
+          await apiService.getAffiliatorCustomers();
+          logger.log('Session still valid');
         } catch (error) {
-          console.error('Token refresh failed:', error);
-          // Force logout on refresh failure
+          logger.error('Session validation failed:', error);
           logout();
         }
-      }, 15000); // Refresh every 15 seconds as suggested
+      }, APP_CONFIG.TOKEN_REFRESH_INTERVAL);
 
       return () => clearInterval(interval);
     }
@@ -74,31 +69,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
-      console.log('AuthContext: Starting login process');
+      logger.log('AuthContext: Starting login process');
       
       const response = await apiService.login(credentials);
-      console.log('AuthContext: Login response received:', response);
+      logger.log('AuthContext: Login response received');
       
       setUser(response.user);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      secureStorage.setUser(response.user);
       
-      console.log('AuthContext: User set and saved to localStorage');
+      logger.log('AuthContext: User set and saved to secure storage');
       
       toast({
         title: "Login berhasil",
         description: `Selamat datang, ${response.user.fullName}!`,
       });
       
-      // Redirect to appropriate dashboard
       const redirectPath = response.user.role === 'ADMIN' ? '/admin' : '/affiliator';
       window.location.href = redirectPath;
     } catch (error) {
-      console.error('AuthContext: Login failed:', error);
-      const errorMessage = error instanceof Error ? error.message : indonesianTexts.login.errors.invalid;
+      logger.error('AuthContext: Login failed:', error);
+      
+      const sanitized = sanitizeError(error);
       
       toast({
         title: "Login gagal",
-        description: errorMessage,
+        description: sanitized.userMessage,
         variant: "destructive",
       });
       throw error;
@@ -110,30 +105,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await apiService.logout();
+      logger.log('Logout successful');
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout error:', error);
     } finally {
       setUser(null);
-      localStorage.removeItem('user');
+      secureStorage.clearUser();
       
       toast({
         title: "Logout berhasil",
         description: "Anda telah keluar dari sistem",
       });
-    }
-  };
-
-  const refreshToken = async (): Promise<boolean> => {
-    try {
-      const response = await apiService.refreshTokenRequest();
-      // Update user data with fresh data from refresh response
-      setUser(response.user);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      return true;
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      logout();
-      return false;
+      
+      window.location.href = '/login';
     }
   };
 
@@ -142,7 +126,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     logout,
-    refreshToken,
   };
 
   return (

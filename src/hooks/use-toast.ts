@@ -1,5 +1,5 @@
-
 import * as React from "react"
+import { sanitizeError } from '@/utils/errorHandler';
 
 import type {
   ToastActionElement,
@@ -169,24 +169,16 @@ function toast({ ...props }: Toast) {
   }
 }
 
-// Helper function to show error toast with backend message
 function showErrorToast(error: any, fallbackMessage: string = "Terjadi kesalahan") {
-  let errorMessage = fallbackMessage;
-  
-  if (error?.message) {
-    errorMessage = error.message;
-  } else if (typeof error === 'string') {
-    errorMessage = error;
-  }
+  const sanitized = sanitizeError(error);
   
   toast({
     title: "Error",
-    description: errorMessage,
+    description: sanitized.userMessage,
     variant: "destructive"
   });
 }
 
-// Helper function to show success toast
 function showSuccessToast(message: string) {
   toast({
     title: "Berhasil",

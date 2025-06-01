@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from 'vite-plugin-pwa';
@@ -10,6 +9,10 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+  },
+  define: {
+    // Make sure environment variables are available
+    __APP_ENV__: JSON.stringify(process.env.VITE_APP_ENV || 'development'),
   },
   plugins: [
     react(),
