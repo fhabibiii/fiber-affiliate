@@ -1,14 +1,19 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, AuthContextType, LoginCredentials } from '@/types/auth';
 import { apiService } from '@/services/api';
-import { mockAuthService } from '@/services/mockAuth';
 import { useToast } from '@/hooks/use-toast';
-import { secureStorage } from '@/utils/secureStorage';
-import { logger } from '@/utils/logger';
-import { sanitizeError, AppError } from '@/utils/errorHandler';
-import { APP_CONFIG } from '@/config/environment';
+import { indonesianTexts } from '@/constants/texts';
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -19,20 +24,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  // Check for existing session on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const savedUser = secureStorage.getUser();
+        const savedUser = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
         
-        logger.log('Checking existing auth:', { hasUser: !!savedUser });
+        console.log('Checking existing auth:', { hasUser: !!savedUser, hasToken: !!token });
         
-        if (savedUser) {
-          logger.log('Found saved user');
-          setUser(savedUser);
+        if (savedUser && token) {
+          const parsedUser = JSON.parse(savedUser);
+          console.log('Found saved user:', parsedUser);
+          setUser(parsedUser);
         }
       } catch (error) {
-        logger.error('Auth check failed:', error);
-        secureStorage.clearUser();
+        console.error('Auth check failed:', error);
+        // Clear invalid data
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
       } finally {
         setIsLoading(false);
       }
@@ -41,18 +52,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
+  // Set up token refresh interval
   useEffect(() => {
-    if (user && APP_CONFIG.IS_DEVELOPMENT) {
+    const token = localStorage.getItem('token');
+    if (token && user) {
       const interval = setInterval(async () => {
         try {
-          // In cookie-based auth, we can check session validity by making a simple API call
-          await apiService.getAffiliatorCustomers();
-          logger.log('Session still valid');
+          await apiService.refreshTokenRequest();
+          console.log('Token refreshed successfully');
         } catch (error) {
-          logger.error('Session validation failed:', error);
+          console.error('Token refresh failed:', error);
+          // Force logout on refresh failure
           logout();
         }
-      }, APP_CONFIG.TOKEN_REFRESH_INTERVAL);
+      }, 15000); // Refresh every 15 seconds as suggested
 
       return () => clearInterval(interval);
     }
@@ -61,39 +74,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
-      logger.log('AuthContext: Starting login process');
+      console.log('AuthContext: Starting login process');
       
-      // Use mock service if API is not accessible
-      let response;
-      try {
-        response = await apiService.login(credentials);
-      } catch (error) {
-        logger.warn('API login failed, falling back to mock service:', error);
-        response = await mockAuthService.login(credentials);
-      }
-      
-      logger.log('AuthContext: Login response received');
+      const response = await apiService.login(credentials);
+      console.log('AuthContext: Login response received:', response);
       
       setUser(response.user);
-      secureStorage.setUser(response.user);
+      localStorage.setItem('user', JSON.stringify(response.user));
       
-      logger.log('AuthContext: User set and saved to secure storage');
+      console.log('AuthContext: User set and saved to localStorage');
       
       toast({
         title: "Login berhasil",
         description: `Selamat datang, ${response.user.fullName}!`,
       });
       
+      // Redirect to appropriate dashboard
       const redirectPath = response.user.role === 'ADMIN' ? '/admin' : '/affiliator';
       window.location.href = redirectPath;
     } catch (error) {
-      logger.error('AuthContext: Login failed:', error);
-      
-      const sanitized = sanitizeError(error);
+      console.error('AuthContext: Login failed:', error);
+      const errorMessage = error instanceof Error ? error.message : indonesianTexts.login.errors.invalid;
       
       toast({
         title: "Login gagal",
-        description: sanitized.userMessage,
+        description: errorMessage,
         variant: "destructive",
       });
       throw error;
@@ -105,19 +110,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await apiService.logout();
-      logger.log('Logout successful');
     } catch (error) {
-      logger.error('Logout error:', error);
+      console.error('Logout error:', error);
     } finally {
       setUser(null);
-      secureStorage.clearUser();
+      localStorage.removeItem('user');
       
       toast({
         title: "Logout berhasil",
         description: "Anda telah keluar dari sistem",
       });
-      
-      window.location.href = '/login';
+    }
+  };
+
+  const refreshToken = async (): Promise<boolean> => {
+    try {
+      const response = await apiService.refreshTokenRequest();
+      // Update user data with fresh data from refresh response
+      setUser(response.user);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      return true;
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      logout();
+      return false;
     }
   };
 
@@ -126,6 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     logout,
+    refreshToken,
   };
 
   return (

@@ -14,6 +14,8 @@ export interface LoginCredentials {
 }
 
 export interface AuthResponse {
+  token: string;
+  refreshToken: string;
   user: User;
 }
 
@@ -22,4 +24,5 @@ export interface AuthContextType {
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
+  refreshToken: () => Promise<boolean>;
 }

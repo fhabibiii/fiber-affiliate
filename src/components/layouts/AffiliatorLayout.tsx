@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { indonesianTexts } from '@/constants/texts';
 import { LogOut, Zap } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';

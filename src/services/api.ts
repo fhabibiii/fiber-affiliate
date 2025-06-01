@@ -1,8 +1,7 @@
 
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
-import { APP_CONFIG } from '@/config/environment';
-import { logger } from '@/utils/logger';
-import { sanitizeError, AppError } from '@/utils/errorHandler';
+
+const API_BASE_URL = 'https://1d18-2404-c0-3650-00-98a6-b79a.ngrok-free.app/api/v1';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -66,48 +65,108 @@ export interface AffiliatorSummary {
 }
 
 class ApiService {
+  private accessToken: string | null = null;
+  private refreshToken: string | null = null;
+
+  constructor() {
+    // Load tokens from localStorage on initialization
+    this.accessToken = localStorage.getItem('token');
+    this.refreshToken = localStorage.getItem('refreshToken');
+  }
+
+  setTokens(accessToken: string, refreshToken: string) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+  }
+
+  clearTokens() {
+    this.accessToken = null;
+    this.refreshToken = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+  }
+
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${APP_CONFIG.API_BASE_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'ngrok-skip-browser-warning': 'true',
-      'Cache-Control': 'no-cache',
+      'Cache-Control': 'no-cache', // Prevent caching issues
       'Pragma': 'no-cache',
       ...(options.headers as Record<string, string> || {}),
     };
 
-    logger.log('Making API request:', { url, method: options.method || 'GET' });
+    if (this.accessToken) {
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    }
 
+    console.log('Making API request:', { url, method: options.method || 'GET', headers });
+
+    // Add timeout to prevent hanging requests
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), APP_CONFIG.REQUEST_TIMEOUT);
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
     try {
       const response = await fetch(url, {
         ...options,
         headers,
         signal: controller.signal,
-        // Temporarily disable credentials for testing
-        // credentials: 'include',
+        // Disable cache for API requests
         cache: 'no-store',
       });
 
       clearTimeout(timeoutId);
       
-      logger.log('API response status:', response.status);
+      console.log('API response status:', response.status);
 
+      // Check if response is HTML (ngrok warning page)
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('text/html')) {
-        logger.error('Received HTML response instead of JSON');
-        throw new AppError(
-          'Server returned HTML instead of JSON',
-          'Server tidak tersedia. Silakan coba lagi nanti.'
-        );
+        console.error('Received HTML response instead of JSON');
+        throw new Error('Server returned HTML instead of JSON. Please check if the API server is running correctly.');
       }
 
       if (!response.ok) {
+        if (response.status === 401) {
+          // Token expired, try to refresh
+          if (this.refreshToken && endpoint !== '/auth/refresh') {
+            try {
+              console.log('Token expired, attempting refresh...');
+              await this.refreshTokenRequest();
+              // Retry the original request with new token
+              headers['Authorization'] = `Bearer ${this.accessToken}`;
+              const retryResponse = await fetch(url, {
+                ...options,
+                headers,
+                cache: 'no-store',
+              });
+              
+              if (!retryResponse.ok) {
+                throw new Error(`HTTP error! status: ${retryResponse.status}`);
+              }
+              
+              // Handle empty response for delete operations
+              if (retryResponse.status === 204 || retryResponse.headers.get('content-length') === '0') {
+                return { success: true } as T;
+              }
+              
+              return retryResponse.json();
+            } catch (refreshError) {
+              console.error('Token refresh failed:', refreshError);
+              this.clearTokens();
+              throw new Error('Session expired. Please login again.');
+            }
+          } else {
+            this.clearTokens();
+            throw new Error('Session expired. Please login again.');
+          }
+        }
+        
         let errorData;
         try {
           errorData = await response.json();
@@ -115,46 +174,38 @@ class ApiService {
           errorData = { message: `HTTP error! status: ${response.status}` };
         }
         
-        logger.error('API error response:', errorData);
-        
-        const sanitized = sanitizeError({
-          message: errorData.message || `HTTP error! status: ${response.status}`,
-          status: response.status
-        });
-        
-        throw new AppError(sanitized.message, sanitized.userMessage, response.status);
+        console.error('API error response:', errorData);
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
+      // Handle empty response for delete operations (204 No Content)
       if (response.status === 204 || response.headers.get('content-length') === '0') {
         return { success: true } as T;
       }
 
       const responseData = await response.json();
-      logger.log('API response received successfully');
+      console.log('API response data:', responseData);
       return responseData;
     } catch (error) {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
-        logger.error('API request timeout');
-        throw new AppError('Request timeout', 'Koneksi timeout. Periksa koneksi internet Anda.');
+        console.error('API request timeout');
+        throw new Error('Request timeout. Please check your internet connection.');
       }
-      logger.error('API request failed:', error);
-      
-      if (error instanceof AppError) {
-        throw error;
-      }
-      
-      const sanitized = sanitizeError(error);
-      throw new AppError(sanitized.message, sanitized.userMessage);
+      console.error('API request failed:', error);
+      throw error;
     }
   }
 
+  // Auth methods
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    logger.log('Attempting login');
+    console.log('Attempting login with credentials:', { username: credentials.username });
     
     try {
       const response = await this.makeRequest<{
         success: boolean;
+        token: string;
+        refreshToken: string;
         user: User;
         message?: string;
       }>('/auth/login', {
@@ -162,19 +213,53 @@ class ApiService {
         body: JSON.stringify(credentials),
       });
 
-      logger.log('Login successful');
+      console.log('Login response:', response);
 
       if (response.success) {
+        this.setTokens(response.token, response.refreshToken);
+        console.log('Login successful, tokens saved');
         return {
+          token: response.token,
+          refreshToken: response.refreshToken,
           user: response.user
         };
       }
 
-      throw new AppError(response.message || 'Login failed', 'Login gagal. Periksa username dan password Anda.');
+      throw new Error(response.message || 'Login failed');
     } catch (error) {
-      logger.error('Login error:', error);
+      console.error('Login error details:', error);
       throw error;
     }
+  }
+
+  async refreshTokenRequest(): Promise<{ token: string; user: User }> {
+    if (!this.refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    console.log('Attempting token refresh...');
+
+    const response = await this.makeRequest<{
+      success: boolean;
+      token: string;
+      user: User;
+      message?: string;
+    }>('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken: this.refreshToken }),
+    });
+
+    if (response.success) {
+      this.accessToken = response.token;
+      localStorage.setItem('token', response.token);
+      console.log('Token refresh successful');
+      return {
+        token: response.token,
+        user: response.user
+      };
+    }
+
+    throw new Error(response.message || 'Token refresh failed');
   }
 
   async logout(): Promise<void> {
@@ -182,19 +267,20 @@ class ApiService {
       await this.makeRequest('/auth/logout', {
         method: 'POST',
       });
-      logger.log('Logout successful');
     } catch (error) {
-      logger.error('Logout error:', error);
-      throw error;
+      console.error('Logout error:', error);
+    } finally {
+      this.clearTokens();
     }
   }
 
+  // Admin methods
   async getAdminSummary(): Promise<AdminSummary> {
     const response = await this.makeRequest<ApiResponse<AdminSummary>>('/admin/summary');
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get admin summary', 'Gagal memuat ringkasan admin');
+    throw new Error(response.message || 'Failed to get admin summary');
   }
 
   async getCustomerStats(year: number): Promise<StatItem[]> {
@@ -202,7 +288,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get customer statistics', 'Gagal memuat statistik pelanggan');
+    throw new Error(response.message || 'Failed to get customer statistics');
   }
 
   async getPaymentStats(year: number): Promise<StatItem[]> {
@@ -210,15 +296,16 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get payment statistics', 'Gagal memuat statistik pembayaran');
+    throw new Error(response.message || 'Failed to get payment statistics');
   }
 
+  // New methods for getting available years
   async getCustomerYears(): Promise<string[]> {
     const response = await this.makeRequest<ApiResponse<string[]>>('/customers/years');
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get customer years', 'Gagal memuat tahun pelanggan');
+    throw new Error(response.message || 'Failed to get customer years');
   }
 
   async getPaymentYears(): Promise<string[]> {
@@ -226,9 +313,10 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get payment years', 'Gagal memuat tahun pembayaran');
+    throw new Error(response.message || 'Failed to get payment years');
   }
 
+  // Affiliator methods
   async getAffiliators(page = 1, limit = 10, search = ''): Promise<{ data: Affiliator[]; pagination: any }> {
     const response = await this.makeRequest<ApiResponse<Affiliator[]>>(`/affiliators?page=${page}&limit=${limit}&search=${search}`);
     if (response.success && response.data) {
@@ -237,7 +325,7 @@ class ApiService {
         pagination: response.pagination || { total: response.data.length, page, limit, pages: 1 }
       };
     }
-    throw new AppError(response.message || 'Failed to get affiliators', 'Gagal memuat data afiliator');
+    throw new Error(response.message || 'Failed to get affiliators');
   }
 
   async getAffiliator(uuid: string): Promise<Affiliator> {
@@ -245,7 +333,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get affiliator', 'Gagal memuat data afiliator');
+    throw new Error(response.message || 'Failed to get affiliator');
   }
 
   async createAffiliator(data: Omit<Affiliator, 'uuid' | 'createdAt'> & { password: string }): Promise<Affiliator> {
@@ -256,7 +344,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to create affiliator', 'Gagal membuat afiliator baru');
+    throw new Error(response.message || 'Failed to create affiliator');
   }
 
   async updateAffiliator(uuid: string, data: Partial<Affiliator>): Promise<Affiliator> {
@@ -267,7 +355,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to update affiliator', 'Gagal memperbarui data afiliator');
+    throw new Error(response.message || 'Failed to update affiliator');
   }
 
   async deleteAffiliator(uuid: string): Promise<void> {
@@ -275,7 +363,7 @@ class ApiService {
       method: 'DELETE',
     });
     if (!response.success) {
-      throw new AppError('Failed to delete affiliator', 'Gagal menghapus afiliator');
+      throw new Error('Failed to delete affiliator');
     }
   }
 
@@ -284,9 +372,10 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get affiliator summary', 'Gagal memuat ringkasan afiliator');
+    throw new Error(response.message || 'Failed to get affiliator summary');
   }
 
+  // Customer methods
   async getCustomersByAffiliator(affiliatorUuid: string, page = 1, limit = 10): Promise<{ data: Customer[]; pagination: any }> {
     const response = await this.makeRequest<ApiResponse<Customer[]>>(`/customers/by-affiliator/${affiliatorUuid}?page=${page}&limit=${limit}`);
     if (response.success && response.data) {
@@ -295,7 +384,7 @@ class ApiService {
         pagination: response.pagination || { total: response.data.length, page, limit, pages: 1 }
       };
     }
-    throw new AppError(response.message || 'Failed to get customers', 'Gagal memuat data pelanggan');
+    throw new Error(response.message || 'Failed to get customers');
   }
 
   async getCustomer(uuid: string): Promise<Customer> {
@@ -303,7 +392,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get customer', 'Gagal memuat data pelanggan');
+    throw new Error(response.message || 'Failed to get customer');
   }
 
   async createCustomer(data: Omit<Customer, 'uuid' | 'createdAt' | 'affiliatorName'>): Promise<Customer> {
@@ -314,7 +403,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to create customer', 'Gagal membuat pelanggan baru');
+    throw new Error(response.message || 'Failed to create customer');
   }
 
   async updateCustomer(uuid: string, data: Partial<Customer>): Promise<Customer> {
@@ -325,7 +414,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to update customer', 'Gagal memperbarui data pelanggan');
+    throw new Error(response.message || 'Failed to update customer');
   }
 
   async deleteCustomer(uuid: string): Promise<void> {
@@ -333,10 +422,11 @@ class ApiService {
       method: 'DELETE',
     });
     if (!response.success) {
-      throw new AppError('Failed to delete customer', 'Gagal menghapus pelanggan');
+      throw new Error('Failed to delete customer');
     }
   }
 
+  // Payment methods
   async getPaymentsByAffiliator(affiliatorUuid: string, page = 1, limit = 10): Promise<{ data: Payment[]; pagination: any }> {
     const response = await this.makeRequest<ApiResponse<Payment[]>>(`/payments/by-affiliator/${affiliatorUuid}?page=${page}&limit=${limit}`);
     if (response.success && response.data) {
@@ -345,7 +435,7 @@ class ApiService {
         pagination: response.pagination || { total: response.data.length, page, limit, pages: 1 }
       };
     }
-    throw new AppError(response.message || 'Failed to get payments', 'Gagal memuat data pembayaran');
+    throw new Error(response.message || 'Failed to get payments');
   }
 
   async getPayment(uuid: string): Promise<Payment> {
@@ -353,7 +443,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get payment', 'Gagal memuat data pembayaran');
+    throw new Error(response.message || 'Failed to get payment');
   }
 
   async createPayment(data: Omit<Payment, 'uuid' | 'createdAt' | 'affiliatorName'>): Promise<Payment> {
@@ -364,7 +454,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to create payment', 'Gagal membuat pembayaran baru');
+    throw new Error(response.message || 'Failed to create payment');
   }
 
   async updatePayment(uuid: string, data: Partial<Payment>): Promise<Payment> {
@@ -375,7 +465,7 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to update payment', 'Gagal memperbarui data pembayaran');
+    throw new Error(response.message || 'Failed to update payment');
   }
 
   async deletePayment(uuid: string): Promise<void> {
@@ -383,16 +473,17 @@ class ApiService {
       method: 'DELETE',
     });
     if (!response.success) {
-      throw new AppError('Failed to delete payment', 'Gagal menghapus pembayaran');
+      throw new Error('Failed to delete payment');
     }
   }
 
+  // Affiliator dashboard methods
   async getAffiliatorCustomers(): Promise<Customer[]> {
     const response = await this.makeRequest<ApiResponse<Customer[]>>('/affiliator/customers');
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get affiliator customers', 'Gagal memuat data pelanggan afiliator');
+    throw new Error(response.message || 'Failed to get affiliator customers');
   }
 
   async getAffiliatorPayments(): Promise<Payment[]> {
@@ -400,9 +491,10 @@ class ApiService {
     if (response.success && response.data) {
       return response.data;
     }
-    throw new AppError(response.message || 'Failed to get affiliator payments', 'Gagal memuat data pembayaran afiliator');
+    throw new Error(response.message || 'Failed to get affiliator payments');
   }
 
+  // File upload methods
   async uploadProofPayment(file: File): Promise<{ filename: string; url: string }> {
     const formData = new FormData();
     formData.append('file', file);
@@ -410,39 +502,45 @@ class ApiService {
     const headers: Record<string, string> = {
       'ngrok-skip-browser-warning': 'true',
     };
+    if (this.accessToken) {
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    }
 
-    const response = await fetch(`${APP_CONFIG.API_BASE_URL}/upload/proof-payment`, {
+    const response = await fetch(`${API_BASE_URL}/upload/proof-payment`, {
       method: 'POST',
       headers,
       body: formData,
-      credentials: 'include',
     });
 
     if (!response.ok) {
-      throw new AppError(`Upload failed: ${response.status}`, 'Gagal mengupload file');
+      throw new Error(`Upload failed: ${response.status}`);
     }
 
     const result = await response.json();
     if (result.success && result.data) {
       return result.data;
     }
-    throw new AppError(result.message || 'Upload failed', 'Gagal mengupload file');
+    throw new Error(result.message || 'Upload failed');
   }
 
+  // Download payment proof with new endpoint
   async downloadPaymentProof(paymentUuid: string): Promise<ArrayBuffer> {
-    const url = `${APP_CONFIG.API_BASE_URL}/payment/proof-image/${paymentUuid}/download`;
+    const url = `${API_BASE_URL}/payment/proof-image/${paymentUuid}/download`;
     const headers: Record<string, string> = {
       'ngrok-skip-browser-warning': 'true',
     };
+    
+    if (this.accessToken) {
+      headers['Authorization'] = `Bearer ${this.accessToken}`;
+    }
 
     const response = await fetch(url, {
       method: 'GET',
-      headers,
-      credentials: 'include',
+      headers
     });
 
     if (!response.ok) {
-      throw new AppError(`Download failed: ${response.status}`, 'Gagal mendownload file');
+      throw new Error(`Download failed: ${response.status}`);
     }
 
     return await response.arrayBuffer();
