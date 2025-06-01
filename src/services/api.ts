@@ -1,3 +1,4 @@
+
 import { LoginCredentials, AuthResponse, User } from '@/types/auth';
 
 const API_BASE_URL = 'https://1d18-2404-c0-3650-00-98a6-b79a.ngrok-free.app/api/v1';
@@ -94,7 +95,9 @@ class ApiService {
     const url = `${API_BASE_URL}${endpoint}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning
+      'ngrok-skip-browser-warning': 'true',
+      'Cache-Control': 'no-cache', // Prevent caching issues
+      'Pragma': 'no-cache',
       ...(options.headers as Record<string, string> || {}),
     };
 
@@ -104,12 +107,21 @@ class ApiService {
 
     console.log('Making API request:', { url, method: options.method || 'GET', headers });
 
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     try {
       const response = await fetch(url, {
         ...options,
         headers,
+        signal: controller.signal,
+        // Disable cache for API requests
+        cache: 'no-store',
       });
 
+      clearTimeout(timeoutId);
+      
       console.log('API response status:', response.status);
 
       // Check if response is HTML (ngrok warning page)
@@ -131,6 +143,7 @@ class ApiService {
               const retryResponse = await fetch(url, {
                 ...options,
                 headers,
+                cache: 'no-store',
               });
               
               if (!retryResponse.ok) {
@@ -174,6 +187,11 @@ class ApiService {
       console.log('API response data:', responseData);
       return responseData;
     } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        console.error('API request timeout');
+        throw new Error('Request timeout. Please check your internet connection.');
+      }
       console.error('API request failed:', error);
       throw error;
     }

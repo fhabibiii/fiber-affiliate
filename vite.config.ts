@@ -17,6 +17,9 @@ export default defineConfig(({ mode }) => ({
     componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
+      devOptions: {
+        enabled: false // Disable PWA in development to avoid conflicts
+      },
       includeAssets: [
         'favicon.ico', 
         'android/*.png', 
@@ -87,6 +90,8 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         maximumFileSizeToCacheInBytes: 5000000,
+        // Exclude API calls from being cached by service worker
+        navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -99,21 +104,9 @@ export default defineConfig(({ mode }) => ({
               }
             }
           },
-          {
-            urlPattern: /^https:\/\/api\..*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 5
-              }
-            }
-          }
+          // Remove API caching to prevent login issues
+          // API calls should not be cached in development
         ]
-      },
-      devOptions: {
-        enabled: true
       }
     })
   ].filter(Boolean),

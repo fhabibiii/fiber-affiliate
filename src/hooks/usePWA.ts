@@ -25,6 +25,12 @@ export const usePWA = (): PWAState => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
+    // Only enable PWA features in production
+    if (import.meta.env.DEV) {
+      console.log('PWA features disabled in development mode');
+      return;
+    }
+
     // Check if app is running in standalone mode
     const checkStandalone = () => {
       const standalone = window.matchMedia('(display-mode: standalone)').matches || 
