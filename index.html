@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
     <title>Fibernode Internet</title>
     <meta name="description" content="Sistem Manajemen Afiliator Fibernode Internet" />
     <meta name="author" content="Fibernode Internet" />
@@ -15,6 +16,10 @@
     <meta name="apple-mobile-web-app-title" content="Fibernode Internet" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="application-name" content="Fibernode Internet" />
+    
+    <!-- Screen Orientation Support -->
+    <meta name="screen-orientation" content="any" />
+    <meta name="orientation" content="any" />
     
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.json" />
@@ -48,6 +53,26 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <style>
+      /* Ensure proper orientation support */
+      @media screen and (orientation: landscape) {
+        body {
+          transform: none;
+        }
+      }
+      
+      @media screen and (orientation: portrait) {
+        body {
+          transform: none;
+        }
+      }
+      
+      /* Prevent zoom on iOS */
+      input, textarea, select {
+        font-size: 16px !important;
+      }
+    </style>
   </head>
 
   <body>
