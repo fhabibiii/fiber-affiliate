@@ -3,557 +3,495 @@
 
 ## Project Info
 
-**URL**: https://lovable.dev/projects/d80c474c-2279-43c7-995d-91c89b52aa5d
+**Repository**: https://github.com/fhabibiii/fiber-affiliate-nexus  
+**Framework**: React + Vite + TypeScript  
+**Styling**: Tailwind CSS + shadcn/ui
 
-## Deployment Guide - Windows 11 dengan Nginx
+## Panduan Deployment - Windows dengan XAMPP
 
 ### Prerequisites
-- Windows 11 Professional/Enterprise (untuk Windows Service)
-- Domain name yang sudah terdaftar dan pointing ke server
+- Windows 10/11
 - Internet connection untuk download dependencies
 - Administrator access di Windows
 
-### Step 1: Install Node.js dan Yarn
+---
 
-1. **Install Node.js**
-   - Kunjungi https://nodejs.org/
-   - Download versi LTS (Long Term Support) terbaru
-   - Jalankan installer dengan setting default
-   - Restart Command Prompt setelah instalasi selesai
-   - Verify installation:
+## Step 1: Install Git untuk Windows
+
+### Download dan Install Git
+
+1. **Buka browser dan kunjungi**: https://git-scm.com/download/win
+2. **Download Git for Windows** (pilih versi 64-bit)
+3. **Jalankan installer** yang sudah didownload
+4. **Ikuti wizard instalasi**:
+   - Welcome screen: Klik **Next**
+   - Select Components: Biarkan default, klik **Next**
+   - Select Start Menu Folder: Biarkan default, klik **Next**
+   - Choosing the default editor: Pilih **Use Visual Studio Code** (atau editor favorit), klik **Next**
+   - Adjusting your PATH environment: Pilih **Git from the command line and also from 3rd-party software**, klik **Next**
+   - Choosing HTTPS transport backend: Pilih **Use the OpenSSL library**, klik **Next**
+   - Configuring the line ending conversions: Pilih **Checkout Windows-style, commit Unix-style**, klik **Next**
+   - Configuring the terminal emulator: Pilih **Use MinTTY**, klik **Next**
+   - Choose the default behavior of git pull: Pilih **Default (fast-forward or merge)**, klik **Next**
+   - Choose a credential helper: Pilih **Git Credential Manager**, klik **Next**
+   - Configuring extra options: Biarkan default, klik **Next**
+   - Configuring experimental options: Jangan centang apapun, klik **Install**
+
+5. **Tunggu proses instalasi selesai**, lalu klik **Finish**
+
+### Verifikasi Instalasi Git
+
+1. **Buka Command Prompt** (tekan `Win + R`, ketik `cmd`, tekan Enter)
+2. **Ketik perintah berikut**:
+   ```cmd
+   git --version
+   ```
+3. **Harusnya muncul output seperti**: `git version 2.x.x.windows.x`
+
+---
+
+## Step 2: Install Node.js dan Yarn
+
+### Install Node.js
+
+1. **Kunjungi**: https://nodejs.org/
+2. **Download versi LTS** (Long Term Support) - pilih yang ada tulisan "Recommended For Most Users"
+3. **Jalankan installer**:
+   - Welcome screen: Klik **Next**
+   - End-User License Agreement: Centang **I accept**, klik **Next**
+   - Destination Folder: Biarkan default `C:\Program Files\nodejs\`, klik **Next**
+   - Custom Setup: Biarkan semua ter-centang, klik **Next**
+   - Tools for Native Modules: **JANGAN centang** "Automatically install the necessary tools", klik **Next**
+   - Ready to Install: Klik **Install**
+   - Tunggu proses instalasi selesai, klik **Finish**
+
+4. **Restart Command Prompt** (tutup dan buka kembali)
+5. **Verifikasi instalasi**:
    ```cmd
    node --version
    npm --version
    ```
+   Harusnya muncul versi Node.js dan npm
 
-2. **Install Yarn Package Manager**
+### Install Yarn Package Manager
+
+1. **Buka Command Prompt sebagai Administrator**:
+   - Tekan `Win + X`
+   - Pilih **"Command Prompt (Admin)"** atau **"Windows PowerShell (Admin)"**
+
+2. **Install Yarn globally**:
    ```cmd
    npm install -g yarn
    ```
-   - Verify installation:
+
+3. **Verifikasi instalasi Yarn**:
    ```cmd
    yarn --version
    ```
+   Harusnya muncul versi Yarn
 
-### Step 2: Install Git dan Clone Repository
+---
 
-1. **Install Git untuk Windows**
-   - Download dari https://git-scm.com/download/win
-   - Install dengan setting default
-   - Verify installation:
+## Step 3: Clone Project dari GitHub
+
+### Buat Folder untuk Project
+
+1. **Buka File Explorer**
+2. **Buat folder baru** di `C:\` dengan nama `websites`
+   - Klik kanan di drive C:
+   - Pilih **New > Folder**
+   - Beri nama: `websites`
+
+### Clone Repository
+
+1. **Buka Command Prompt**
+2. **Masuk ke folder websites**:
    ```cmd
-   git --version
-   ```
-
-2. **Clone Repository**
-   ```cmd
-   # Buat folder untuk project
-   mkdir C:\websites
    cd C:\websites
-   
-   # Clone repository (ganti dengan URL repository Anda)
-   git clone <YOUR_GIT_REPOSITORY_URL> fibernode-app
-   cd fibernode-app
    ```
 
-### Step 3: Install Dependencies dan Build Project
-
-1. **Install Dependencies**
+3. **Clone repository**:
    ```cmd
-   # Pastikan berada di folder project
-   cd C:\websites\fibernode-app
-   
-   # Install semua dependencies
+   git clone https://github.com/fhabibiii/fiber-affiliate-nexus.git
+   ```
+
+4. **Masuk ke folder project**:
+   ```cmd
+   cd fiber-affiliate-nexus
+   ```
+
+5. **Verifikasi isi folder**:
+   ```cmd
+   dir
+   ```
+   Harusnya muncul file-file seperti: `package.json`, `src`, `public`, dll.
+
+---
+
+## Step 4: Install Dependencies Project
+
+### Install Dependencies
+
+1. **Pastikan berada di folder project**:
+   ```cmd
+   cd C:\websites\fiber-affiliate-nexus
+   ```
+
+2. **Install semua dependencies**:
+   ```cmd
    yarn install
    ```
+   
+   **Catatan**: 
    - Proses ini akan download semua packages yang diperlukan
    - Tunggu hingga selesai (5-15 menit tergantung koneksi internet)
+   - Jika muncul warning, itu normal, yang penting tidak ada error merah
 
-2. **Setup Environment Variables untuk Production**
-   - Buat file `.env.production` di root project:
+3. **Verifikasi instalasi berhasil**:
    ```cmd
-   copy .env.example .env.production
+   yarn --version
    ```
-   - Edit file `.env.production` dengan text editor:
+   Dan pastikan ada folder `node_modules` di dalam project:
+   ```cmd
+   dir
+   ```
+
+---
+
+## Step 5: Mengganti Favicon
+
+### Cara Mengganti Favicon.ico
+
+1. **Siapkan file favicon baru**:
+   - File harus berformat `.ico`, `.png`, atau `.jpg`
+   - Ukuran yang direkomendasikan: 32x32 pixel atau 16x16 pixel
+   - Nama file sebaiknya: `favicon.ico`
+
+2. **Ganti file favicon**:
+   - Buka folder `C:\websites\fiber-affiliate-nexus\public\`
+   - **Backup favicon lama** (rename menjadi `favicon-old.ico`)
+   - **Copy file favicon baru** ke folder `public`
+   - **Rename file baru** menjadi `favicon.ico`
+
+3. **Update referensi di index.html** (jika diperlukan):
+   - Buka file `C:\websites\fiber-affiliate-nexus\index.html` dengan text editor
+   - Cari baris yang berisi `<link rel="icon"`
+   - Pastikan mengarah ke favicon yang benar:
+   ```html
+   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+   ```
+
+---
+
+## Step 6: Membuat File Environment (.env)
+
+### Buat File .env
+
+1. **Buka folder project**: `C:\websites\fiber-affiliate-nexus\`
+
+2. **Buat file baru** bernama `.env` (tanpa ekstensi):
+   - Klik kanan di folder project
+   - Pilih **New > Text Document**
+   - Rename file dari `New Text Document.txt` menjadi `.env`
+   - **Penting**: Pastikan tidak ada ekstensi `.txt` di belakangnya
+
+3. **Edit file .env** dengan text editor (Notepad, VS Code, dll):
    ```env
-   VITE_API_BASE_URL=https://yourdomain.com/api/v1
+   # Environment Configuration
+   VITE_API_BASE_URL=http://localhost/fiber-affiliate-nexus/api
    VITE_APP_ENV=production
    VITE_APP_TITLE=Fibernode Internet
+   VITE_APP_VERSION=1.0.0
+   
+   # Optional: Jika ada konfigurasi lain
+   # VITE_COMPANY_NAME=Fibernode Internet
+   # VITE_CONTACT_EMAIL=info@fibernode.com
    ```
-   - Ganti `yourdomain.com` dengan domain sebenarnya
 
-3. **Build Project untuk Production**
+4. **Save file .env**
+
+**Catatan Penting**: 
+- Semua environment variable di Vite harus diawali dengan `VITE_`
+- Sesuaikan `VITE_API_BASE_URL` dengan lokasi API backend Anda
+- Jika tidak ada backend, biarkan seperti contoh di atas
+
+---
+
+## Step 7: Build Project untuk Production
+
+### Build Project
+
+1. **Buka Command Prompt**
+2. **Masuk ke folder project**:
    ```cmd
-   # Build aplikasi untuk production
+   cd C:\websites\fiber-affiliate-nexus
+   ```
+
+3. **Jalankan perintah build**:
+   ```cmd
    yarn build
    ```
-   - Perintah ini akan membuat folder `dist` berisi file production-ready
+
+4. **Tunggu proses build selesai**:
+   - Proses ini akan membuat folder `dist` yang berisi file production-ready
    - Pastikan tidak ada error dalam proses build
+   - Jika berhasil, akan muncul pesan seperti: "✓ built in Xs"
 
-### Step 4: Install dan Setup Nginx
-
-#### A. Download dan Install Nginx
-
-1. **Download Nginx untuk Windows**
-   - Kunjungi https://nginx.org/en/download.html
-   - Download versi "Stable version" untuk Windows
-   - Extract file ZIP ke `C:\nginx`
-
-2. **Verifikasi Instalasi**
+5. **Verifikasi folder dist**:
    ```cmd
-   cd C:\nginx
-   nginx -v
+   dir dist
+   ```
+   Harusnya ada file `index.html` dan folder `assets`
+
+---
+
+## Step 8: Install dan Setup XAMPP
+
+### Download dan Install XAMPP
+
+1. **Kunjungi**: https://www.apachefriends.org/download.html
+2. **Download XAMPP untuk Windows** (versi terbaru dengan PHP 8.x)
+3. **Jalankan installer**:
+   - Jika muncul warning User Account Control, klik **Yes**
+   - Welcome screen: Klik **Next**
+   - Select Components: 
+     - Pastikan **Apache** ter-centang
+     - **MySQL** ter-centang (jika butuh database)
+     - **PHP** ter-centang
+     - **phpMyAdmin** ter-centang (jika butuh database)
+     - Yang lain bisa di-uncheck jika tidak perlu
+     - Klik **Next**
+   - Installation folder: Biarkan default `C:\xampp`, klik **Next**
+   - Bitnami for XAMPP: **Uncheck** "Learn more about Bitnami", klik **Next**
+   - Ready to Install: Klik **Next**
+   - Tunggu proses instalasi selesai
+   - Klik **Finish**
+
+4. **Buka XAMPP Control Panel**:
+   - Akan otomatis terbuka setelah instalasi
+   - Atau bisa buka dari Start Menu: "XAMPP Control Panel"
+
+### Start Apache di XAMPP
+
+1. **Di XAMPP Control Panel**:
+   - Klik tombol **Start** di samping **Apache**
+   - Status Apache harusnya berubah menjadi hijau dengan tulisan "Running"
+   - Jika muncul Windows Firewall alert, klik **Allow access**
+
+2. **Test Apache berjalan**:
+   - Buka browser
+   - Kunjungi: `http://localhost`
+   - Harusnya muncul halaman welcome XAMPP
+
+---
+
+## Step 9: Deploy Project ke XAMPP
+
+### Copy File Build ke XAMPP
+
+1. **Buat folder untuk project di XAMPP**:
+   - Buka folder: `C:\xampp\htdocs\`
+   - Buat folder baru bernama: `fiber-affiliate-nexus`
+   - Full path: `C:\xampp\htdocs\fiber-affiliate-nexus\`
+
+2. **Copy semua isi folder dist**:
+   - Buka folder: `C:\websites\fiber-affiliate-nexus\dist\`
+   - **Select All** (Ctrl+A) semua file dan folder di dalam `dist`
+   - **Copy** (Ctrl+C)
+   - Buka folder: `C:\xampp\htdocs\fiber-affiliate-nexus\`
+   - **Paste** (Ctrl+V) semua file
+
+3. **Verifikasi file sudah tercopy**:
+   - Di folder `C:\xampp\htdocs\fiber-affiliate-nexus\` harusnya ada:
+     - `index.html`
+     - Folder `assets` (berisi CSS, JS, dll)
+     - File `favicon.ico`
+
+### Setup Virtual Host (Opsional)
+
+Jika ingin menggunakan domain custom seperti `fibernode.local`:
+
+1. **Edit file hosts Windows**:
+   - Buka Notepad **sebagai Administrator**
+   - Open file: `C:\Windows\System32\drivers\etc\hosts`
+   - Tambahkan baris di akhir file:
+   ```
+   127.0.0.1    fibernode.local
+   ```
+   - Save file
+
+2. **Edit file httpd-vhosts.conf**:
+   - Buka file: `C:\xampp\apache\conf\extra\httpd-vhosts.conf`
+   - Tambahkan di akhir file:
+   ```apache
+   <VirtualHost *:80>
+       DocumentRoot "C:/xampp/htdocs/fiber-affiliate-nexus"
+       ServerName fibernode.local
+       ErrorLog "logs/fibernode-error.log"
+       CustomLog "logs/fibernode-access.log" common
+   </VirtualHost>
+   ```
+   - Save file
+
+3. **Enable virtual host di Apache**:
+   - Buka file: `C:\xampp\apache\conf\httpd.conf`
+   - Cari baris: `#Include conf/extra/httpd-vhosts.conf`
+   - Hapus tanda `#` di depannya menjadi: `Include conf/extra/httpd-vhosts.conf`
+   - Save file
+
+4. **Restart Apache**:
+   - Di XAMPP Control Panel, klik **Stop** lalu **Start** untuk Apache
+
+---
+
+## Step 10: Menjalankan dan Mengakses Aplikasi
+
+### Akses Aplikasi
+
+1. **Pastikan Apache sudah running** di XAMPP Control Panel
+
+2. **Buka browser** dan kunjungi salah satu URL berikut:
+
+   **Opsi 1 - Direct folder access**:
+   ```
+   http://localhost/fiber-affiliate-nexus/
    ```
 
-#### B. Setup Nginx sebagai Windows Service
+   **Opsi 2 - Jika sudah setup virtual host**:
+   ```
+   http://fibernode.local/
+   ```
 
-1. **Download NSSM (Non-Sucking Service Manager)**
-   - Kunjungi https://nssm.cc/download
-   - Download versi terbaru
-   - Extract ke `C:\tools\nssm`
+3. **Aplikasi harusnya terbuka** dan menampilkan halaman login/dashboard
 
-2. **Install Nginx sebagai Windows Service**
+### Test Fitur Aplikasi
+
+1. **Test halaman utama**: Pastikan semua elemen tampil dengan benar
+2. **Test navigation**: Klik menu-menu yang ada
+3. **Test responsive**: Resize browser untuk test mobile view
+4. **Check console**: Buka Developer Tools (F12) dan pastikan tidak ada error di console
+
+---
+
+## Step 11: Update dan Maintenance
+
+### Update Project (Jika Ada Perubahan Code)
+
+1. **Pull perubahan terbaru dari GitHub**:
    ```cmd
-   # Buka Command Prompt sebagai Administrator
-   cd C:\tools\nssm\win64
-   
-   # Install service
-   nssm install nginx "C:\nginx\nginx.exe"
-   
-   # Set working directory
-   nssm set nginx AppDirectory "C:\nginx"
-   
-   # Set startup type to automatic
-   nssm set nginx Start SERVICE_AUTO_START
-   
-   # Set description
-   nssm set nginx Description "Nginx Web Server"
-   ```
-
-### Step 5: Setup SSL Certificate dengan Let's Encrypt (Certbot)
-
-#### A. Install Certbot untuk Windows
-
-1. **Install Chocolatey Package Manager**
-   - Buka PowerShell sebagai Administrator
-   - Jalankan perintah:
-   ```powershell
-   Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-   ```
-
-2. **Install Certbot via Chocolatey**
-   ```powershell
-   choco install certbot
-   ```
-
-#### B. Konfigurasi Domain dan DNS
-
-1. **Pastikan Domain Pointing ke Server**
-   - Login ke domain registrar/DNS provider
-   - Set A record untuk domain mengarah ke IP public server
-   - Set CNAME record untuk www mengarah ke domain utama
-   - Tunggu propagasi DNS (biasanya 15-60 menit)
-
-2. **Verify DNS Propagation**
-   ```cmd
-   nslookup yourdomain.com
-   ping yourdomain.com
-   ```
-
-#### C. Generate SSL Certificate
-
-1. **Stop Nginx Service sementara**
-   ```cmd
-   # Buka Command Prompt sebagai Administrator
-   net stop nginx
-   ```
-
-2. **Request SSL Certificate**
-   ```cmd
-   # Request certificate untuk domain dan www subdomain
-   certbot certonly --standalone -d yourdomain.com -d www.yourdomain.com
-   ```
-   - Ikuti prompt untuk memasukkan email dan agree terms
-   - Certificate akan disimpan di: `C:\Certbot\live\yourdomain.com\`
-
-3. **Verify Certificate Files**
-   ```cmd
-   dir "C:\Certbot\live\yourdomain.com"
-   ```
-   - Pastikan ada files: `privkey.pem`, `fullchain.pem`, `cert.pem`, `chain.pem`
-
-### Step 6: Konfigurasi Nginx
-
-#### A. Backup Konfigurasi Default
-
-```cmd
-cd C:\nginx\conf
-copy nginx.conf nginx.conf.backup
-```
-
-#### B. Buat Konfigurasi Production
-
-1. **Edit nginx.conf**
-   - Buka `C:\nginx\conf\nginx.conf` dengan text editor
-   - Ganti seluruh isi dengan konfigurasi berikut:
-
-```nginx
-worker_processes auto;
-error_log logs/error.log;
-pid logs/nginx.pid;
-
-events {
-    worker_connections 1024;
-    use select;
-}
-
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
-    
-    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-                    '$status $body_bytes_sent "$http_referer" '
-                    '"$http_user_agent" "$http_x_forwarded_for"';
-    
-    access_log logs/access.log main;
-    
-    sendfile on;
-    tcp_nopush on;
-    tcp_nodelay on;
-    keepalive_timeout 65;
-    types_hash_max_size 2048;
-    
-    # Gzip compression
-    gzip on;
-    gzip_vary on;
-    gzip_min_length 1024;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-    
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "no-referrer-when-downgrade" always;
-    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
-    
-    # Rate limiting
-    limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;
-    limit_req_zone $binary_remote_addr zone=api:10m rate=100r/m;
-    
-    # Redirect HTTP to HTTPS
-    server {
-        listen 80;
-        server_name yourdomain.com www.yourdomain.com;
-        return 301 https://$server_name$request_uri;
-    }
-    
-    # HTTPS Server
-    server {
-        listen 443 ssl http2;
-        server_name yourdomain.com www.yourdomain.com;
-        
-        # SSL Configuration
-        ssl_certificate "C:/Certbot/live/yourdomain.com/fullchain.pem";
-        ssl_certificate_key "C:/Certbot/live/yourdomain.com/privkey.pem";
-        
-        ssl_session_cache shared:SSL:1m;
-        ssl_session_timeout 10m;
-        ssl_protocols TLSv1.2 TLSv1.3;
-        ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384;
-        ssl_prefer_server_ciphers on;
-        
-        # Document root
-        root "C:/websites/fibernode-app/dist";
-        index index.html;
-        
-        # Handle client-side routing
-        location / {
-            try_files $uri $uri/ /index.html;
-        }
-        
-        # Static assets caching
-        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-            expires 1y;
-            add_header Cache-Control "public, immutable";
-        }
-        
-        # API proxy (jika diperlukan)
-        location /api/ {
-            limit_req zone=api burst=20 nodelay;
-            proxy_pass http://your-backend-server;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection 'upgrade';
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_cache_bypass $http_upgrade;
-        }
-        
-        # Security: Hide nginx version
-        server_tokens off;
-        
-        # Security: Prevent access to sensitive files
-        location ~ /\. {
-            deny all;
-        }
-        
-        location ~ ~$ {
-            deny all;
-        }
-    }
-}
-```
-
-2. **Ganti Domain Placeholder**
-   - Ganti semua `yourdomain.com` dengan domain sebenarnya
-   - Ganti `your-backend-server` dengan URL backend server jika ada
-
-#### C. Test Konfigurasi Nginx
-
-```cmd
-cd C:\nginx
-nginx -t
-```
-- Pastikan output menunjukkan "syntax is ok" dan "test is successful"
-
-### Step 7: Setup Auto-Renewal SSL Certificate
-
-#### A. Buat Script untuk Auto-Renewal
-
-1. **Buat folder untuk scripts**
-   ```cmd
-   mkdir C:\scripts
-   ```
-
-2. **Buat batch script untuk renewal**
-   - Buat file `C:\scripts\renew-ssl.bat`:
-   ```batch
-   @echo off
-   echo Starting SSL certificate renewal...
-   
-   REM Stop nginx service
-   net stop nginx
-   
-   REM Renew certificate
-   certbot renew --quiet
-   
-   REM Start nginx service
-   net start nginx
-   
-   echo SSL certificate renewal completed.
-   ```
-
-#### B. Setup Task Scheduler untuk Auto-Renewal
-
-1. **Buka Task Scheduler**
-   - Tekan `Win + R`, ketik `taskschd.msc`
-
-2. **Create New Task**
-   - Klik "Create Task" di sidebar kanan
-   - **General Tab:**
-     - Name: "SSL Certificate Auto Renewal"
-     - Description: "Automatically renew Let's Encrypt SSL certificates"
-     - Run whether user is logged on or not: ✓
-     - Run with highest privileges: ✓
-
-   - **Triggers Tab:**
-     - Click "New"
-     - Begin the task: "On a schedule"
-     - Settings: "Monthly"
-     - Day: 1 (first day of month)
-     - Time: 02:00 AM
-     - Repeat task every: 12 hours for duration of 1 day
-
-   - **Actions Tab:**
-     - Click "New"
-     - Action: "Start a program"
-     - Program/script: `C:\scripts\renew-ssl.bat`
-
-   - **Settings Tab:**
-     - Allow task to be run on demand: ✓
-     - If the running task does not end when requested, force it to stop: ✓
-
-### Step 8: Deploy dan Start Services
-
-#### A. Copy Built Files
-
-```cmd
-# Pastikan folder dist sudah ada
-cd C:\websites\fibernode-app
-dir dist
-
-# Files sudah di tempat yang benar dari proses build sebelumnya
-```
-
-#### B. Start Nginx Service
-
-```cmd
-# Start nginx service
-net start nginx
-
-# Verify service status
-sc query nginx
-```
-
-#### C. Test Website
-
-1. **Test HTTP Redirect**
-   - Buka browser: `http://yourdomain.com`
-   - Seharusnya redirect otomatis ke HTTPS
-
-2. **Test HTTPS Access**
-   - Buka browser: `https://yourdomain.com`
-   - Verify SSL certificate valid (green lock icon)
-
-3. **Test Application Functionality**
-   - Test login functionality
-   - Test all routes dan navigation
-   - Check browser console untuk errors
-
-### Step 9: Monitoring dan Maintenance
-
-#### A. Setup Log Monitoring
-
-1. **Nginx Access Logs**
-   - Location: `C:\nginx\logs\access.log`
-   - Monitor untuk traffic patterns
-
-2. **Nginx Error Logs**
-   - Location: `C:\nginx\logs\error.log`
-   - Monitor untuk errors dan issues
-
-#### B. Regular Maintenance Tasks
-
-1. **Update Application**
-   ```cmd
-   cd C:\websites\fibernode-app
-   
-   # Pull latest changes
+   cd C:\websites\fiber-affiliate-nexus
    git pull origin main
-   
-   # Install new dependencies
+   ```
+
+2. **Install dependencies baru** (jika ada):
+   ```cmd
    yarn install
-   
-   # Build for production
+   ```
+
+3. **Build ulang project**:
+   ```cmd
    yarn build
-   
-   # Restart nginx to clear cache
-   net stop nginx
-   net start nginx
    ```
 
-2. **Monitor SSL Certificate Expiry**
+4. **Copy ulang ke XAMPP**:
+   - Hapus isi folder `C:\xampp\htdocs\fiber-affiliate-nexus\`
+   - Copy semua isi folder `dist` yang baru ke folder tersebut
+
+### Backup Project
+
+1. **Backup source code**:
+   - Copy folder `C:\websites\fiber-affiliate-nexus\` ke lokasi backup
+
+2. **Backup file production**:
+   - Copy folder `C:\xampp\htdocs\fiber-affiliate-nexus\` ke lokasi backup
+
+---
+
+## Troubleshooting
+
+### Apache Tidak Bisa Start
+
+**Problem**: Port 80 sudah digunakan aplikasi lain
+
+**Solution**:
+1. **Check aplikasi yang menggunakan port 80**:
    ```cmd
-   # Check certificate expiry date
-   certbot certificates
-   ```
-
-3. **Backup Important Files**
-   - Backup `C:\nginx\conf\nginx.conf`
-   - Backup `C:\Certbot\live\yourdomain.com\`
-   - Backup project files regular
-
-### Step 10: Troubleshooting
-
-#### A. Common Issues dan Solutions
-
-1. **Nginx Service Won't Start**
-   ```cmd
-   # Check configuration
-   cd C:\nginx
-   nginx -t
-   
-   # Check error logs
-   type logs\error.log
-   ```
-
-2. **SSL Certificate Issues**
-   ```cmd
-   # Test SSL certificate
-   certbot certificates
-   
-   # Force renew if needed
-   certbot renew --force-renewal
-   ```
-
-3. **Port Already in Use**
-   ```cmd
-   # Check what's using port 80/443
    netstat -ano | findstr :80
-   netstat -ano | findstr :443
    ```
+2. **Stop aplikasi tersebut** atau **ganti port Apache**:
+   - Edit file: `C:\xampp\apache\conf\httpd.conf`
+   - Cari: `Listen 80`
+   - Ganti menjadi: `Listen 8080`
+   - Restart Apache
+   - Akses dengan: `http://localhost:8080/fiber-affiliate-nexus/`
 
-4. **DNS Issues**
+### Build Error
+
+**Problem**: Error saat `yarn build`
+
+**Solution**:
+1. **Hapus node_modules dan install ulang**:
    ```cmd
-   # Flush DNS cache
-   ipconfig /flushdns
-   
-   # Check DNS resolution
-   nslookup yourdomain.com
+   rmdir /s node_modules
+   yarn install
    ```
-
-#### B. Performance Monitoring
-
-1. **Monitor Resource Usage**
-   - Open Task Manager
-   - Monitor nginx.exe CPU dan memory usage
-   - Ensure system has adequate resources
-
-2. **Check Website Performance**
-   - Use tools seperti GTmetrix, PageSpeed Insights
-   - Monitor loading times dan optimization opportunities
-
-### Step 11: Security Hardening
-
-#### A. Windows Firewall Configuration
-
-1. **Open Required Ports**
+2. **Clear cache**:
    ```cmd
-   # Allow HTTP (port 80)
-   netsh advfirewall firewall add rule name="HTTP" dir=in action=allow protocol=TCP localport=80
-   
-   # Allow HTTPS (port 443)
-   netsh advfirewall firewall add rule name="HTTPS" dir=in action=allow protocol=TCP localport=443
+   yarn cache clean
    ```
 
-#### B. Regular Security Updates
+### File .env Tidak Terbaca
 
-1. **Keep Windows Updated**
-   - Enable automatic Windows updates
-   - Regular security patches
+**Problem**: Environment variables tidak working
 
-2. **Update Nginx Regular**
-   - Download latest version dari nginx.org
-   - Replace files dan restart service
+**Solution**:
+1. **Pastikan nama file benar**: `.env` (bukan `.env.txt`)
+2. **Pastikan variable diawali VITE_**: `VITE_API_BASE_URL=...`
+3. **Build ulang setelah edit .env**:
+   ```cmd
+   yarn build
+   ```
 
-3. **Monitor Security Logs**
-   - Check nginx access logs untuk suspicious activity
-   - Setup fail2ban equivalent untuk Windows jika diperlukan
+### Halaman Blank/White Screen
+
+**Problem**: Aplikasi tidak tampil, halaman kosong
+
+**Solution**:
+1. **Check Developer Console** (F12) untuk error
+2. **Pastikan file index.html ada** di root folder XAMPP
+3. **Check path file assets** apakah benar
+4. **Coba akses langsung**: `http://localhost/fiber-affiliate-nexus/index.html`
+
+---
 
 ## Technologies Used
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-- Nginx
-- Let's Encrypt SSL
-- Windows Services
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **UI Framework**: Tailwind CSS + shadcn/ui
+- **Icons**: Lucide React
+- **Web Server**: Apache (XAMPP)
+- **Version Control**: Git
+
+---
 
 ## Support
 
-Untuk bantuan deployment atau troubleshooting, silakan hubungi tim development atau refer ke dokumentasi official:
+Untuk bantuan deployment atau troubleshooting, silakan:
 
-- Nginx Documentation: https://nginx.org/en/docs/
-- Certbot Documentation: https://certbot.eff.org/docs/
-- Let's Encrypt: https://letsencrypt.org/docs/
+1. **Check dokumentasi resmi**:
+   - React: https://react.dev/
+   - Vite: https://vitejs.dev/
+   - XAMPP: https://www.apachefriends.org/
 
-## Notes
+2. **Hubungi tim development** untuk support khusus project ini
 
-- Pastikan domain sudah pointing ke server sebelum request SSL certificate
-- Auto-renewal SSL akan berjalan setiap bulan, monitor logs untuk memastikan success
-- Backup konfigurasi dan certificates secara regular
-- Monitor server resources dan website performance secara berkala
+---
+
+## Notes Penting
+
+- **Selalu backup** project sebelum update
+- **Test aplikasi** setelah setiap deployment
+- **Monitor log Apache** di `C:\xampp\apache\logs\` jika ada masalah
+- **Keep XAMPP updated** untuk security
+- **Jangan expose** file .env ke public jika ada data sensitif
