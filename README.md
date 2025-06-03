@@ -262,6 +262,7 @@
 
 1. **Buat folder untuk project di XAMPP**:
    - Buka folder: `C:\xampp\htdocs\`
+   - Hapus semua isinya karena sudah tidak diperlukan
 
 2. **Copy semua isi folder dist**:
    - Buka folder: `C:\websites\fiber-affiliate\dist\`
