@@ -3,7 +3,7 @@
 
 ## Project Info
 
-**Repository**: https://github.com/fhabibiii/fiber-affiliate-nexus  
+**Repository**: https://github.com/fhabibiii/fiber-affiliate  
 **Framework**: React + Vite + TypeScript  
 **Styling**: Tailwind CSS + shadcn/ui
 
@@ -112,12 +112,12 @@
 
 3. **Clone repository**:
    ```cmd
-   git clone https://github.com/fhabibiii/fiber-affiliate-nexus.git
+   git clone https://github.com/fhabibiii/fiber-affiliate.git
    ```
 
 4. **Masuk ke folder project**:
    ```cmd
-   cd fiber-affiliate-nexus
+   cd fiber-affiliate
    ```
 
 5. **Verifikasi isi folder**:
@@ -134,7 +134,7 @@
 
 1. **Pastikan berada di folder project**:
    ```cmd
-   cd C:\websites\fiber-affiliate-nexus
+   cd C:\websites\fiber-affiliate
    ```
 
 2. **Install semua dependencies**:
@@ -158,36 +158,11 @@
 
 ---
 
-## Step 5: Mengganti Favicon
-
-### Cara Mengganti Favicon.ico
-
-1. **Siapkan file favicon baru**:
-   - File harus berformat `.ico`, `.png`, atau `.jpg`
-   - Ukuran yang direkomendasikan: 32x32 pixel atau 16x16 pixel
-   - Nama file sebaiknya: `favicon.ico`
-
-2. **Ganti file favicon**:
-   - Buka folder `C:\websites\fiber-affiliate-nexus\public\`
-   - **Backup favicon lama** (rename menjadi `favicon-old.ico`)
-   - **Copy file favicon baru** ke folder `public`
-   - **Rename file baru** menjadi `favicon.ico`
-
-3. **Update referensi di index.html** (jika diperlukan):
-   - Buka file `C:\websites\fiber-affiliate-nexus\index.html` dengan text editor
-   - Cari baris yang berisi `<link rel="icon"`
-   - Pastikan mengarah ke favicon yang benar:
-   ```html
-   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-   ```
-
----
-
-## Step 6: Membuat File Environment (.env)
+## Step 5: Membuat File Environment (.env)
 
 ### Buat File .env
 
-1. **Buka folder project**: `C:\websites\fiber-affiliate-nexus\`
+1. **Buka folder project**: `C:\websites\fiber-affiliate\`
 
 2. **Buat file baru** bernama `.env` (tanpa ekstensi):
    - Klik kanan di folder project
@@ -198,14 +173,10 @@
 3. **Edit file .env** dengan text editor (Notepad, VS Code, dll):
    ```env
    # Environment Configuration
-   VITE_API_BASE_URL=http://localhost/fiber-affiliate-nexus/api
+   VITE_API_BASE_URL=http://localhost/api/v1
    VITE_APP_ENV=production
    VITE_APP_TITLE=Fibernode Internet
    VITE_APP_VERSION=1.0.0
-   
-   # Optional: Jika ada konfigurasi lain
-   # VITE_COMPANY_NAME=Fibernode Internet
-   # VITE_CONTACT_EMAIL=info@fibernode.com
    ```
 
 4. **Save file .env**
@@ -217,14 +188,14 @@
 
 ---
 
-## Step 7: Build Project untuk Production
+## Step 6: Build Project untuk Production
 
 ### Build Project
 
 1. **Buka Command Prompt**
 2. **Masuk ke folder project**:
    ```cmd
-   cd C:\websites\fiber-affiliate-nexus
+   cd C:\websites\fiber-affiliate
    ```
 
 3. **Jalankan perintah build**:
@@ -245,7 +216,7 @@
 
 ---
 
-## Step 8: Install dan Setup XAMPP
+## Step 7: Install dan Setup XAMPP
 
 ### Download dan Install XAMPP
 
@@ -285,81 +256,35 @@
 
 ---
 
-## Step 9: Deploy Project ke XAMPP
+## Step 8: Deploy Project ke XAMPP
 
 ### Copy File Build ke XAMPP
 
 1. **Buat folder untuk project di XAMPP**:
    - Buka folder: `C:\xampp\htdocs\`
-   - Buat folder baru bernama: `fiber-affiliate-nexus`
-   - Full path: `C:\xampp\htdocs\fiber-affiliate-nexus\`
 
 2. **Copy semua isi folder dist**:
-   - Buka folder: `C:\websites\fiber-affiliate-nexus\dist\`
+   - Buka folder: `C:\websites\fiber-affiliate\dist\`
    - **Select All** (Ctrl+A) semua file dan folder di dalam `dist`
    - **Copy** (Ctrl+C)
-   - Buka folder: `C:\xampp\htdocs\fiber-affiliate-nexus\`
+   - Buka folder: `C:\xampp\htdocs\`
    - **Paste** (Ctrl+V) semua file
 
 3. **Verifikasi file sudah tercopy**:
-   - Di folder `C:\xampp\htdocs\fiber-affiliate-nexus\` harusnya ada:
+   - Di folder `C:\xampp\htdocs\` harusnya ada:
      - `index.html`
      - Folder `assets` (berisi CSS, JS, dll)
      - File `favicon.ico`
 
-### Setup Virtual Host (Opsional)
-
-Jika ingin menggunakan domain custom seperti `fibernode.local`:
-
-1. **Edit file hosts Windows**:
-   - Buka Notepad **sebagai Administrator**
-   - Open file: `C:\Windows\System32\drivers\etc\hosts`
-   - Tambahkan baris di akhir file:
-   ```
-   127.0.0.1    fibernode.local
-   ```
-   - Save file
-
-2. **Edit file httpd-vhosts.conf**:
-   - Buka file: `C:\xampp\apache\conf\extra\httpd-vhosts.conf`
-   - Tambahkan di akhir file:
-   ```apache
-   <VirtualHost *:80>
-       DocumentRoot "C:/xampp/htdocs/fiber-affiliate-nexus"
-       ServerName fibernode.local
-       ErrorLog "logs/fibernode-error.log"
-       CustomLog "logs/fibernode-access.log" common
-   </VirtualHost>
-   ```
-   - Save file
-
-3. **Enable virtual host di Apache**:
-   - Buka file: `C:\xampp\apache\conf\httpd.conf`
-   - Cari baris: `#Include conf/extra/httpd-vhosts.conf`
-   - Hapus tanda `#` di depannya menjadi: `Include conf/extra/httpd-vhosts.conf`
-   - Save file
-
-4. **Restart Apache**:
-   - Di XAMPP Control Panel, klik **Stop** lalu **Start** untuk Apache
-
----
-
-## Step 10: Menjalankan dan Mengakses Aplikasi
+## Step 9: Menjalankan dan Mengakses Aplikasi
 
 ### Akses Aplikasi
 
 1. **Pastikan Apache sudah running** di XAMPP Control Panel
 
 2. **Buka browser** dan kunjungi salah satu URL berikut:
-
-   **Opsi 1 - Direct folder access**:
    ```
-   http://localhost/fiber-affiliate-nexus/
-   ```
-
-   **Opsi 2 - Jika sudah setup virtual host**:
-   ```
-   http://fibernode.local/
+   http://localhost
    ```
 
 3. **Aplikasi harusnya terbuka** dan menampilkan halaman login/dashboard
@@ -373,13 +298,13 @@ Jika ingin menggunakan domain custom seperti `fibernode.local`:
 
 ---
 
-## Step 11: Update dan Maintenance
+## Step 10: Update dan Maintenance
 
 ### Update Project (Jika Ada Perubahan Code)
 
 1. **Pull perubahan terbaru dari GitHub**:
    ```cmd
-   cd C:\websites\fiber-affiliate-nexus
+   cd C:\websites\fiber-affiliate
    git pull origin main
    ```
 
@@ -394,16 +319,16 @@ Jika ingin menggunakan domain custom seperti `fibernode.local`:
    ```
 
 4. **Copy ulang ke XAMPP**:
-   - Hapus isi folder `C:\xampp\htdocs\fiber-affiliate-nexus\`
+   - Hapus isi folder `C:\xampp\htdocs\`
    - Copy semua isi folder `dist` yang baru ke folder tersebut
 
 ### Backup Project
 
 1. **Backup source code**:
-   - Copy folder `C:\websites\fiber-affiliate-nexus\` ke lokasi backup
+   - Copy folder `C:\websites\fiber-affiliate\` ke lokasi backup
 
 2. **Backup file production**:
-   - Copy folder `C:\xampp\htdocs\fiber-affiliate-nexus\` ke lokasi backup
+   - Copy folder `C:\xampp\htdocs\` ke lokasi backup
 
 ---
 
@@ -423,7 +348,7 @@ Jika ingin menggunakan domain custom seperti `fibernode.local`:
    - Cari: `Listen 80`
    - Ganti menjadi: `Listen 8080`
    - Restart Apache
-   - Akses dengan: `http://localhost:8080/fiber-affiliate-nexus/`
+   - Akses dengan: `http://localhost:8080`
 
 ### Build Error
 
@@ -460,7 +385,7 @@ Jika ingin menggunakan domain custom seperti `fibernode.local`:
 1. **Check Developer Console** (F12) untuk error
 2. **Pastikan file index.html ada** di root folder XAMPP
 3. **Check path file assets** apakah benar
-4. **Coba akses langsung**: `http://localhost/fiber-affiliate-nexus/index.html`
+4. **Coba akses langsung**: `http://localhost/index.html`
 
 ---
 
