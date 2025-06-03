@@ -20,14 +20,10 @@ import AffiliatorDashboard from "@/pages/affiliator/AffiliatorDashboard";
 import PaymentHistory from "@/pages/affiliator/PaymentHistory";
 import NotFound from "./pages/NotFound";
 import ThemeToggle from "@/components/ThemeToggle";
-import PWAInstallPrompt from "@/components/PWAInstallPrompt";
-import { usePWA } from "@/hooks/usePWA";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { isStandalone } = usePWA();
-  
   return (
     <>
       <Routes>
@@ -131,9 +127,7 @@ const AppContent = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       
-      {/* Only show theme toggle and install prompt when not in standalone mode */}
-      {!isStandalone && <ThemeToggle />}
-      <PWAInstallPrompt />
+      <ThemeToggle />
     </>
   );
 };
