@@ -3,7 +3,7 @@
 
 ## Project Info
 
-**Repository**: https://github.com/fhabibiii/fiber-affiliate-nexus  
+**Repository**: https://github.com/fhabibiii/fiber-affiliate  
 **Framework**: React + Vite + TypeScript  
 **Styling**: Tailwind CSS + shadcn/ui
 
@@ -112,12 +112,12 @@
 
 3. **Clone repository**:
    ```cmd
-   git clone https://github.com/fhabibiii/fiber-affiliate-nexus.git
+   git clone https://github.com/fhabibiii/fiber-affiliate.git
    ```
 
 4. **Masuk ke folder project**:
    ```cmd
-   cd fiber-affiliate-nexus
+   cd fiber-affiliate
    ```
 
 5. **Verifikasi isi folder**:
@@ -134,7 +134,7 @@
 
 1. **Pastikan berada di folder project**:
    ```cmd
-   cd C:\websites\fiber-affiliate-nexus
+   cd C:\websites\fiber-affiliate
    ```
 
 2. **Install semua dependencies**:
@@ -158,37 +158,11 @@
 
 ---
 
-## Step 5: Kustomisasi Favicon (Opsional)
-
-### Mengganti Favicon Default
-
-1. **Siapkan file favicon**:
-   - Format yang didukung: `.ico`, `.png`, `.jpg`, `.svg`
-   - Ukuran yang disarankan: 32x32px atau 16x16px
-   - Nama file: `favicon.ico` (untuk kompatibilitas terbaik)
-
-2. **Ganti file favicon**:
-   - Buka folder: `C:\websites\fiber-affiliate-nexus\public\`
-   - **Backup** file `favicon.ico` yang lama (rename menjadi `favicon-old.ico`)
-   - **Copy** file favicon baru ke folder tersebut
-   - **Rename** file baru menjadi `favicon.ico`
-
-3. **Verifikasi favicon baru**:
-   - Setelah build dan deploy, favicon baru akan muncul di browser tab
-   - Mungkin perlu clear cache browser untuk melihat perubahan
-
-**Tips Favicon**:
-- Gunakan desain yang simple dan mudah dikenali
-- Test di berbagai ukuran untuk memastikan clarity
-- Konsisten dengan branding aplikasi
-
----
-
-## Step 6: Membuat File Environment (.env)
+## Step 5: Membuat File Environment (.env)
 
 ### Buat File .env
 
-1. **Buka folder project**: `C:\websites\fiber-affiliate-nexus\`
+1. **Buka folder project**: `C:\websites\fiber-affiliate\`
 
 2. **Buat file baru** bernama `.env` (tanpa ekstensi):
    - Klik kanan di folder project
@@ -207,13 +181,6 @@
 
 4. **Save file .env**
 
-### Penjelasan Environment Variables
-
-- **VITE_API_BASE_URL**: URL dasar untuk komunikasi dengan backend API. Ubah sesuai lokasi server API Anda.
-- **VITE_APP_ENV**: Mode aplikasi (development/production). Gunakan "production" untuk deployment live.
-- **VITE_APP_TITLE**: Judul aplikasi yang akan ditampilkan di browser tab dan header.
-- **VITE_APP_VERSION**: Versi aplikasi untuk tracking dan debugging.
-
 **Catatan Penting**: 
 - Semua environment variable di Vite harus diawali dengan `VITE_`
 - Sesuaikan `VITE_API_BASE_URL` dengan lokasi API backend Anda
@@ -221,14 +188,14 @@
 
 ---
 
-## Step 7: Build Project untuk Production
+## Step 6: Build Project untuk Production
 
 ### Build Project
 
 1. **Buka Command Prompt**
 2. **Masuk ke folder project**:
    ```cmd
-   cd C:\websites\fiber-affiliate-nexus
+   cd C:\websites\fiber-affiliate
    ```
 
 3. **Jalankan perintah build**:
@@ -245,11 +212,11 @@
    ```cmd
    dir dist
    ```
-   Harusnya ada file `index.html`, `.htaccess`, dan folder `assets`
+   Harusnya ada file `index.html` dan folder `assets`
 
 ---
 
-## Step 8: Install dan Setup XAMPP
+## Step 7: Install dan Setup XAMPP
 
 ### Download dan Install XAMPP
 
@@ -275,42 +242,12 @@
    - Akan otomatis terbuka setelah instalasi
    - Atau bisa buka dari Start Menu: "XAMPP Control Panel"
 
-### Aktivasi mod_rewrite Apache
-
-**Penting**: Untuk mendukung routing React Router, mod_rewrite harus diaktifkan.
-
-1. **Buka file konfigurasi Apache**:
-   - File: `C:\xampp\apache\conf\httpd.conf`
-   - Buka dengan text editor (Notepad, VS Code)
-
-2. **Cari dan uncomment baris berikut**:
-   ```apache
-   # Cari baris ini (sekitar baris 150-160):
-   #LoadModule rewrite_module modules/mod_rewrite.so
-   
-   # Hilangkan tanda # di depannya menjadi:
-   LoadModule rewrite_module modules/mod_rewrite.so
-   ```
-
-3. **Cari dan ubah AllowOverride**:
-   ```apache
-   # Cari bagian <Directory> untuk htdocs (sekitar baris 220-230):
-   <Directory "C:/xampp/htdocs">
-       # Ubah dari:
-       AllowOverride None
-       # Menjadi:
-       AllowOverride All
-   </Directory>
-   ```
-
-4. **Save file** dan **restart Apache** di XAMPP Control Panel
-
 ### Start Apache di XAMPP
 
 1. **Di XAMPP Control Panel**:
    - Klik tombol **Start** di samping **Apache**
    - Status Apache harusnya berubah menjadi hijau dengan tulisan "Running"
-   - Jika m uncul Windows Firewall alert, klik **Allow access**
+   - Jika muncul Windows Firewall alert, klik **Allow access**
 
 2. **Test Apache berjalan**:
    - Buka browser
@@ -319,79 +256,28 @@
 
 ---
 
-## Step 9: Deploy Project ke XAMPP
-
-### Backup dan Clean Folder XAMPP
-
-1. **Backup folder XAMPP htdocs** (opsional tapi direkomendasikan):
-   ```cmd
-   xcopy "C:\xampp\htdocs" "C:\xampp\htdocs_backup" /E /I /H
-   ```
-   
-2. **Bersihkan folder htdocs**:
-   ```cmd
-   del /S /Q "C:\xampp\htdocs\*.*"
-   ```
+## Step 8: Deploy Project ke XAMPP
 
 ### Copy File Build ke XAMPP
 
-1. **Copy semua isi folder dist**:
-   ```cmd
-   xcopy "C:\websites\fiber-affiliate-nexus\dist\*" "C:\xampp\htdocs\" /E /H
-   ```
-   
-   **Atau dengan File Explorer**:
-   - Buka folder: `C:\websites\fiber-affiliate-nexus\dist\`
+1. **Buat folder untuk project di XAMPP**:
+   - Buka folder: `C:\xampp\htdocs\`
+   - Hapus semua isinya karena sudah tidak diperlukan
+
+2. **Copy semua isi folder dist**:
+   - Buka folder: `C:\websites\fiber-affiliate\dist\`
    - **Select All** (Ctrl+A) semua file dan folder di dalam `dist`
    - **Copy** (Ctrl+C)
    - Buka folder: `C:\xampp\htdocs\`
    - **Paste** (Ctrl+V) semua file
 
-2. **Verifikasi file sudah tercopy**:
+3. **Verifikasi file sudah tercopy**:
    - Di folder `C:\xampp\htdocs\` harusnya ada:
      - `index.html`
-     - `.htaccess` (penting untuk routing!)
      - Folder `assets` (berisi CSS, JS, dll)
      - File `favicon.ico`
 
-3. **Verifikasi Apache Config untuk .htaccess**:
-   - Restart Apache jika baru mengubah konfigurasi
-   - Pastikan tidak ada error di Apache logs: `C:\xampp\apache\logs\error.log`
-
----
-
-## Step 10: Auto-Start XAMPP Saat Windows Boot (Opsional)
-
-### Setup Auto-Start Apache
-
-1. **Buka Run dialog**: Tekan `Win + R`
-2. **Buka Task Scheduler**: Ketik `taskschd.msc` dan tekan Enter
-3. **Buat Task Baru**:
-   - Di menu **Action**, pilih **Create Basic Task**
-   - **Name**: "Start XAMPP Apache"
-   - **Description**: "Auto-start Apache on Windows login"
-   - Klik **Next**
-   - **Trigger**: Choose "When I log on"
-   - Klik **Next**
-   - **Action**: Start a Program
-   - **Program/script**: `C:\xampp\apache_start.bat`
-   - Klik **Next** dan **Finish**
-
-4. **Buat file batch `apache_start.bat`**:
-   - Buka Notepad
-   - Copy-paste code berikut:
-     ```batch
-     @echo off
-     echo Starting Apache...
-     "C:\xampp\apache\bin\httpd.exe"
-     ```
-   - Save di `C:\xampp\apache_start.bat`
-
-5. **Test**: Restart Windows dan cek `http://localhost`
-
----
-
-## Step 11: Menjalankan dan Mengakses Aplikasi
+## Step 9: Menjalankan dan Mengakses Aplikasi
 
 ### Akses Aplikasi
 
@@ -402,13 +288,7 @@
    http://localhost
    ```
 
-3. **Pastikan Routing Berfungsi**:
-   - Test akses langsung ke route: `http://localhost/login`
-   - Test akses langsung ke route: `http://localhost/admin`
-   - Test akses langsung ke route: `http://localhost/affiliator`
-   - Semua URL di atas harusnya berhasil dimuat tanpa error 404
-
-4. **Aplikasi harusnya terbuka** dan menampilkan halaman login/dashboard
+3. **Aplikasi harusnya terbuka** dan menampilkan halaman login/dashboard
 
 ### Test Fitur Aplikasi
 
@@ -419,13 +299,13 @@
 
 ---
 
-## Step 12: Update dan Maintenance
+## Step 10: Update dan Maintenance
 
 ### Update Project (Jika Ada Perubahan Code)
 
 1. **Pull perubahan terbaru dari GitHub**:
    ```cmd
-   cd C:\websites\fiber-affiliate-nexus
+   cd C:\websites\fiber-affiliate
    git pull origin main
    ```
 
@@ -440,14 +320,13 @@
    ```
 
 4. **Copy ulang ke XAMPP**:
-   - Backup existing files: `xcopy "C:\xampp\htdocs" "C:\xampp\htdocs_backup_DATE" /E /I /H`
-   - Delete current files: `del /S /Q "C:\xampp\htdocs\*.*"`
-   - Copy semua isi folder `dist` yang baru: `xcopy "C:\websites\fiber-affiliate-nexus\dist\*" "C:\xampp\htdocs\" /E /H`
+   - Hapus isi folder `C:\xampp\htdocs\`
+   - Copy semua isi folder `dist` yang baru ke folder tersebut
 
 ### Backup Project
 
 1. **Backup source code**:
-   - Copy folder `C:\websites\fiber-affiliate-nexus\` ke lokasi backup
+   - Copy folder `C:\websites\fiber-affiliate\` ke lokasi backup
 
 2. **Backup file production**:
    - Copy folder `C:\xampp\htdocs\` ke lokasi backup
@@ -508,34 +387,6 @@
 2. **Pastikan file index.html ada** di root folder XAMPP
 3. **Check path file assets** apakah benar
 4. **Coba akses langsung**: `http://localhost/index.html`
-
-### Routing Error (404 Not Found)
-
-**Problem**: URL langsung seperti `/admin` atau `/login` menampilkan error 404
-
-**Solution**:
-1. **Pastikan file .htaccess ada** di root folder `htdocs`
-2. **Verifikasi mod_rewrite aktif**:
-   - Cek `httpd.conf` sudah uncomment `LoadModule rewrite_module`
-   - Cek `AllowOverride All` sudah diset untuk directory htdocs
-3. **Restart Apache** di XAMPP Control Panel
-4. **Cek error log Apache**: `C:\xampp\apache\logs\error.log`
-
-### Error CORS saat API Call
-
-**Problem**: API call gagal dengan error CORS (Cross-Origin Resource Sharing)
-
-**Solution**:
-1. **Pastikan API mendukung CORS**
-2. **Tambahkan header CORS di .htaccess** jika API di server yang sama:
-   ```apache
-   # Tambahkan di .htaccess
-   <IfModule mod_headers.c>
-     Header set Access-Control-Allow-Origin "*"
-     Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-     Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-   </IfModule>
-   ```
 
 ---
 
